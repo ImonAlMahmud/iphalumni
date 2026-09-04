@@ -1,0 +1,287 @@
+/*
+ * IPH Alumni Association — App CSS
+ * Supplements Tailwind CDN with custom design tokens
+ */
+
+/* ── Google Fonts import (backup) ────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+@import url('https://fonts.maateen.me/kalpurush/font.css');
+
+/* ── Design Tokens ────────────────────────────────────────────────────── */
+:root {
+  --ink:         #101820;
+  --teal-deep:   #0F2A3D;
+  --teal-mid:    #153548;
+  --gold:        #800020; /* Royal Maroon */
+  --gold-soft:   #A22638; /* Soft Maroon */
+  --gold-light:  #C0394B; /* Light Maroon */
+  --gold-pale:   #E58E97; /* Pale Maroon */
+  --sage:        #2F8863;
+  --sage-light:  #4E9C81;
+  --ivory:       #12181F;
+  --ivory-dim:   #6B7178;
+  --paper:       #FAFAFA;
+  --glass:       rgba(255,255,255,0.72);
+  --glass-strong:rgba(255,255,255,0.88);
+  --glass-border:rgba(16,24,32,0.08);
+  --shadow:      0 10px 34px -14px rgba(16,24,32,0.14);
+  --radius:      18px;
+}
+
+/* ── Reset & Base ─────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Kalpurush', 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--gold-soft); outline-offset: 3px; border-radius: 6px; }
+img { max-width: 100%; height: auto; display: block; }
+
+/* ── Scrollbar ────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(16,24,32,0.15); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(16,24,32,0.3); }
+
+/* ── Glass morphism utilities ─────────────────────────────────────────── */
+.glass {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(14px) saturate(130%);
+  -webkit-backdrop-filter: blur(14px) saturate(130%);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.glass-strong {
+  background: var(--glass-strong);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 11px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn-gold {
+  background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+  color: #ffffff !important;
+  box-shadow: 0 6px 20px -6px rgba(128,0,32,0.4);
+}
+.btn-gold:hover { color: #ffffff !important; box-shadow: 0 10px 28px -8px rgba(128,0,32,0.6); }
+.btn-ghost {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  color: var(--ivory);
+}
+.btn-ghost:hover { background: var(--glass-strong); }
+
+/* ── Form inputs ─────────────────────────────────────────────────────── */
+.form-input {
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  color: var(--ivory);
+  background: rgba(255,255,255,0.9);
+  border: 1px solid rgba(16,24,32,0.15);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  font-family: inherit;
+}
+.form-input:focus {
+  outline: none;
+  border-color: rgba(184,134,58,0.5);
+  box-shadow: 0 0 0 3px rgba(184,134,58,0.12);
+}
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ivory);
+  margin-bottom: 6px;
+}
+
+/* ── Section spacing ─────────────────────────────────────────────────── */
+.section { padding: 64px 0; }
+
+/* ── Eyebrow / tag ───────────────────────────────────────────────────── */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  color: var(--sage);
+}
+
+/* ── Badge ────────────────────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  color: var(--sage);
+  background: rgba(47,136,99,0.1);
+  border: 1px solid rgba(47,136,99,0.25);
+  padding: 4px 10px;
+  border-radius: 100px;
+}
+.badge-gold {
+  color: var(--gold-soft);
+  background: rgba(184,134,58,0.1);
+  border-color: rgba(184,134,58,0.25);
+}
+
+/* ── Avatar ──────────────────────────────────────────────────────────── */
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 16px;
+  background: linear-gradient(135deg, var(--teal-mid), var(--sage));
+  color: #FAFAFA;
+  border: 1px solid var(--glass-border);
+  flex-shrink: 0;
+}
+
+/* ── Ring animation ──────────────────────────────────────────────────── */
+@keyframes ring-spin { to { transform: rotate(360deg); } }
+.ring-spin-slow {
+  animation: ring-spin 90s linear infinite;
+  transform-origin: center;
+}
+.ring-spin-slow-rev {
+  animation: ring-spin 130s linear infinite reverse;
+  transform-origin: center;
+}
+.ring-spin-fast {
+  animation: ring-spin 60s linear infinite;
+  transform-origin: center;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ring-spin-slow, .ring-spin-slow-rev, .ring-spin-fast { animation: none; }
+}
+
+/* ── Hover lift ──────────────────────────────────────────────────────── */
+.hover-lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.hover-lift:hover { transform: translateY(-3px); box-shadow: 0 12px 30px -10px rgba(16,24,32,0.16); }
+
+/* ── Pagination ──────────────────────────────────────────────────────── */
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 32px;
+}
+.page-btn {
+  min-width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 500;
+  transition: all 0.15s;
+  padding: 0 10px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  color: var(--ivory-dim);
+}
+.page-btn:hover, .page-btn.active {
+  background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+  color: #241a06;
+  border-color: transparent;
+}
+
+/* ── Tables ──────────────────────────────────────────────────────────── */
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th {
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--ivory-dim);
+  border-bottom: 1px solid var(--glass-border);
+  font-family: 'IBM Plex Mono', monospace;
+}
+.data-table td {
+  padding: 14px 16px;
+  font-size: 13.5px;
+  border-bottom: 1px solid var(--glass-border);
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: rgba(16,24,32,0.02); }
+
+/* ── Alert boxes ─────────────────────────────────────────────────────── */
+.alert {
+  padding: 14px 18px;
+  border-radius: 14px;
+  font-size: 13.5px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.alert-warning {
+  background: rgba(184,134,58,0.08);
+  border: 1px solid rgba(184,134,58,0.25);
+  color: #7a5a1e;
+}
+.alert-success {
+  background: rgba(47,136,99,0.08);
+  border: 1px solid rgba(47,136,99,0.25);
+  color: #1a5c40;
+}
+.alert-error {
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.25);
+  color: #7f1d1d;
+}
+
+/* ── Dropdown Select Option Styling Fix ───────────────────────────────── */
+select option {
+  background-color: #1a2332 !important;
+  color: #ffffff !important;
+}
+select option:hover {
+  background-color: var(--gold-soft) !important;
+  color: #241a06 !important;
+}
+
+/* ── Mobile Responsive Table Wrapper ──────────────────────────────────── */
+@media (max-width: 1024px) {
+  div:has(> table), 
+  div.rounded-2xl:has(table) {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  div:has(> table) table, 
+  div.rounded-2xl:has(table) table {
+    min-width: 800px !important;
+  }
+}
+
