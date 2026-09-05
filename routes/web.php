@@ -289,27 +289,19 @@ Route::prefix('/admin')->middleware('auth.admin')->name('admin.')->group(functio
 Route::match(['GET', 'POST'], '/webhook/deploy', [DeployController::class, 'handle'])->name('webhook.deploy');
 Route::post('/webhook/uddoktapay', [UddoktaPayController::class, 'webhook'])->name('webhook.uddoktapay');
 
-// Secure storage serving (only serve storage/app/public or public/storage)
 Route::get('/storage/{path}', function (string $path) {
     $allowedRoots = [
         realpath(storage_path('app/public')),
         realpath(public_path('storage')),
     ];
-
-    // normalize requested path
-    $candidate1 = storage_path('app/public/'.$path);
-    $candidate2 = public_path('storage/'.$path);
+    $candidate1 = storage_path('app/public/' . $path);
+    $candidate2 = public_path('storage/' . $path);
     $requested = realpath($candidate1) ?: realpath($candidate2);
-
-    if (! $requested) {
-        abort(404);
-    }
-
+    if (!$requested) abort(404);
     foreach ($allowedRoots as $root) {
         if ($root && str_starts_with($requested, $root)) {
             return response()->file($requested);
         }
     }
-
     abort(404);
 })->where('path', '.*')->name('storage.serve');
