@@ -7,14 +7,14 @@
 <div class="max-w-6xl mx-auto px-6 py-14">
   <!-- Header -->
   <div class="mb-10">
-    <span class="font-mono text-[11px] tracking-widest text-[#2F8863] block mb-2"><?= __('সফলতার গল্প', 'SUCCESS STORIES') ?></span>
-    <h1 class="font-serif text-[clamp(28px,4vw,40px)] font-semibold text-[#101820] mb-2"><?= __('আইপিএইচ অ্যালামনাইদের সাফল্য', 'IPH Alumni Achievements') ?></h1>
-    <p class="text-[14px] text-[#6B7178]"><?= __('বিশ্বজুড়ে ইতিবাচক পরিবর্তন আনা আমাদের গ্র্যাজুয়েটদের অনুপ্রেরণামূলক গল্পসমূহ।', 'Inspiring journeys of our graduates leading changes across the globe.') ?></p>
+    <span class="font-mono text-[11px] tracking-widest text-[#2F8863] block mb-2 uppercase"><?= __('ব্লগ ও আর্টিকেল', 'BLOGS & ARTICLES') ?></span>
+    <h1 class="font-serif text-[clamp(28px,4vw,40px)] font-semibold text-[#101820] mb-2"><?= __('Blogs & Articles', 'Blogs & Articles') ?></h1>
+    <p class="text-[14px] text-[#6B7178]"><?= __('আইপিএইচ অ্যালামনাইদের জ্ঞানগর্ভ লেখা, গবেষণামূলক প্রবন্ধ ও অনুপ্রেরণামূলক গল্পসমূহ।', 'Insights, research articles, and inspiring stories shared by our alumni community.') ?></p>
   </div>
 
   <?php if (empty($stories)): ?>
   <div class="py-20 text-center glass">
-    <p class="text-[#6B7178]"><?= __('এখনো কোনো সফলতার গল্প প্রকাশ করা হয়নি।', 'No success stories have been published yet.') ?></p>
+    <p class="text-[#6B7178]"><?= __('এখনো কোনো ব্লগ বা আর্টিকেল প্রকাশ করা হয়নি।', 'No blogs or articles have been published yet.') ?></p>
   </div>
   <?php else: ?>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -35,7 +35,7 @@
           <?= e($story['excerpt'] ?? mb_strimwidth(strip_tags($story['content']), 0, 120, '…')) ?>
         </p>
         <a href="<?= url('/stories/' . e($story['slug'])) ?>" class="mt-auto inline-flex items-center gap-1.5 text-[13.5px] font-semibold text-[#800020] hover:underline">
-          <?= __('গল্পটি পড়ুন →', 'Read Story →') ?>
+          <?= __('আর্টিকেলটি পড়ুন →', 'Read Article →') ?>
         </a>
       </div>
     </div>

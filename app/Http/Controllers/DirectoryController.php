@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\AlumniProfile;
+use App\Models\Setting;
 use App\Services\MailService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,30 +13,45 @@ class DirectoryController extends BaseController
 {
     public function index(Request $request)
     {
+        $settingModel      = new Setting();
+        $requireMembership = $settingModel->get('directory_require_membership', '0') === '1';
+
         $model   = new AlumniProfile();
         $filters = [
-            'q'             => trim((string)$request->input('q', '')),
-            'batch'         => trim((string)$request->input('batch', '')),
-            'university'    => trim((string)$request->input('university', '')),
-            'programme'     => trim((string)$request->input('programme', '')),
-            'phone'         => trim((string)$request->input('phone', '')),
-            'designation'   => trim((string)$request->input('designation', '')),
-            'organization'  => trim((string)$request->input('organization', '')),
-            'location'      => trim((string)$request->input('location', '')),
-            'country'       => trim((string)$request->input('country', '')),
-            'location_type' => trim((string)$request->input('location_type', '')),
+            'q'                  => trim((string)$request->input('q', '')),
+            'batch'              => trim((string)$request->input('batch', '')),
+            'university'         => trim((string)$request->input('university', '')),
+            'programme'          => trim((string)$request->input('programme', '')),
+            'phone'              => trim((string)$request->input('phone', '')),
+            'designation'        => trim((string)$request->input('designation', '')),
+            'organization'       => trim((string)$request->input('organization', '')),
+            'location'           => trim((string)$request->input('location', '')),
+            'country'            => trim((string)$request->input('country', '')),
+            'location_type'      => trim((string)$request->input('location_type', '')),
+            'is_featured'        => !empty($request->input('is_featured')) ? 1 : 0,
+            'require_membership' => $requireMembership,
         ];
         $page   = max(1, (int)$request->input('page', 1));
 
         $result = $model->search($filters, $page, 12);
 
-        $batches = DB::table('alumni_profiles')
-            ->whereNotNull('batch_year')
-            ->whereIn('status', ['approved', 'verified', 'active'])
-            ->whereNull('deleted_at')
+        $batchQuery = DB::table('alumni_profiles as ap')
+            ->whereNotNull('ap.batch_year')
+            ->whereIn('ap.status', ['approved', 'verified', 'active'])
+            ->whereNull('ap.deleted_at');
+
+        if ($requireMembership) {
+            $batchQuery->join('memberships as m', function ($join) {
+                $join->on('m.alumni_profile_id', '=', 'ap.id')
+                     ->where('m.status', '=', 'active')
+                     ->whereNull('m.deleted_at');
+            });
+        }
+
+        $batches = $batchQuery
             ->distinct()
-            ->orderBy('batch_year', 'desc')
-            ->pluck('batch_year')
+            ->orderBy('ap.batch_year', 'desc')
+            ->pluck('ap.batch_year')
             ->toArray();
 
         return $this->legacyView('directory/index', compact('result', 'batches', 'filters'), 'main', 'Alumni Directory');
@@ -57,6 +73,26 @@ class DirectoryController extends BaseController
         }
 
         $alumni = (array)$alumni;
+
+        $settingModel      = new Setting();
+        $requireMembership = $settingModel->get('directory_require_membership', '0') === '1';
+
+        if ($requireMembership) {
+            $hasActiveMembership = DB::table('memberships')
+                ->where('alumni_profile_id', $id)
+                ->where('status', 'active')
+                ->whereNull('deleted_at')
+                ->exists();
+
+            $currentUser = auth();
+            $isOwner = $currentUser && (int)($currentUser['id'] ?? 0) === (int)$alumni['user_id'];
+            $isAdmin = is_admin();
+
+            if (!$hasActiveMembership && !$isOwner && !$isAdmin) {
+                abort(404, 'Profile not found');
+            }
+        }
+
         $model      = new AlumniProfile();
         $education  = $model->getEducation($id);
         $employment = $model->getEmployment($id);

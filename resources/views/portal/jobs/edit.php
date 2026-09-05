@@ -16,6 +16,7 @@
 <!-- Form Card -->
 <div class="p-8 rounded-2xl w-full" style="background:rgba(255,255,255,0.9);border:1px solid rgba(16,24,32,0.08);box-shadow:0 4px 20px -6px rgba(16,24,32,0.08);">
   <form method="POST" action="<?= url('/portal/jobs/' . $job['id'] . '/update') ?>" class="space-y-6">
+    <?= csrf_field() ?>
     <input type="hidden" name="job_id" value="<?= $job['id'] ?>">
 
     <!-- Job Title & Company -->

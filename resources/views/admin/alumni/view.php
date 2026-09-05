@@ -10,6 +10,9 @@
   </a>
 
   <div class="flex items-center gap-2">
+    <a href="<?= url('/admin/alumni/' . $alumni['id'] . '/card-svg/zip') ?>" class="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[12px] border border-amber-500/30 font-semibold flex items-center gap-1.5 transition-colors" title="Download Print Card in SVG format (Both Sides)">
+      <i class="fa-solid fa-id-card"></i> Download Card (SVG)
+    </a>
     <?php if (!empty($alumni['phone'])): ?>
     <a href="tel:<?= e($alumni['phone']) ?>" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-white text-[12px] border border-white/10 font-semibold flex items-center gap-1.5 transition-colors">
       📞 Call Member
@@ -105,12 +108,6 @@
         <div>
           <div class="text-white/40 font-mono text-[11px]">COUNTRY</div>
           <div class="font-medium text-white"><?= e($alumni['country']) ?></div>
-        </div>
-        <?php endif; ?>
-        <?php if (!empty($alumni['hall_hostel'])): ?>
-        <div>
-          <div class="text-white/40 font-mono text-[11px]">HALL / HOSTEL</div>
-          <div class="font-medium text-white"><?= e($alumni['hall_hostel']) ?></div>
         </div>
         <?php endif; ?>
         <div>

@@ -29,6 +29,7 @@ use App\Http\Controllers\Admin\StoriesController as AdminStories;
 use App\Http\Controllers\Admin\ReportController as AdminReport;
 use App\Http\Controllers\Admin\SettingsController as AdminSettings;
 use App\Http\Controllers\Admin\EmailTemplatesController;
+use App\Http\Controllers\Payment\UddoktaPayController;
 
 // ── Public Routes ─────────────────────────────────────────────────────────────
 
@@ -73,7 +74,9 @@ Route::post('/gallery/{id}/upload', [GalleryController::class, 'upload'])->middl
 // Job Circulars (Public)
 Route::get('/jobs', [JobController::class, 'index'])->name('jobs');
 Route::get('/jobs/{id}', [JobController::class, 'show'])->name('jobs.show');
-Route::post('/jobs/apply', [JobController::class, 'apply'])->middleware('auth.alumni')->name('jobs.apply');
+Route::post('/jobs/apply', [JobController::class, 'apply'])->name('jobs.apply');
+Route::post('/jobs/subscribe', [JobController::class, 'subscribe'])->name('jobs.subscribe');
+Route::get('/jobs/unsubscribe/{token}', [JobController::class, 'unsubscribe'])->name('jobs.unsubscribe');
 
 // Donation
 Route::get('/donate', [DonationController::class, 'index'])->name('donate');
@@ -132,6 +135,9 @@ Route::prefix('/portal')->middleware('auth.alumni')->name('portal.')->group(func
     Route::get('/membership', [PortalMembership::class, 'index'])->name('membership');
     Route::post('/membership/apply', [PortalMembership::class, 'apply'])->name('membership.apply');
     Route::get('/membership/qr', [PortalMembership::class, 'qrId'])->name('membership.qr');
+    Route::post('/membership/payment/uddoktapay', [UddoktaPayController::class, 'initiate'])->name('membership.payment.uddoktapay');
+    Route::get('/membership/payment/uddoktapay/success', [UddoktaPayController::class, 'success'])->name('membership.payment.uddoktapay.success');
+    Route::get('/membership/payment/uddoktapay/cancel', [UddoktaPayController::class, 'cancel'])->name('membership.payment.uddoktapay.cancel');
 
     // Portal Stories
     Route::get('/stories', [StoryController::class, 'index'])->name('stories');
@@ -139,6 +145,7 @@ Route::prefix('/portal')->middleware('auth.alumni')->name('portal.')->group(func
     Route::post('/stories', [StoryController::class, 'store'])->name('stories.store');
     Route::get('/stories/{id}/edit', [StoryController::class, 'edit'])->name('stories.edit');
     Route::post('/stories/{id}/update', [StoryController::class, 'update'])->name('stories.update');
+    Route::post('/stories/{id}/delete', [StoryController::class, 'delete'])->name('stories.delete');
 
     // Portal Jobs
     Route::get('/jobs', [PortalJobController::class, 'index'])->name('jobs');
@@ -187,6 +194,8 @@ Route::prefix('/admin')->middleware('auth.admin')->name('admin.')->group(functio
     Route::get('/alumni', [AdminAlumni::class, 'index'])->name('alumni');
     Route::get('/alumni/export/excel', [AdminAlumni::class, 'exportExcel'])->name('alumni.export_excel');
     Route::get('/alumni/export/pdf', [AdminAlumni::class, 'exportPdf'])->name('alumni.export_pdf');
+    Route::get('/alumni/export/cards-svg', [AdminAlumni::class, 'exportCardsSvg'])->name('alumni.export_cards_svg');
+    Route::get('/alumni/{id}/card-svg/{side}', [AdminAlumni::class, 'downloadSingleCardSvg'])->name('alumni.card_svg');
     Route::get('/alumni/mapping', [AdminAlumni::class, 'mapping'])->name('alumni.mapping');
     Route::post('/alumni/map-student', [AdminAlumni::class, 'mapStudent'])->name('alumni.map_student');
     Route::get('/alumni/contact-requests', [AdminAlumni::class, 'contactRequests'])->name('alumni.contact_requests');
@@ -194,6 +203,7 @@ Route::prefix('/admin')->middleware('auth.admin')->name('admin.')->group(functio
     Route::post('/alumni/{id}/approve', [AdminAlumni::class, 'approve'])->name('alumni.approve');
     Route::post('/alumni/{id}/reject', [AdminAlumni::class, 'reject'])->name('alumni.reject');
     Route::post('/alumni/{id}/status', [AdminAlumni::class, 'updateStatus'])->name('alumni.status');
+    Route::post('/alumni/{id}/toggle-featured', [AdminAlumni::class, 'toggleFeatured'])->name('alumni.toggle_featured');
 
     // Membership
     Route::get('/membership', [AdminMembership::class, 'index'])->name('membership');
@@ -262,13 +272,17 @@ Route::prefix('/admin')->middleware('auth.admin')->name('admin.')->group(functio
     Route::get('/settings', [AdminSettings::class, 'index'])->name('settings');
     Route::post('/settings', [AdminSettings::class, 'update'])->name('settings.update');
     Route::post('/settings/logo', [AdminSettings::class, 'uploadLogo'])->name('settings.logo');
+    Route::post('/settings/uddoktapay/test', [AdminSettings::class, 'testUddoktaPay'])->name('settings.uddoktapay.test');
+    Route::post('/settings/smtp/test', [AdminSettings::class, 'testSmtp'])->name('settings.smtp.test');
 
     // Email templates
     Route::get('/email-templates', [EmailTemplatesController::class, 'index'])->name('email_templates');
+    Route::post('/email-templates/send-test', [EmailTemplatesController::class, 'sendTest'])->name('email_templates.send_test');
 });
 
 // ── Automated Webhook Deployment Route ───────────────────────────────────────
 Route::match(['GET', 'POST'], '/webhook/deploy', [\App\Http\Controllers\Webhook\DeployController::class, 'handle'])->name('webhook.deploy');
+Route::post('/webhook/uddoktapay', [UddoktaPayController::class, 'webhook'])->name('webhook.uddoktapay');
 
 // ── Public Storage Serving Route (Fallback for cPanel / Shared Hosting) ─────
 Route::get('/storage/{path}', function (string $path) {

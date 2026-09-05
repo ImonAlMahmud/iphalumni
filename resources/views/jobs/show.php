@@ -3,6 +3,12 @@
  * Single Job Details & Application Form View
  * Variables: $job, $isLoggedIn, $isVerifiedStudent, $studentInfo, $hasApplied, $user
  */
+$user              = $user ?? (auth() ?? []);
+$isLoggedIn        = $isLoggedIn ?? (!empty($user));
+$hasApplied        = $hasApplied ?? false;
+$isVerifiedStudent = $isVerifiedStudent ?? false;
+$studentInfo       = $studentInfo ?? null;
+$captchaQuestion   = $captchaQuestion ?? '3 + 4';
 ?>
 <div class="max-w-4xl mx-auto px-6 py-14">
 
@@ -62,15 +68,20 @@
         </a>
         <?php endif; ?>
 
-        <div class="p-4 rounded-2xl flex items-center gap-3"
-             style="background:rgba(16,24,32,0.04);border:1px solid rgba(16,24,32,0.07);">
-          <div class="w-10 h-10 rounded-full flex items-center justify-center font-serif font-semibold text-[14px] text-white"
-               style="background:linear-gradient(135deg,#800020,#2F8863);">
-            <?= initials($job['poster_name'] ?? 'A') ?>
-          </div>
+        <div class="p-3.5 rounded-2xl flex items-center gap-3 bg-white/80 border border-slate-200/80 shadow-sm">
+          <?php if (!empty($job['poster_avatar'])): ?>
+            <img src="<?= asset('storage/avatars/' . e($job['poster_avatar'])) ?>"
+                 alt="<?= e($job['poster_name'] ?? 'Alumni') ?>"
+                 class="w-10 h-10 rounded-full object-cover border border-[#800020]/20 shadow-sm shrink-0">
+          <?php else: ?>
+            <div class="w-10 h-10 rounded-full flex items-center justify-center font-serif font-semibold text-[14px] text-white shrink-0 shadow-sm"
+                 style="background:linear-gradient(135deg,#800020,#2F8863);">
+              <?= initials($job['poster_name'] ?? 'A') ?>
+            </div>
+          <?php endif; ?>
           <div>
-            <div class="text-[10px] font-mono text-[#9CA3AF] uppercase"><?= __('সার্কুলারদাতা অ্যালামনাই', 'Posted By Alumni') ?></div>
-            <div class="text-[13px] font-semibold text-[#101820]"><?= e($job['poster_name'] ?? 'Alumni') ?></div>
+            <div class="text-[10px] font-mono text-[#9CA3AF] uppercase font-semibold"><?= __('সার্কুলারদাতা অ্যালামনাই', 'Posted By Alumni') ?></div>
+            <div class="text-[13.5px] font-bold text-[#101820]"><?= e($job['poster_name'] ?? 'Alumni') ?></div>
           </div>
         </div>
       </div>
@@ -188,12 +199,12 @@
 
     <?php else: ?>
       <!-- 📌 Default IPH Portal Form Application -->
-      <?php if (!$isLoggedIn): ?>
-        <!-- Guest Notice -->
+      <?php if (!$isLoggedIn && ($job['visibility'] ?? 'members') === 'members'): ?>
+        <!-- Guest Notice (Only for Members-Only Jobs) -->
         <div class="p-5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-[14px]">
-          <p class="font-semibold mb-1">🔒 <?= __('আবেদন করতে লগইন প্রয়োজন', 'Login required to apply') ?></p>
+          <p class="font-semibold mb-1">🔒 <?= __('মেম্বার-অনলি পদে আবেদন করতে লগইন প্রয়োজন', 'Login required for member-only jobs') ?></p>
           <p class="text-[13px] text-amber-800 mb-4">
-            <?= __('এই পদে আবেদন করতে এবং আপনার সিভি পাঠাতে আইপিএইচ পোর্টাল অ্যাকাউন্টে লগইন করুন।', 'Please log in to your IPH portal account to submit your application.') ?>
+            <?= __('এই পদে শুধুমাত্র রেজিস্টার্ড ও ভেরিফাইড আইপিএইচ অ্যালামনাই সদস্যরা আবেদন করতে পারেন। আবেদন করতে অনুগ্রহ করে আপনার অ্যাকাউন্টে লগইন করুন।', 'Only registered & verified IPH alumni members can apply for this member-only job. Please log in to proceed.') ?>
           </p>
           <a href="<?= url('/login') ?>" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-white text-[13.5px]" style="background:#800020;">
             <i class="fa-solid fa-right-to-bracket text-[12px]"></i>
@@ -222,8 +233,8 @@
                 🌐 <?= __('পাবলিক জব ভেরিফিকেশন নির্দেশিকা (Student Reference Verification)', 'Public Job Verification Guidelines') ?>
               </div>
               <p class="text-[#6B7178] leading-relaxed mb-2">
-                <?= __('এই পাবলিক জবে শুধুমাত্র <strong>Student Reference Database</strong> এর রানিং/সাবেক ছাত্র-ছাত্রীরা আবেদন করতে পারবেন। সিস্টেমে আপনার অ্যাকাউন্ট অটো-ম্যাচ না হয়ে থাকলে, ভর্তি ফর্ম অনুযায়ী আপনার <strong>সঠিক নামের বানান (Name)</strong> এবং <strong>নিজের মোবাইল / অভিভাবকের মোবাইল (Mobile / Guardian Mobile)</strong> প্রদান করুন। তথ্য দুটি মিললেই আপনার আবেদন সফলভাবে গৃহীত হবে।',
-                      'Only verified students in the Student Reference Database can apply to public jobs. Enter your Name (as spelled during admission) and Mobile / Guardian Mobile number to verify.') ?>
+                <?= __('এই পাবলিক জবে আইপিএইচ এর সাবেক/রানিং ছাত্র-ছাত্রীরা সরাসরি আবেদন করতে পারবেন (লগইন করা বাধ্যতামূলক নয়)। ভর্তি ফর্ম অনুযায়ী আপনার <strong>সঠিক নামের বানান (Name)</strong> এবং <strong>নিজের মোবাইল / অভিভাবকের মোবাইল (Mobile / Guardian Mobile)</strong> প্রদান করুন। ডাটাবেজের তথ্যের সাথে মিললেই আপনার আবেদন সফলভাবে গৃহীত হবে।',
+                      'Students/graduates can apply directly to this public job without login. Enter your Name and Mobile/Guardian Mobile number as given during admission.') ?>
               </p>
             </div>
           </div>
@@ -232,6 +243,7 @@
 
         <!-- Application Form -->
         <form method="POST" action="<?= url('/jobs/apply') ?>" enctype="multipart/form-data" class="space-y-4">
+          <?= csrf_field() ?>
           <input type="hidden" name="job_id" value="<?= $job['id'] ?>">
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -239,13 +251,14 @@
               <label class="block text-[12.5px] font-medium text-[#101820] mb-1.5">
                 <?= __('আবেদনকারীর নাম (IPH ভর্তি ফর্মের সঠিক বানান)', 'Applicant Name (Proper Admission Spelling)') ?> <span class="text-red-500">*</span>
               </label>
-              <input type="text" name="applicant_name" value="<?= e($user['name']) ?>" required
+              <input type="text" name="applicant_name" value="<?= e($user['name'] ?? '') ?>" required
                      placeholder="e.g. Mahmudur Rahman Imon"
                      class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-[13.5px] focus:outline-none focus:border-[#800020]">
             </div>
             <div>
               <label class="block text-[12.5px] font-medium text-[#101820] mb-1.5"><?= __('ইমেইল অ্যাড্রেস', 'Email Address') ?> <span class="text-red-500">*</span></label>
-              <input type="email" name="applicant_email" value="<?= e($user['email']) ?>" required
+              <input type="email" name="applicant_email" value="<?= e($user['email'] ?? '') ?>" required
+                     placeholder="e.g. example@domain.com"
                      class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-[13.5px] bg-gray-50 focus:bg-white focus:outline-none focus:border-[#800020]">
             </div>
           </div>
@@ -269,9 +282,32 @@
 
           <div>
             <label class="block text-[12.5px] font-medium text-[#101820] mb-1.5"><?= __('কভার লেটার / সংক্ষিপ্ত বার্তা', 'Cover Letter / Short Message') ?></label>
-            <textarea name="cover_letter" rows="4" placeholder="<?= __('ক্যানডিডেট হিসেবে আপনার অভিজ্ঞতা ও আবেদনের উদ্দেশ্য সংক্ষেপে লিখুন...', 'Briefly explain your suitability and motivation...') ?>"
+            <textarea name="cover_letter" rows="3" placeholder="<?= __('ক্যানডিডেট হিসেবে আপনার অভিজ্ঞতা ও আবেদনের উদ্দেশ্য সংক্ষেপে লিখুন...', 'Briefly explain your suitability and motivation...') ?>"
                       class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-[13.5px] focus:outline-none focus:border-[#800020]"></textarea>
           </div>
+
+          <?php if (!$isLoggedIn): ?>
+          <!-- Math Captcha for Guest Applicants -->
+          <div class="p-4 rounded-2xl border border-amber-200/80 bg-amber-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-[#800020]/10 text-[#800020] flex items-center justify-center text-[16px] shrink-0">
+                🧮
+              </div>
+              <div>
+                <label for="captcha_answer" class="block text-[13px] font-bold text-[#101820]">
+                  <?= __('হিউম্যান ভেরিফিকেশন (Math Captcha)', 'Human Security Verification') ?> <span class="text-red-500">*</span>
+                </label>
+                <div class="text-[12px] text-[#6B7178] mt-0.5">
+                  <?= __('যোগফলটি লিখুন:', 'Calculate:') ?> <strong class="font-mono text-[#800020] text-[14px] bg-white px-2 py-0.5 rounded-lg border border-gray-200 ml-1"><?= e($captchaQuestion) ?> = ?</strong>
+                </div>
+              </div>
+            </div>
+            <div class="w-full sm:w-32">
+              <input type="number" name="captcha_answer" id="captcha_answer" required placeholder="উত্তর দিন"
+                     class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-[14px] font-bold text-center focus:outline-none focus:border-[#800020] bg-white">
+            </div>
+          </div>
+          <?php endif; ?>
 
           <button type="submit" class="w-full py-3.5 rounded-2xl font-semibold text-white text-[14.5px] transition-all hover:shadow-xl"
                   style="background:linear-gradient(135deg,#A22638,#800020);">
@@ -281,6 +317,30 @@
         </form>
       <?php endif; ?>
     <?php endif; ?>
+  </div>
+
+  <!-- Job Alert Mini Subscription Card -->
+  <div class="mt-8 p-6 rounded-3xl border border-gray-200/80 bg-white/90 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 rounded-2xl bg-rose-50 text-[#800020] border border-rose-100 flex items-center justify-center text-xl shrink-0">
+        <i class="fa-solid fa-bell"></i>
+      </div>
+      <div>
+        <h4 class="font-serif font-bold text-[16px] text-[#101820]"><?= __('অনুরূপ চাকরির বিজ্ঞপ্তি ইমেইলে পেতে চান?', 'Looking for similar opportunities?') ?></h4>
+        <p class="text-[13px] text-[#6B7178]"><?= __('আইপিএইচ সার্কুলার এলার্ট সাবস্ক্রাইব করুন এবং নতুন সার্কুলার পোস্ট হলেই সরাসরি নোটিফিকেশন পান।', 'Subscribe to job alerts and receive fresh openings directly.') ?></p>
+      </div>
+    </div>
+    <form method="POST" action="<?= url('/jobs/subscribe') ?>" class="flex items-center gap-2 w-full md:w-auto">
+      <?= csrf_field() ?>
+      <input type="email" name="email" required
+             value="<?= e(auth_user()['email'] ?? '') ?>"
+             placeholder="<?= __('আপনার ইমেইল...', 'Your email...') ?>"
+             class="px-4 py-2 rounded-xl border border-gray-300 text-[13px] text-[#101820] focus:outline-none focus:border-[#800020] bg-white w-full sm:w-64">
+      <button type="submit"
+              class="px-5 py-2 rounded-xl text-[13px] font-semibold text-white bg-[#800020] hover:bg-[#A22638] transition-all shadow shrink-0">
+        <?= __('এলার্ট পান', 'Get Alerts') ?>
+      </button>
+    </form>
   </div>
 
 </div>

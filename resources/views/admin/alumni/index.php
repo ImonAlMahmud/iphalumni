@@ -33,6 +33,12 @@
       <i class="fa-solid fa-file-pdf"></i> Export PDF / Print
     </a>
 
+    <a href="<?= url('/admin/alumni/export/cards-svg?q=' . urlencode($search) . '&status=' . urlencode($status)) ?>"
+       class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-semibold text-amber-300 bg-amber-950/60 border border-amber-800/80 hover:bg-amber-900 transition-colors"
+       title="সকল মেম্বার কার্ড ফোল্ডারভিত্তিক SVG প্রিন্ট ফরম্যাটে ডাউনলোড করুন">
+      <i class="fa-solid fa-id-card"></i> Export Cards (SVG ZIP)
+    </a>
+
     <div class="text-[12.5px] font-mono text-white/50 border-l border-white/10 pl-3">
       <?= number_format($pagination['total']) ?> records
     </div>
@@ -44,14 +50,14 @@
   <table class="w-full text-[13px]">
     <thead>
       <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
-        <?php foreach (['Name', 'Email', 'Batch', 'Status', 'Registered', 'Actions'] as $h): ?>
+        <?php foreach (['Name', 'Email', 'Batch', 'Status', 'Featured', 'Registered', 'Actions'] as $h): ?>
         <th class="text-left px-5 py-3.5 font-medium font-mono text-[11px] tracking-wider" style="color:rgba(255,255,255,0.35);"><?= $h ?></th>
         <?php endforeach; ?>
       </tr>
     </thead>
     <tbody class="divide-y" style="border-color:rgba(255,255,255,0.05);">
       <?php if (empty($alumni)): ?>
-      <tr><td colspan="6" class="px-5 py-8 text-center" style="color:rgba(255,255,255,0.35);">No alumni found.</td></tr>
+      <tr><td colspan="7" class="px-5 py-8 text-center" style="color:rgba(255,255,255,0.35);">No alumni found.</td></tr>
       <?php else: ?>
       <?php foreach ($alumni as $a):
         $statusColors = [
@@ -78,14 +84,28 @@
             <?= strtoupper(str_replace('_',' ', $a['status'])) ?>
           </span>
         </td>
+        <td class="px-5 py-3.5">
+          <form method="POST" action="<?= url('/admin/alumni/' . $a['id'] . '/toggle-featured') ?>" class="inline">
+            <?= csrf_field() ?>
+            <button type="submit" class="px-2.5 py-1 rounded text-[11px] font-semibold uppercase transition-all shadow-sm <?= !empty($a['is_featured']) ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30' : 'bg-white/5 text-white/40 border border-white/10 hover:bg-white/10 hover:text-white' ?>" title="হোমপেজে Featured হিসেবে দেখাতে ক্লিক করুন">
+              <?= !empty($a['is_featured']) ? '★ Featured' : '☆ Feature' ?>
+            </button>
+          </form>
+        </td>
         <td class="px-5 py-3.5 font-mono text-[11.5px]" style="color:rgba(255,255,255,0.4);">
           <?= date('d M Y', strtotime($a['registered_at'])) ?>
         </td>
         <td class="px-5 py-3.5">
-          <a href="<?= url('/admin/alumni/' . $a['id']) ?>" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-colors"
-             style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);">
-            View →
-          </a>
+          <div class="flex items-center gap-2">
+            <a href="<?= url('/admin/alumni/' . $a['id']) ?>" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-colors"
+               style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);">
+              View →
+            </a>
+            <a href="<?= url('/admin/alumni/' . $a['id'] . '/card-svg/zip') ?>" class="p-1.5 rounded-lg text-amber-400 hover:text-amber-300 hover:bg-white/5 transition-colors border border-transparent hover:border-amber-500/30"
+               title="Download Member ID Card (SVG ZIP)">
+              <i class="fa-solid fa-id-card text-[12.5px]"></i>
+            </a>
+          </div>
         </td>
       </tr>
       <?php endforeach; ?>

@@ -47,7 +47,7 @@ $navGroups = [
         ['/admin/membership', 'Memberships', 'fa-solid fa-id-card-clip'],
     ],
     'CONTENT' => [
-        ['/admin/stories', 'Success Stories', 'fa-solid fa-book-open-reader'],
+        ['/admin/stories', 'Blogs & Articles', 'fa-solid fa-book-open-reader'],
         ['/admin/news', 'News & Articles', 'fa-solid fa-newspaper'],
         ['/admin/events', 'Events', 'fa-solid fa-calendar-days'],
         ['/admin/gallery', 'Gallery Albums', 'fa-solid fa-images'],
@@ -219,6 +219,10 @@ $navGroups = [
         <h2 class="font-serif text-[18px] font-semibold text-white truncate"><?= isset($pageTitle) ? e($pageTitle) : 'Admin Panel' ?></h2>
       </div>
       <div class="flex items-center gap-3 text-[13px]" style="color:rgba(255,255,255,0.45);">
+        <button type="button" onclick="toggleGoogleTranslate()" class="notranslate text-[12px] font-semibold text-white/80 hover:text-white bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-lg border border-white/10 flex items-center gap-1.5 transition-all cursor-pointer" translate="no">
+          <i class="fa-solid fa-language text-[#E58E97]"></i>
+          <span class="gt-lang-label notranslate" translate="no">English</span>
+        </button>
         <span class="font-mono text-[11px] hidden sm:inline"><?= date('D, d M Y') ?></span>
         <span class="font-semibold truncate max-w-[120px] sm:max-w-none" style="color:#E58E97;"><?= e($user['name'] ?? '') ?></span>
       </div>
@@ -226,6 +230,9 @@ $navGroups = [
     <main class="flex-1 p-4 sm:p-6 lg:p-8"><?= $content ?? '' ?></main>
   </div>
 </div>
+
+<!-- Google Translate Partial (Top bar hidden, clean toggle) -->
+<?php require view_path('partials/google_translate.php'); ?>
 
 <script>
 setTimeout(() => {

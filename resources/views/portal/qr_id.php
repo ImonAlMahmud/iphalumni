@@ -62,7 +62,7 @@ $qrServerUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" 
           <span class="text-white/80 font-medium"><?= e($membership['membership_number']) ?></span>
         </div>
         <div>
-          <span class="text-white/30 text-[10px] block">GRADUATING BATCH</span>
+          <span class="text-white/30 text-[10px] block">BATCH</span>
           <span class="text-white/80 font-medium"><?= $profile['batch_year'] ? 'Batch ' . e($profile['batch_year']) : '—' ?></span>
         </div>
       </div>

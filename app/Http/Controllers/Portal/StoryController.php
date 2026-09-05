@@ -105,13 +105,9 @@ class StoryController extends BaseController
             ->first();
 
         if (!$story) {
-            return redirect('/portal/stories')->with('error', 'ব্লগটি খুঁজে পাওয়া যায়নি।');
+            return redirect('/portal/stories')->with('error', 'ব্লগটি খুঁজে পাওয়া যায়নি অথবা আপনার এই ব্লগটি এডিট করার অনুমতি নেই।');
         }
         $story = (array)$story;
-
-        if ($story['status'] === 'published') {
-            return redirect('/portal/stories')->with('error', 'এডমিন অনুমোদিত ব্লগ পোস্ট আর এডিট করা যাবে না।');
-        }
 
         return $this->legacyView('portal/stories/edit', compact('story'), 'portal', 'Edit Blog Post');
     }
@@ -129,13 +125,9 @@ class StoryController extends BaseController
             ->first();
 
         if (!$story) {
-            return redirect('/portal/stories')->with('error', 'ব্লগটি খুঁজে পাওয়া যায়নি।');
+            return redirect('/portal/stories')->with('error', 'ব্লগটি খুঁজে পাওয়া যায়নি অথবা আপনার এই ব্লগটি সংশোধন করার অনুমতি নেই।');
         }
         $story = (array)$story;
-
-        if ($story['status'] === 'published') {
-            return redirect('/portal/stories')->with('error', 'এডমিন অনুমোদিত ব্লগ পোস্ট আর এডিট করা যাবে না।');
-        }
 
         $title      = trim((string)$request->input('title', ''));
         $batch_year = trim((string)($request->input('batch_year') ?: $story['batch_year']));
@@ -163,5 +155,29 @@ class StoryController extends BaseController
         ]);
 
         return redirect('/portal/stories')->with('success', 'ব্লগ পোস্টের সংশোধন সফলভাবে সংরক্ষিত হয়েছে!');
+    }
+
+    public function delete(Request $request, $id)
+    {
+        $id      = (int)$id;
+        $user    = Auth::user();
+        $profile = (new AlumniProfile())->getByUserId((int)$user->id);
+
+        $story = DB::table('success_stories')
+            ->where('id', $id)
+            ->where('profile_id', $profile['id'] ?? 0)
+            ->whereNull('deleted_at')
+            ->first();
+
+        if (!$story) {
+            return redirect('/portal/stories')->with('error', 'ব্লগটি খুঁজে পাওয়া যায়নি অথবা আপনার এই ব্লগটি মুছে ফেলার অনুমতি নেই।');
+        }
+
+        DB::table('success_stories')->where('id', $id)->update([
+            'deleted_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect('/portal/stories')->with('success', 'আপনার ব্লগ পোস্টটি সফলভাবে মুছে ফেলা হয়েছে।');
     }
 }

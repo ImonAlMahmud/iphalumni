@@ -32,7 +32,7 @@ $primaryNavLinks = [
 $exploreSubmenu = [
     ['/jobs',        __('জব সার্কুলার', 'Jobs'),    'fa-solid fa-briefcase'],
     ['/mentorship',  __('মেনটরশিপ কানেক্ট', 'Mentorship'), 'fa-solid fa-user-graduate'],
-    ['/stories',     __('সফলতার গল্প',  'Stories'), 'fa-solid fa-trophy'],
+    ['/stories',     __('ব্লগ ও আর্টিকেল', 'Blogs & Articles'), 'fa-solid fa-newspaper'],
     ['/events',      __('ইভেন্ট',        'Events'),   'fa-solid fa-calendar-days'],
     ['/news',        __('সংবাদ',         'News'),     'fa-solid fa-newspaper'],
     ['/gallery',     __('গ্যালারি',      'Gallery'),  'fa-solid fa-images'],
@@ -47,7 +47,7 @@ foreach ($exploreSubmenu as [$subHref]) {
     }
 }
 ?>
-<header class="sticky top-0 z-50 px-4 pt-3 pb-2">
+<header id="main-header" class="sticky top-0 z-50 px-4 pt-3 pb-2 transition-all duration-700">
   <div class="max-w-7xl mx-auto">
     <div class="flex items-center justify-between gap-4 px-5 py-2.5"
          style="background:rgba(255,255,255,0.9);border:1px solid rgba(16,24,32,0.07);backdrop-filter:blur(22px) saturate(160%);border-radius:18px;box-shadow:0 8px 32px -12px rgba(16,24,32,0.12),0 1px 0 rgba(255,255,255,0.8) inset;">
@@ -60,9 +60,9 @@ foreach ($exploreSubmenu as [$subHref]) {
           <div class="font-semibold text-[#101820] text-[14.5px] leading-tight tracking-tight">
             <?= e(__('আইপিএইচ অ্যালামনাই অ্যাসোসিয়েশন', $appName)) ?>
           </div>
-          <div class="font-mono text-[10px] text-[#800020] tracking-widest">IPH ALUMNI</div>
+          <div class="font-mono text-[10px] text-[#800020] tracking-wide font-medium">IPH Alumni Association</div>
         </div>
-        <div class="sm:hidden font-serif text-[17px] font-bold text-[#800020]">IPH</div>
+        <div class="sm:hidden font-serif text-[17px] font-bold text-[#800020] tracking-tight">IPHAA</div>
       </a>
 
       <!-- ── Desktop Nav ── -->
@@ -132,15 +132,26 @@ foreach ($exploreSubmenu as [$subHref]) {
       <!-- ── Right Actions ── -->
       <div class="flex items-center gap-2">
 
-        <!-- Language toggle -->
-        <a href="?lang=<?= $toggleLocale ?>"
-           class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[12.5px] font-medium text-[#6B7178] hover:text-[#101820] transition-all hover:bg-[#101820]/5"
-           style="border:1px solid rgba(16,24,32,0.08);">
-          <i class="fa-solid fa-language text-[13px]"></i>
-          <?= $toggleLabel ?>
-        </a>
+        <!-- Google Translate language toggle (Desktop) -->
+        <button type="button" onclick="toggleGoogleTranslate()"
+           class="notranslate hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[12.5px] font-medium text-[#6B7178] hover:text-[#101820] transition-all hover:bg-[#101820]/5 cursor-pointer"
+           translate="no"
+           style="border:1px solid rgba(16,24,32,0.08);"
+           title="Translate Page">
+          <i class="fa-solid fa-language text-[13px] text-[#800020]"></i>
+          <span class="gt-lang-label notranslate" translate="no">English</span>
+        </button>
 
         <?php if (is_logged_in()): ?>
+          <?php 
+            $currentUser = auth();
+            $userAvatar = !empty($currentUser['avatar']) ? $currentUser['avatar'] : null;
+            if (!$userAvatar && !empty($currentUser['id'])) {
+                $userAvatar = \Illuminate\Support\Facades\DB::table('alumni_profiles')
+                    ->where('user_id', $currentUser['id'])
+                    ->value('avatar');
+            }
+          ?>
           <?php if (is_admin()): ?>
           <a href="<?= url('/admin') ?>"
              class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-[13px] font-medium text-[#6B7178] hover:text-[#101820] transition-all"
@@ -151,12 +162,19 @@ foreach ($exploreSubmenu as [$subHref]) {
           <?php endif; ?>
 
           <a href="<?= url('/portal') ?>"
-             class="hidden sm:inline-flex items-center gap-2 px-4 py-1.5 rounded-xl text-[13px] font-semibold text-[#101820] transition-all hover:-translate-y-px hover:shadow-md"
+             class="hidden sm:inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-[13px] font-semibold text-[#101820] transition-all hover:-translate-y-px hover:shadow-md"
              style="background:rgba(255,255,255,0.8);border:1px solid rgba(16,24,32,0.1);">
-            <span class="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-bold shrink-0"
-                  style="background:linear-gradient(135deg,#800020,#2F8863);">
-              <?= initials(auth()['name']) ?>
-            </span>
+            <?php if (!empty($userAvatar)): ?>
+              <img src="<?= avatar_url($userAvatar) ?>" 
+                   alt="<?= e($currentUser['name'] ?? 'Avatar') ?>" 
+                   class="w-6 h-6 rounded-full object-cover border border-slate-200 shadow-sm shrink-0"
+                   onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\'w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-bold shrink-0\' style=\'background:linear-gradient(135deg,#800020,#2F8863);\'>' + '<?= initials($currentUser['name'] ?? 'U') ?>' + '</span>';">
+            <?php else: ?>
+              <span class="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-bold shrink-0"
+                    style="background:linear-gradient(135deg,#800020,#2F8863);">
+                <?= initials($currentUser['name'] ?? 'U') ?>
+              </span>
+            <?php endif; ?>
             <i class="fa-solid fa-table-columns text-[11px] opacity-70"></i>
             <?= __('পোর্টাল', 'Portal') ?>
           </a>
@@ -252,12 +270,13 @@ foreach ($exploreSubmenu as [$subHref]) {
       </nav>
 
       <div class="border-t border-gray-100 mt-3 pt-3 flex flex-col gap-1.5">
-        <!-- Language -->
-        <a href="?lang=<?= $toggleLocale ?>"
-           class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[14px] text-[#800020] hover:bg-red-50 transition-colors font-medium">
+        <!-- Mobile Language toggle via Google Translate -->
+        <button type="button" onclick="toggleGoogleTranslate()"
+           class="notranslate flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[14px] text-[#800020] hover:bg-red-50 transition-colors font-medium cursor-pointer text-left w-full"
+           translate="no">
           <i class="fa-solid fa-language w-4 text-center text-[#800020]"></i>
-          <?= $toggleLabel ?>
-        </a>
+          <span class="gt-lang-label notranslate" translate="no">English</span>
+        </button>
 
         <?php if (!is_logged_in()): ?>
         <a href="<?= url('/login') ?>"
@@ -274,7 +293,11 @@ foreach ($exploreSubmenu as [$subHref]) {
         <?php else: ?>
         <a href="<?= url('/portal') ?>"
            class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[14px] text-[#4A5568] hover:bg-gray-50 transition-colors">
-          <i class="fa-solid fa-table-columns w-4 text-center text-[#9CA3AF]"></i>
+          <?php if (!empty($userAvatar)): ?>
+            <img src="<?= avatar_url($userAvatar) ?>" alt="Avatar" class="w-5 h-5 rounded-full object-cover shrink-0 border border-slate-200">
+          <?php else: ?>
+            <i class="fa-solid fa-table-columns w-4 text-center text-[#9CA3AF]"></i>
+          <?php endif; ?>
           <?= __('আমার পোর্টাল', 'My Portal') ?>
         </a>
         <a href="<?= url('/logout') ?>"

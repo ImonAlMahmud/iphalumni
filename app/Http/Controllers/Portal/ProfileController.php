@@ -47,118 +47,148 @@ class ProfileController extends BaseController
         $locationType = $request->input('location_type', 'bangladesh');
         $countryName  = trim((string)$request->input('country', ''));
 
-        DB::table('alumni_profiles')->where('id', (int)$profile['id'])->update([
-            'phone'            => trim((string)$request->input('phone', '')),
-            'nid_number'       => trim((string)$request->input('nid_number', '')),
-            'dob'              => $request->input('dob') ?: null,
-            'gender'           => $request->input('gender') ?: null,
-            'blood_group'      => $request->input('blood_group') ?: null,
-            'batch_year'       => $request->input('batch_year') ?: null,
-            'bio'              => trim((string)$request->input('bio', '')),
-            'location_type'    => $locationType,
-            'current_location' => trim((string)$request->input('current_location', '')),
-            'thana_upazila'    => trim((string)$request->input('thana_upazila', '')),
-            'country'          => $countryName,
-            'province_city'    => trim((string)$request->input('province_city', '')),
-            'activity_type'    => $request->input('activity_type', 'work'),
-            'website'          => trim((string)$request->input('website', '')),
-            'linkedin_url'     => trim((string)$request->input('linkedin_url', '')),
-            'facebook_url'     => trim((string)$request->input('facebook_url', '')),
-            'hall_hostel'      => trim((string)$request->input('hall_hostel', '')),
-            'session_years'    => trim((string)$request->input('session_years', '')),
-            'specialization'   => trim((string)$request->input('specialization', '')),
-            'skills'           => trim((string)$request->input('skills', '')),
-            'experience_years' => trim((string)$request->input('experience_years', '')),
-            'willing_to_mentor'=> (int)$request->input('willing_to_mentor', 0),
-            'job_referral'     => (int)$request->input('job_referral', 0),
-            'contribution_areas' => trim((string)$request->input('contribution_areas', '')),
-            'google_scholar_url' => trim((string)$request->input('google_scholar_url', '')),
-            'researchgate_url' => trim((string)$request->input('researchgate_url', '')),
-            'permanent_district' => trim((string)$request->input('permanent_district', '')),
-            'permanent_upazila'  => trim((string)$request->input('permanent_upazila', '')),
-            'emergency_contact_name'  => trim((string)$request->input('emergency_contact_name', '')),
-            'emergency_contact_phone' => trim((string)$request->input('emergency_contact_phone', '')),
-            'publications'        => trim((string)$request->input('publications', '')),
-            'awards_recognition'  => trim((string)$request->input('awards_recognition', '')),
-            'association_roles'   => trim((string)$request->input('association_roles', '')),
-            'updated_at'          => now(),
-        ]);
-
-        // Update name in users table
-        if ($request->input('name')) {
-            DB::table('users')->where('id', $user->id)->update(['name' => trim((string)$request->input('name')), 'updated_at' => now()]);
-        }
-
-        // Save / Update Education (Study Info)
-        $university = trim((string)$request->input('university', ''));
-        $programme  = trim((string)$request->input('programme', ''));
-        $subject    = trim((string)$request->input('subject', ''));
-
-        if (!empty($university)) {
-            $targetCountry = ($locationType === 'abroad' && !empty($countryName)) ? $countryName : 'Bangladesh';
-            $checkUniv = DB::table('universities')->whereRaw('LOWER(country) = LOWER(?)', [$targetCountry])->whereRaw('LOWER(name) = LOWER(?)', [$university])->count();
-            if ($checkUniv === 0) {
-                DB::table('universities')->insert([
-                    'country'    => $targetCountry,
-                    'name'       => $university,
-                    'created_by' => $user->id,
-                    'created_at' => now(),
-                ]);
+        $newEmail = strtolower(trim((string)$request->input('email', '')));
+        if (!empty($newEmail) && $newEmail !== strtolower((string)$user->email)) {
+            if (!filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
+                return redirect('/portal/profile')->with('error', 'অনুগ্রহ করে একটি সঠিক ইমেইল ঠিকানা প্রদান করুন।');
+            }
+            $existing = DB::table('users')->where('email', $newEmail)->where('id', '!=', $user->id)->first();
+            if ($existing) {
+                return redirect('/portal/profile')->with('error', 'এই ইমেইল ঠিকানাটি ইতোমধ্যে অন্য একজন সদস্যের অ্যাকাউন্টে ব্যবহৃত হচ্ছে। অনুগ্রহ করে ভিন্ন ইমেইল ব্যবহার করুন।');
             }
         }
 
-        if (!empty($university) || !empty($programme) || !empty($subject)) {
-            $eduId = DB::table('alumni_education')->where('alumni_profile_id', $profile['id'])->where('is_primary', 1)->value('id');
+        $dobInput   = trim((string)$request->input('dob', ''));
+        $dob        = (!empty($dobInput) && strtotime($dobInput)) ? date('Y-m-d', strtotime($dobInput)) : null;
+        $gender     = trim((string)$request->input('gender', '')) ?: null;
+        $bloodGroup = trim((string)$request->input('blood_group', '')) ?: null;
+        $batchYear  = trim((string)$request->input('batch_year', '')) ?: null;
 
-            if ($eduId) {
-                DB::table('alumni_education')->where('id', $eduId)->update([
-                    'degree'         => $programme,
-                    'institution'    => $university,
-                    'field_of_study' => $subject,
-                    'updated_at'     => now(),
-                ]);
-            } else {
-                DB::table('alumni_education')->insert([
-                    'alumni_profile_id' => $profile['id'],
-                    'degree'            => $programme,
-                    'institution'       => $university,
-                    'field_of_study'    => $subject,
-                    'is_primary'        => 1,
-                    'created_at'        => now(),
-                    'updated_at'        => now(),
-                ]);
+        try {
+            DB::table('alumni_profiles')->where('id', (int)$profile['id'])->update([
+                'phone'            => trim((string)$request->input('phone', '')),
+                'nid_number'       => trim((string)$request->input('nid_number', '')),
+                'dob'              => $dob,
+                'gender'           => $gender,
+                'blood_group'      => $bloodGroup,
+                'batch_year'       => $batchYear,
+                'bio'              => trim((string)$request->input('bio', '')),
+                'location_type'    => $locationType,
+                'current_location' => trim((string)$request->input('current_location', '')),
+                'thana_upazila'    => trim((string)$request->input('thana_upazila', '')),
+                'country'          => $countryName,
+                'province_city'    => trim((string)$request->input('province_city', '')),
+                'activity_type'    => $request->input('activity_type', 'work'),
+                'website'          => trim((string)$request->input('website', '')),
+                'linkedin_url'     => trim((string)$request->input('linkedin_url', '')),
+                'facebook_url'     => trim((string)$request->input('facebook_url', '')),
+                'session_years'    => trim((string)$request->input('session_years', '')),
+                'specialization'   => trim((string)$request->input('specialization', '')),
+                'skills'           => trim((string)$request->input('skills', '')),
+                'experience_years' => trim((string)$request->input('experience_years', '')),
+                'willing_to_mentor'=> (int)$request->input('willing_to_mentor', 0),
+                'job_referral'     => (int)$request->input('job_referral', 0),
+                'contribution_areas' => trim((string)$request->input('contribution_areas', '')),
+                'google_scholar_url' => trim((string)$request->input('google_scholar_url', '')),
+                'researchgate_url' => trim((string)$request->input('researchgate_url', '')),
+                'permanent_location' => trim((string)$request->input('permanent_location', '')),
+                'permanent_district' => trim((string)$request->input('permanent_district', '')),
+                'permanent_upazila'  => trim((string)$request->input('permanent_upazila', '')),
+                'emergency_contact_name'  => trim((string)$request->input('emergency_contact_name', '')),
+                'emergency_contact_phone' => trim((string)$request->input('emergency_contact_phone', '')),
+                'publications'        => trim((string)$request->input('publications', '')),
+                'awards_recognition'  => trim((string)$request->input('awards_recognition', '')),
+                'association_roles'   => trim((string)$request->input('association_roles', '')),
+                'updated_at'          => now(),
+            ]);
+
+            // Update name and email in users table
+            $userUpdates = [];
+            if ($request->filled('name')) {
+                $userUpdates['name'] = trim((string)$request->input('name'));
             }
-        }
-
-        // Save / Update Employment (Work Info)
-        $designation  = trim((string)$request->input('designation', ''));
-        $organization = trim((string)$request->input('organization', ''));
-        $department   = trim((string)$request->input('department', ''));
-
-        if (!empty($designation) || !empty($organization) || !empty($department)) {
-            $empId = DB::table('alumni_employment')->where('alumni_profile_id', $profile['id'])->where('is_current', 1)->value('id');
-
-            if ($empId) {
-                DB::table('alumni_employment')->where('id', $empId)->update([
-                    'job_title'    => $designation,
-                    'organization' => $organization,
-                    'department'   => $department,
-                    'updated_at'   => now(),
-                ]);
-            } else {
-                DB::table('alumni_employment')->insert([
-                    'alumni_profile_id' => $profile['id'],
-                    'job_title'         => $designation,
-                    'organization'      => $organization,
-                    'department'        => $department,
-                    'is_current'        => 1,
-                    'created_at'        => now(),
-                    'updated_at'        => now(),
-                ]);
+            if (!empty($newEmail) && $newEmail !== strtolower((string)$user->email)) {
+                $userUpdates['email'] = $newEmail;
             }
-        }
+            if (!empty($userUpdates)) {
+                $userUpdates['updated_at'] = now();
+                DB::table('users')->where('id', $user->id)->update($userUpdates);
+            }
 
-        return redirect('/portal/profile')->with('success', 'প্রোফাইল সফলভাবে আপডেট করা হয়েছে।');
+            // Save / Update Education (Study Info)
+            $university = trim((string)$request->input('university', ''));
+            $programme  = trim((string)$request->input('programme', ''));
+            $subject    = trim((string)$request->input('subject', ''));
+
+            if (!empty($university)) {
+                $targetCountry = ($locationType === 'abroad' && !empty($countryName)) ? $countryName : 'Bangladesh';
+                $checkUniv = DB::table('universities')->whereRaw('LOWER(country) = LOWER(?)', [$targetCountry])->whereRaw('LOWER(name) = LOWER(?)', [$university])->count();
+                if ($checkUniv === 0) {
+                    DB::table('universities')->insert([
+                        'country'    => $targetCountry,
+                        'name'       => $university,
+                        'created_by' => $user->id,
+                        'created_at' => now(),
+                    ]);
+                }
+            }
+
+            if (!empty($university) || !empty($programme) || !empty($subject)) {
+                $eduId = DB::table('alumni_education')->where('alumni_profile_id', $profile['id'])->where('is_primary', 1)->value('id');
+
+                if ($eduId) {
+                    DB::table('alumni_education')->where('id', $eduId)->update([
+                        'degree'         => $programme,
+                        'institution'    => $university,
+                        'field_of_study' => $subject,
+                        'updated_at'     => now(),
+                    ]);
+                } else {
+                    DB::table('alumni_education')->insert([
+                        'alumni_profile_id' => $profile['id'],
+                        'degree'            => $programme,
+                        'institution'       => $university,
+                        'field_of_study'    => $subject,
+                        'is_primary'        => 1,
+                        'created_at'        => now(),
+                        'updated_at'        => now(),
+                    ]);
+                }
+            }
+
+            // Save / Update Employment (Work Info)
+            $designation  = trim((string)$request->input('designation', ''));
+            $organization = trim((string)$request->input('organization', ''));
+            $department   = trim((string)$request->input('department', ''));
+
+            if (!empty($designation) || !empty($organization) || !empty($department)) {
+                $empId = DB::table('alumni_employment')->where('alumni_profile_id', $profile['id'])->where('is_current', 1)->value('id');
+
+                if ($empId) {
+                    DB::table('alumni_employment')->where('id', $empId)->update([
+                        'job_title'    => $designation,
+                        'organization' => $organization,
+                        'department'   => $department,
+                        'updated_at'   => now(),
+                    ]);
+                } else {
+                    DB::table('alumni_employment')->insert([
+                        'alumni_profile_id' => $profile['id'],
+                        'job_title'         => $designation,
+                        'organization'      => $organization,
+                        'department'        => $department,
+                        'is_current'        => 1,
+                        'created_at'        => now(),
+                        'updated_at'        => now(),
+                    ]);
+                }
+            }
+
+            return redirect('/portal/profile')->with('success', 'প্রোফাইল সফলভাবে আপডেট করা হয়েছে।');
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Profile update failed: ' . $e->getMessage(), ['exception' => $e]);
+            return redirect('/portal/profile')->with('error', 'প্রোফাইল সংরক্ষণ করার সময় একটি সমস্যা হয়েছে: ' . $e->getMessage());
+        }
     }
 
     public function uploadAvatar(Request $request)
@@ -347,7 +377,7 @@ class ProfileController extends BaseController
             ->map(fn($r) => (array)$r)
             ->toArray();
 
-        return $this->legacyView('portal/contact_requests', compact('requests'), 'portal', 'Contact Requests');
+        return $this->legacyView('portal/contact_requests', compact('requests', 'user', 'profile'), 'portal', 'Contact Requests');
     }
 
     public function acceptContactRequest(Request $request, $id)

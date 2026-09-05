@@ -7,7 +7,7 @@
 <div class="max-w-4xl mx-auto px-6 py-14 font-['Kalpurush']">
   <div class="mb-6">
     <a href="<?= url('/stories') ?>" class="text-[13px] text-[#6B7178] hover:text-[#101820] inline-flex items-center gap-1 font-sans">
-      ← Back to Stories
+      ← <?= __('সকল আর্টিকেলে ফিরে যান', 'Back to Blogs & Articles') ?>
     </a>
   </div>
 

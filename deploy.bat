@@ -1,107 +1,66 @@
 @echo off
 cd /d "%~dp0"
 
-set DEPLOY_BRANCH=main
 set DEPLOY_SECRET=iph_alumni_secret_key_deploy_2026
 set DEPLOY_DOMAIN=iphalumni.dev.cv
-set DEPLOY_URL=https://iphalumni.dev.cv/deploy.php
+set DEPLOY_URL=https://%DEPLOY_DOMAIN%/deploy.php
 
 :: CLI Quick Actions
+if "%~1"=="--direct" goto :DO_DIRECT_SYNC
+if "%~1"=="--full" goto :DO_FULL_SYNC
 if "%~1"=="--webhook-only" goto :TRIGGER_WEBHOOK_DIRECT
 if "%~1"=="--clear-cache" goto :DO_CLEAR_CACHE
-if not "%~1"=="" (
-    set COMMIT_MSG=%~1
-    goto :EXECUTE_AUTO_DEPLOY
-)
 
-title IPH Alumni - Auto Deploy & Sync System 2>nul
+title IPH Alumni - Local to Server Auto Deploy 2>nul
 color 0B 2>nul
 
 :MAIN_MENU
 cls
 echo ===============================================================================
-echo                IPH ALUMNI ASSOCIATION - AUTO DEPLOY SYSTEM                     
+echo            IPH ALUMNI - DIRECT LOCAL TO SERVER AUTO DEPLOY                     
+echo                       (NO GITHUB REQUIRED)                                     
 echo ===============================================================================
-echo   Live Server URL   : https://%DEPLOY_DOMAIN%
-echo   Deployment Branch : %DEPLOY_BRANCH%
-echo   Webhook Endpoint  : %DEPLOY_URL%
+echo   Live Server URL  : https://%DEPLOY_DOMAIN%
+echo   Deploy Endpoint  : %DEPLOY_URL%
 echo ===============================================================================
 echo.
-echo   [1] Full Auto-Deploy (Custom Commit Message + Git Push + Live Webhook)
-echo   [2] Quick Auto-Deploy (Auto-Timestamp Commit + Git Push + Live Webhook)
-echo   [3] Trigger Live Webhook Only (Re-run Migrations & Cache on Server)
+echo   [1] Direct Auto-Deploy (Sync App, Config, Database, Views to Server)
+echo   [2] Full Auto-Deploy (Sync Everything including Vendor Folder)
+echo   [3] Trigger Server Cache Clear & Migrations (No file upload)
 echo   [4] Clear Local Laravel Cache (php artisan optimize:clear)
-echo   [5] Check Local Git Status & Remote URL
-echo   [6] Exit
+echo   [5] Exit
 echo.
 echo ===============================================================================
 set CHOICE=
-set /p CHOICE="Select an option [1-6] and press Enter: "
+set /p CHOICE="Select an option [1-5] and press Enter: "
 
-if "%CHOICE%"=="1" goto :CUSTOM_COMMIT
-if "%CHOICE%"=="2" goto :QUICK_COMMIT
+if "%CHOICE%"=="1" goto :DO_DIRECT_SYNC
+if "%CHOICE%"=="2" goto :DO_FULL_SYNC
 if "%CHOICE%"=="3" goto :TRIGGER_WEBHOOK_MENU
 if "%CHOICE%"=="4" goto :DO_CLEAR_CACHE_MENU
-if "%CHOICE%"=="5" goto :DO_GIT_STATUS
-if "%CHOICE%"=="6" goto :DO_EXIT
+if "%CHOICE%"=="5" goto :DO_EXIT
 
 echo [!] Invalid option.
 timeout /t 2 >nul
 goto :MAIN_MENU
 
-:CUSTOM_COMMIT
+:DO_DIRECT_SYNC
 cls
-echo ===============================================================================
-echo                     STEP 1: CUSTOM COMMIT MESSAGE                              
-echo ===============================================================================
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\local_direct_deploy.ps1" -Url "%DEPLOY_URL%" -Secret "%DEPLOY_SECRET%"
 echo.
-set COMMIT_MSG=
-set /p COMMIT_MSG="Enter your commit message (or press Enter for default): "
-if "%COMMIT_MSG%"=="" set COMMIT_MSG=Auto deploy update on %DATE% at %TIME%
-goto :EXECUTE_AUTO_DEPLOY
+pause
+goto :MAIN_MENU
 
-:QUICK_COMMIT
-set COMMIT_MSG=Quick deploy update on %DATE% at %TIME%
-goto :EXECUTE_AUTO_DEPLOY
-
-:EXECUTE_AUTO_DEPLOY
+:DO_FULL_SYNC
 cls
-echo ===============================================================================
-echo                       STEP 1: LOCAL GIT SYNC & PUSH                            
-echo ===============================================================================
+echo [INFO] Packaging including Vendor folder may take a minute...
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\local_direct_deploy.ps1" -Url "%DEPLOY_URL%" -Secret "%DEPLOY_SECRET%" -IncludeVendor
 echo.
-
-if not exist ".git" (
-    echo [INFO] Git repository not initialized. Initializing now...
-    git init -b %DEPLOY_BRANCH%
-    echo.
-    set /p REPO_URL="Enter your remote Git URL (e.g. https://github.com/user/repo.git): "
-    if not "%REPO_URL%"=="" git remote add origin %REPO_URL%
-)
-
-echo [1/3] Staging changes...
-git add -A
-
-echo.
-echo [2/3] Committing changes...
-git commit -m "%COMMIT_MSG%"
-
-echo.
-echo [3/3] Pushing to remote branch (%DEPLOY_BRANCH%)...
-git push origin %DEPLOY_BRANCH%
-if %errorlevel% neq 0 (
-    echo [WARNING] Default push failed. Trying with upstream set:
-    git push -u origin %DEPLOY_BRANCH%
-)
-
-echo.
-echo ===============================================================================
-echo                    STEP 2: TRIGGERING LIVE WEBHOOK DEPLOY                      
-echo ===============================================================================
-echo.
+pause
+goto :MAIN_MENU
 
 :TRIGGER_WEBHOOK_DIRECT
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\deploy_webhook.ps1" -Url "%DEPLOY_URL%" -Secret "%DEPLOY_SECRET%" -Branch "%DEPLOY_BRANCH%"
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\deploy_webhook.ps1" -Url "%DEPLOY_URL%" -Secret "%DEPLOY_SECRET%" -Branch "main"
 if not "%~1"=="" goto :DO_EXIT
 pause
 goto :MAIN_MENU
@@ -109,10 +68,10 @@ goto :MAIN_MENU
 :TRIGGER_WEBHOOK_MENU
 cls
 echo ===============================================================================
-echo                    TRIGGERING LIVE WEBHOOK DEPLOYMENT                          
+echo                    TRIGGERING SERVER CACHE & MIGRATIONS                        
 echo ===============================================================================
 echo.
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\deploy_webhook.ps1" -Url "%DEPLOY_URL%" -Secret "%DEPLOY_SECRET%" -Branch "%DEPLOY_BRANCH%"
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\deploy_webhook.ps1" -Url "%DEPLOY_URL%" -Secret "%DEPLOY_SECRET%" -Branch "main"
 echo.
 pause
 goto :MAIN_MENU
@@ -130,43 +89,6 @@ echo.
 php artisan optimize:clear
 echo.
 pause
-goto :MAIN_MENU
-
-:DO_GIT_STATUS
-cls
-echo ===============================================================================
-echo                        GIT STATUS & CONFIGURATION                              
-echo ===============================================================================
-echo.
-if exist ".git" (
-    echo [Git Status]
-    git status -s
-    echo.
-    echo [Remote URLs]
-    git remote -v
-    echo.
-    echo [Current Branch]
-    git branch --show-current
-) else (
-    echo [INFO] Git repository is not initialized.
-)
-echo.
-echo Options:
-echo   [1] Set/Change Git Remote Origin URL
-echo   [2] Back to Main Menu
-echo.
-set GIT_OPT=
-set /p GIT_OPT="Select an option [1-2]: "
-if "%GIT_OPT%"=="1" (
-    echo.
-    set /p NEW_REMOTE="Enter Git Remote URL (e.g. https://github.com/user/repo.git): "
-    if not "%NEW_REMOTE%"=="" (
-        git remote remove origin 2>nul
-        git remote add origin %NEW_REMOTE%
-        echo Remote origin updated to: %NEW_REMOTE%
-    )
-    pause
-)
 goto :MAIN_MENU
 
 :DO_EXIT

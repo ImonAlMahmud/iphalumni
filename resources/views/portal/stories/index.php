@@ -61,22 +61,25 @@
         <p class="text-[13px] text-[#6B7178] line-clamp-3 mb-4"><?= e($s['excerpt'] ?: mb_substr(strip_tags($s['content']), 0, 140)) ?></p>
       </div>
 
-      <div class="pt-4 border-t border-gray-100 flex items-center justify-between text-[12px] text-gray-400">
+      <div class="pt-4 border-t border-gray-100 flex items-center justify-between text-[12px] text-gray-400 flex-wrap gap-2">
         <span><?= date('d M, Y', strtotime($s['created_at'])) ?></span>
-        <div class="flex items-center gap-3">
-          <?php if ($s['status'] !== 'published'): ?>
-          <a href="<?= url('/portal/stories/' . $s['id'] . '/edit') ?>" class="text-[#800020] bg-[#800020]/10 px-3 py-1 rounded-lg font-semibold hover:bg-[#800020] hover:text-white transition-all flex items-center gap-1">
-            ✏️ <?= __('সম্পাদনা', 'Edit') ?>
+        <div class="flex items-center gap-2">
+          <?php if ($s['status'] === 'published'): ?>
+          <a href="<?= url('/stories/' . e($s['slug'])) ?>" target="_blank" class="text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg font-semibold transition-all flex items-center gap-1 border border-emerald-200">
+            👁 <?= __('পাবলিক পেজ', 'View Live') ?> ↗
           </a>
           <?php endif; ?>
 
-          <?php if ($s['status'] === 'published'): ?>
-          <a href="<?= url('/stories/' . e($s['slug'])) ?>" target="_blank" class="text-[#800020] font-semibold hover:underline flex items-center gap-1">
-            <?= __('পাবলিক পেজে দেখুন', 'View Live') ?> ↗
+          <a href="<?= url('/portal/stories/' . $s['id'] . '/edit') ?>" class="text-[#800020] bg-[#800020]/10 hover:bg-[#800020] hover:text-white px-3 py-1.5 rounded-lg font-semibold transition-all flex items-center gap-1">
+            ✏️ <?= __('সম্পাদনা', 'Edit') ?>
           </a>
-          <?php else: ?>
-          <span class="text-amber-700 font-medium"><?= __('এডমিন অনুমোদনের অপেক্ষায়', 'Awaiting Approval') ?></span>
-          <?php endif; ?>
+
+          <form method="POST" action="<?= url('/portal/stories/' . $s['id'] . '/delete') ?>" class="inline" onsubmit="return confirm('<?= __('আপনি কি নিশ্চিত যে এই ব্লগ পোস্টটি মুছে ফেলতে চান?', 'Are you sure you want to delete this blog post?') ?>')">
+            <?= csrf_field() ?>
+            <button type="submit" class="text-rose-600 bg-rose-50 hover:bg-rose-600 hover:text-white px-3 py-1.5 rounded-lg font-semibold transition-all flex items-center gap-1 border border-rose-200">
+              🗑️ <?= __('ডিলিট', 'Delete') ?>
+            </button>
+          </form>
         </div>
       </div>
     </div>

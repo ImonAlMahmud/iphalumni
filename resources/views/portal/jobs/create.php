@@ -15,6 +15,7 @@
 <!-- Form Card -->
 <div class="p-8 rounded-2xl w-full" style="background:rgba(255,255,255,0.9);border:1px solid rgba(16,24,32,0.08);box-shadow:0 4px 20px -6px rgba(16,24,32,0.08);">
   <form method="POST" action="<?= url('/portal/jobs') ?>" class="space-y-6">
+    <?= csrf_field() ?>
 
     <!-- Job Title & Company -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">

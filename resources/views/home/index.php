@@ -19,266 +19,413 @@ $headlineLine1En = $diffYears . ' Years of Student Legacy (' . $startYear . '–
 .hover-lift:hover { transform: translateY(-4px); box-shadow: 0 16px 40px -12px rgba(16,24,32,0.15); }
 @keyframes laser-flow { to { stroke-dashoffset: -40; } }
 .laser-anim { animation: laser-flow 2s linear infinite; }
-
-/* ── Hero entrance animations ── */
-@keyframes heroFadeUp   { from{opacity:0;transform:translateY(28px);} to{opacity:1;transform:translateY(0);} }
-@keyframes heroFadeLeft { from{opacity:0;transform:translateX(36px);} to{opacity:1;transform:translateX(0);} }
-@keyframes heroBadge    { from{opacity:0;transform:scale(0.82);}      to{opacity:1;transform:scale(1);} }
-@keyframes floatCard    { 0%,100%{transform:translateY(0) rotate(0deg);} 50%{transform:translateY(-10px) rotate(1deg);} }
-@keyframes floatCardAlt { 0%,100%{transform:translateY(0) rotate(0deg);} 50%{transform:translateY(-7px) rotate(-1deg);} }
-@keyframes blink        { 0%,100%{opacity:1;} 50%{opacity:0;} }
-@keyframes scanline     { 0%{top:-4px;} 100%{top:100%;} }
-@keyframes shimmer      { from{background-position:-200% 0;} to{background-position:200% 0;} }
-@keyframes scrollBounce { 0%,100%{transform:translateY(0);} 50%{transform:translateY(4px);} }
-
-.hero-badge  { animation: heroBadge    0.55s cubic-bezier(.34,1.56,.64,1) 0.1s  both; }
-.hero-h1     { animation: heroFadeUp   0.7s ease 0.3s  both; }
-.hero-sub    { animation: heroFadeUp   0.7s ease 0.45s both; }
-.hero-btns   { animation: heroFadeUp   0.7s ease 0.6s  both; }
-.hero-stats  { animation: heroFadeUp   0.7s ease 0.75s both; }
-.hero-img    { animation: heroFadeLeft 0.8s ease 0.5s  both; }
-
-.float-card-1 { animation: floatCard    4.5s ease-in-out         infinite; }
-.float-card-2 { animation: floatCardAlt 5.5s ease-in-out 0.8s   infinite; }
-.float-card-3 { animation: floatCard    5s   ease-in-out 1.5s   infinite; }
-
-.tw-cursor::after { content:'|'; animation: blink 0.9s step-end infinite; color:#A22638; margin-left:1px; }
-
-/* 3D tilt */
-.tilt-frame { transform-style: preserve-3d; transition: transform 0.08s ease; will-change: transform; }
-.tilt-shine {
-  position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:20;
-  background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.13) 0%, transparent 58%);
-  opacity:0; transition: opacity 0.3s;
-}
-.tilt-frame:hover .tilt-shine { opacity:1; }
-
-/* Shimmer CTA */
+@keyframes shimmer { from{background-position:-200% 0;} to{background-position:200% 0;} }
 .shimmer-btn {
   background-size:250% 100%;
   background-image: linear-gradient(120deg, #A22638 0%, #800020 35%, #C0394B 50%, #800020 65%, #A22638 100%);
   animation: shimmer 2.8s linear infinite;
 }
 
-.scroll-dot  { animation: scrollBounce 1.4s ease-in-out infinite; }
+/* ── Typewriter Headline Styles ── */
+@keyframes heroCursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.hero-type-cursor {
+  animation: heroCursorBlink 0.75s step-start infinite;
+  display: inline-block;
+  line-height: 1;
+}
+.hero-type-cursor.cursor-soft {
+  animation: heroCursorBlink 1.4s ease-in-out infinite;
+  opacity: 0.6;
+}
+
+/* ── Home Video Hero & Intro Animation Controller ── */
+#main-header {
+  opacity: 0 !important;
+  transform: translateY(-100%) !important;
+  pointer-events: none !important;
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+html.hero-intro-seen #main-header,
+body.home-intro-revealed #main-header {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+  pointer-events: auto !important;
+}
+
+#hero-section {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 640px;
+  overflow: hidden;
+  margin-top: -85px;
+  padding-top: 85px;
+  background-color: #0F172A;
+}
+
+#hero-bg-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+}
+
+#hero-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  transition: background 1.2s ease, backdrop-filter 1.2s ease, -webkit-backdrop-filter 1.2s ease;
+}
+body.home-intro-playing #hero-overlay {
+  background: linear-gradient(180deg, rgba(15,23,42,0.2) 0%, rgba(15,23,42,0.1) 50%, rgba(15,23,42,0.35) 100%);
+}
+html.hero-intro-seen #hero-overlay,
+body.home-intro-revealed #hero-overlay {
+  background: linear-gradient(180deg, rgba(15,23,42,0.78) 0%, rgba(15,23,42,0.52) 42%, rgba(15,23,42,0.88) 100%);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+#hero-content-wrap {
+  opacity: 0 !important;
+  transform: translateY(35px) !important;
+  pointer-events: none !important;
+  transition: opacity 0.85s ease 0.15s, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
+}
+html.hero-intro-seen #hero-content-wrap,
+body.home-intro-revealed #hero-content-wrap {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+  pointer-events: auto !important;
+}
+
+@keyframes heroItemFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+body.home-intro-revealed .hero-anim-item {
+  animation: heroItemFadeUp 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+html.hero-intro-seen .hero-anim-item {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+  animation: none !important;
+}
+body.home-intro-revealed .hero-delay-1 { animation-delay: 0.1s; }
+body.home-intro-revealed .hero-delay-2 { animation-delay: 0.25s; }
+body.home-intro-revealed .hero-delay-3 { animation-delay: 0.4s; }
+body.home-intro-revealed .hero-delay-4 { animation-delay: 0.55s; }
+body.home-intro-revealed .hero-delay-5 { animation-delay: 0.7s; }
 </style>
-<section class="relative overflow-hidden -mt-[85px] pt-[95px]">
 
-  <!-- Modern Mesh Gradient Background (Clean, Elegant & Premium - Image Removed) -->
-  <div class="absolute inset-0 -z-10 pointer-events-none overflow-hidden select-none" style="background: radial-gradient(circle at 50% -20%, rgba(128,0,32,0.06) 0%, rgba(255,255,255,0.98) 70%);">
-    
-    <!-- Architectural Dot Grid Pattern -->
-    <div class="absolute inset-0 opacity-[0.4]" 
-         style="background-image: radial-gradient(rgba(128,0,32,0.12) 1px, transparent 1px); background-size: 28px 28px;"></div>
+<script>
+  try {
+    const heroKey = 'iph_hero_intro_seen_v3';
+    if (localStorage.getItem(heroKey) === '1' || document.cookie.indexOf(heroKey + '=1') !== -1) {
+      document.documentElement.classList.add('hero-intro-seen');
+      document.body.classList.add('home-intro-revealed');
+    } else {
+      document.body.classList.add('home-intro-playing');
+    }
+  } catch(e) {}
+</script>
 
-    <!-- Smooth Dynamic Mesh Gradient Orbs -->
-    <div class="absolute -top-40 -left-40 w-[650px] h-[650px] rounded-full blur-[140px] opacity-30 animate-pulse"
-         style="background:radial-gradient(circle,rgba(162,38,56,0.35),transparent 70%); animation-duration: 8s;"></div>
-    <div class="absolute top-1/4 -right-32 w-[550px] h-[550px] rounded-full blur-[130px] opacity-25"
-         style="background:radial-gradient(circle,rgba(47,136,99,0.3),transparent 70%);"></div>
-    <div class="absolute -bottom-20 left-1/3 w-[600px] h-[300px] rounded-full blur-[120px] opacity-20"
-         style="background:radial-gradient(circle,rgba(212,165,74,0.25),transparent 70%);"></div>
+<!-- ══════════════════════════ FULL-VIEW VIDEO HERO SECTION ════════════════════════════════ -->
+<section id="hero-section" class="flex flex-col justify-center items-center select-none">
 
-    <!-- Soft Top Light Accent Bar -->
-    <div class="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-[#800020]/20 to-transparent"></div>
-    
-    <!-- Animated Particle Canvas -->
-    <canvas id="hero-canvas" class="relative z-10"></canvas>
-  </div>
+  <!-- Background Video (No buttons, no navigation, muted, plays to end scene then pauses as image) -->
+  <video id="hero-bg-video"
+         autoplay
+         muted
+         playsinline
+         webkit-playsinline
+         x5-playsinline
+         tabindex="-1"
+         preload="auto"
+         disablePictureInPicture>
+    <source src="<?= asset('storage/Index_Hero_video.mp4') ?>?v=20260905" type="video/mp4">
+    <source src="<?= asset('videos/Index_Hero_video.mp4') ?>?v=20260905" type="video/mp4">
+  </video>
 
-  <div class="max-w-7xl mx-auto px-6 pt-10 pb-6">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
+  <!-- Cinematic Dynamic Backdrop Overlay -->
+  <div id="hero-overlay"></div>
 
-      <!-- ── LEFT — COPY ── -->
-      <div class="relative z-10 order-2 lg:order-1">
+  <!-- Hero Content (Animates in once video reaches the end frame) -->
+  <div id="hero-content-wrap" class="relative z-10 max-w-5xl mx-auto px-6 text-center w-full py-10">
 
-        <!-- Animated live badge -->
-        <div class="hero-badge inline-flex items-center gap-2.5 px-4 py-2 rounded-full mb-7 cursor-default select-none"
-             style="background:rgba(128,0,32,0.07);border:1px solid rgba(128,0,32,0.2);backdrop-filter:blur(8px);">
-          <span class="relative flex h-2.5 w-2.5">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#2F8863] opacity-70"></span>
-            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#2F8863]"></span>
-          </span>
-          <span class="font-mono text-[11px] tracking-widest text-[#A22638]">
-            <?= __('প্রতিষ্ঠিত ', 'Est. ') ?><?= $appFounded ?>
-            &nbsp;·&nbsp;
-            <?= __('ইনস্টিটিউট অব পাবলিক হেলথ', 'Institute of Public Health') ?>
-          </span>
-        </div>
+    <!-- Live Badge -->
+    <div class="hero-anim-item hero-delay-1 inline-flex items-center gap-2.5 px-4 py-2 rounded-full mb-6 select-none border border-white/20 bg-black/35 backdrop-blur-md shadow-xl">
+      <span class="relative flex h-2.5 w-2.5">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
+      </span>
+      <span class="font-mono text-[11px] sm:text-[12px] tracking-widest text-emerald-300 font-bold uppercase">
+        <?= __('প্রতিষ্ঠিত ২০২৫', 'Est. 2025') ?> &nbsp;·&nbsp; <?= __('আইপিএইচ এলামনাই এসোসিয়েশন', 'IPH Alumni Association') ?>
+      </span>
+    </div>
 
-        <!-- Headline (Fixed Static Text) -->
-        <h1 class="hero-h1 font-serif text-[clamp(20px,2.7vw,34px)] leading-[1.25] font-semibold tracking-tight text-[#101820] mb-5">
-          <span class="block whitespace-nowrap"><?= __($headlineLine1Bn, $headlineLine1En) ?></span>
-          <em class="not-italic text-[#A22638] block"><?= __('এক অ্যালামনাই পরিবার।', 'One Alumni Family.') ?></em>
-        </h1>
+    <!-- Main Headline -->
+    <h1 class="hero-anim-item hero-delay-2 font-serif text-[clamp(28px,4.5vw,56px)] leading-[1.2] font-bold tracking-tight text-white mb-6 drop-shadow-2xl">
+      <span class="block"><?= __($headlineLine1Bn, $headlineLine1En) ?></span>
+      <span class="inline-flex items-center justify-center flex-wrap mt-1 min-h-[1.2em]">
+        <span id="hero-typing-target" class="bg-gradient-to-r from-amber-300 via-rose-300 to-amber-200 bg-clip-text text-transparent inline-block" data-type-text="<?= htmlspecialchars(__('এক অ্যালামনাই পরিবার।', 'One Alumni Family.')) ?>"></span><span id="hero-typing-cursor" class="text-amber-300 hero-type-cursor font-light -ml-0.5 select-none inline-block">|</span>
+      </span>
+    </h1>
 
-        <p class="hero-sub text-[16px] leading-[1.78] text-[#6B7178] max-w-[510px] mb-8">
-          <?= __('বিশ্বজুড়ে ছড়িয়ে থাকা আইপিএইচ গ্র্যাজুয়েটদের সাথে যুক্ত হন — পুরনো বন্ধু খুঁজুন, আপনার পথচলার গল্প ভাগ করুন, এবং সেই নেটওয়ার্কের অংশ থাকুন যা আপনার ক্যারিয়ার গড়েছে।',
-                'Connect with IPH graduates from around the world — find old batchmates, share your story, and stay part of the network that shaped your career.') ?>
-        </p>
+    <!-- Subtitle -->
+    <p class="hero-anim-item hero-delay-3 text-[clamp(15px,1.3vw,18.5px)] leading-relaxed text-slate-200/95 max-w-2xl mx-auto mb-9 font-normal drop-shadow">
+      <?= __('বিশ্বজুড়ে ছড়িয়ে থাকা আইপিএইচ গ্র্যাজুয়েটদের সাথে যুক্ত হন — পুরনো বন্ধু খুঁজুন, আপনার পথচলার গল্প ভাগ করুন, এবং সেই নেটওয়ার্কের অংশ থাকুন যা আপনার ক্যারিয়ার গড়েছে।',
+            'Connect with IPH graduates from around the world — find old batchmates, share your story, and stay part of the network that shaped your career.') ?>
+    </p>
 
-        <!-- CTA Buttons (Inline on Mobile) -->
-        <div class="hero-btns flex flex-row items-center gap-2.5 sm:gap-3 mb-4">
-          <a href="<?= url('/register') ?>"
-             class="shimmer-btn inline-flex items-center justify-center gap-1.5 sm:gap-2.5 px-3.5 sm:px-7 py-3 sm:py-3.5 rounded-2xl text-[13px] sm:text-[15px] font-semibold text-white transition-all hover:-translate-y-1 hover:shadow-2xl active:scale-95 shrink-0"
-             style="box-shadow:0 8px 26px -6px rgba(128,0,32,0.5);">
-            <i class="fa-solid fa-user-plus text-[11px] sm:text-[13px]"></i>
-            <span><?= __('অ্যালামনাই হিসেবে যোগ দিন', 'Join as Alumni') ?></span>
-            <i class="fa-solid fa-arrow-right text-[10px] sm:text-[12px] hidden xs:inline-block"></i>
-          </a>
-          <a href="<?= url('/directory') ?>"
-             class="inline-flex items-center justify-center gap-1.5 sm:gap-2.5 px-3.5 sm:px-7 py-3 sm:py-3.5 rounded-2xl text-[13px] sm:text-[15px] font-semibold text-[#101820] transition-all hover:-translate-y-1 hover:shadow-lg active:scale-95 shrink-0"
-             style="background:rgba(255,255,255,0.85);border:1px solid rgba(16,24,32,0.1);backdrop-filter:blur(10px);">
-            <i class="fa-solid fa-address-book text-[11px] sm:text-[13px] text-[#6B7178]"></i>
-            <span><?= __('ডিরেক্টরি দেখুন', 'Browse Directory') ?></span>
-          </a>
+    <!-- CTA Buttons -->
+    <div class="hero-anim-item hero-delay-4 flex flex-row items-center justify-center gap-3 sm:gap-4 mb-10">
+      <a href="<?= url('/register') ?>"
+         class="shimmer-btn inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-[14px] sm:text-[16px] font-semibold text-white transition-all hover:-translate-y-1 hover:shadow-2xl active:scale-95 shrink-0"
+         style="box-shadow: 0 10px 30px -6px rgba(128,0,32,0.6);">
+        <i class="fa-solid fa-user-plus text-[13px] sm:text-[14px]"></i>
+        <span><?= __('অ্যালামনাই হিসেবে যোগ দিন', 'Join as Alumni') ?></span>
+        <i class="fa-solid fa-arrow-right text-[12px] sm:text-[13px] hidden xs:inline-block"></i>
+      </a>
+      <a href="<?= url('/directory') ?>"
+         class="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-[14px] sm:text-[16px] font-semibold text-white bg-white/10 hover:bg-white/20 border border-white/30 backdrop-blur-md transition-all hover:-translate-y-1 hover:shadow-lg active:scale-95 shrink-0">
+        <i class="fa-solid fa-address-book text-[13px] sm:text-[14px] text-amber-300"></i>
+        <span><?= __('ডিরেক্টরি দেখুন', 'Browse Directory') ?></span>
+      </a>
+    </div>
+
+    <?php 
+      $isBnLang = !session('locale') || session('locale') === 'bn' || session('lang') === 'bn';
+      $memberCountDisplay  = $isBnLang ? to_bn_number($stats['total']) : number_format($stats['total']);
+      $countryCountDisplay = $isBnLang ? to_bn_number($stats['countries']) : number_format($stats['countries']);
+    ?>
+
+    <!-- Floating Quick Stats Bar -->
+    <div class="hero-anim-item hero-delay-5 inline-flex flex-wrap items-center justify-center gap-4 sm:gap-8 px-6 sm:px-8 py-3.5 rounded-2xl bg-black/40 border border-white/15 backdrop-blur-xl shadow-2xl text-white">
+      <div class="flex items-center gap-2.5">
+        <i class="fa-solid fa-users text-amber-400 text-[18px]"></i>
+        <div class="text-left">
+          <div class="font-bold text-[17px] sm:text-[19px] leading-tight font-mono text-white"><?= $memberCountDisplay ?>+</div>
+          <div class="text-[10px] sm:text-[11px] text-slate-300 font-mono uppercase tracking-wider"><?= __('নিবন্ধিত সদস্য', 'Registered Members') ?></div>
         </div>
       </div>
-
-      <!-- ── RIGHT — 3D IMAGE + FLOATING CARDS ── -->
-      <div class="hero-img relative z-10 flex justify-center lg:justify-end order-1 lg:order-2">
-        <div id="hero-tilt" class="tilt-frame relative w-full max-w-[480px]" style="perspective:900px;">
-
-          <!-- Ambient glow behind frame -->
-          <div class="absolute -inset-8 rounded-[48px] blur-3xl opacity-35 pointer-events-none -z-10"
-               style="background:linear-gradient(135deg,rgba(128,0,32,0.35),rgba(47,136,99,0.25));"></div>
-
-          <!-- Glass outer frame -->
-          <div class="p-4 rounded-[32px] shadow-2xl relative overflow-hidden"
-               style="background:rgba(255,255,255,0.65);border:1.5px solid rgba(255,255,255,0.8);backdrop-filter:blur(18px);">
-
-            <!-- Mouse-follow shine -->
-            <div class="tilt-shine rounded-[26px]"></div>
-
-            <!-- Scanline sweep -->
-            <div class="absolute left-0 right-0 h-[3px] pointer-events-none z-20 opacity-15"
-                 style="background:linear-gradient(90deg,transparent,rgba(128,0,32,0.9),transparent);animation:scanline 4s linear infinite;"></div>
-
-            <!-- Image -->
-            <div class="rounded-[22px] overflow-hidden border border-[#800020]/10 relative aspect-[4/3]">
-              <img src="<?= asset('images/Campus-front-view.jpg') ?>"
-                   alt="IPH Campus"
-                   class="w-full h-full object-cover transition-transform duration-700 hover:scale-105">
-              <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-transparent"></div>
-
-              <!-- Caption -->
-              <div class="absolute bottom-5 left-5 right-5 text-white">
-                <span class="font-mono text-[9px] tracking-widest uppercase text-[#E58E97] block mb-1">
-                  <i class="fa-solid fa-location-dot mr-1"></i>
-                  <?= __('আমাদের প্রিয় শিক্ষাপ্রতিষ্ঠান', 'Our Alma Mater') ?>
-                </span>
-                <h4 class="font-serif text-[17px] font-bold">
-                  <?= __('ইনস্টিটিউট অব পাবলিক হেলথ', 'Institute of Public Health') ?>
-                </h4>
-              </div>
-
-              <!-- Live badge on image -->
-              <div class="absolute top-4 right-4 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono text-white"
-                   style="background:rgba(0,0,0,0.42);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.15);">
-                <span class="w-1.5 h-1.5 rounded-full bg-[#2F8863] animate-pulse"></span>
-                <?= __('লাইভ ডিরেক্টরি', 'Live Directory') ?>
-              </div>
-            </div>
-          </div>
-
-
-
-          <?php 
-            $isBnLang = !session('locale') || session('locale') === 'bn' || session('lang') === 'bn';
-            $memberCountDisplay  = $isBnLang ? to_bn_number($stats['total']) : number_format($stats['total']);
-            $countryCountDisplay = $isBnLang ? to_bn_number($stats['countries']) : number_format($stats['countries']);
-          ?>
-
-          <!-- ★ Floating Card 2: Member count (Right side middle) -->
-          <div class="float-card-2 absolute -right-6 top-1/3 hidden lg:flex flex-col items-center gap-1 px-5 py-4 rounded-2xl shadow-xl text-center"
-               style="background:rgba(255,255,255,0.95);border:1px solid rgba(16,24,32,0.07);backdrop-filter:blur(16px);">
-            <i class="fa-solid fa-users text-[#800020] text-[20px]"></i>
-            <div class="font-serif text-[22px] font-bold text-[#101820] leading-tight"><?= $memberCountDisplay ?>+</div>
-            <div class="text-[10px] text-[#9CA3AF] font-mono"><?= __('সদস্য', 'Members') ?></div>
-          </div>
+      <div class="hidden sm:block w-px h-7 bg-white/20"></div>
+      <div class="flex items-center gap-2.5">
+        <i class="fa-solid fa-globe text-emerald-400 text-[18px]"></i>
+        <div class="text-left">
+          <div class="font-bold text-[17px] sm:text-[19px] leading-tight font-mono text-white"><?= $countryCountDisplay ?>+</div>
+          <div class="text-[10px] sm:text-[11px] text-slate-300 font-mono uppercase tracking-wider"><?= __('দেশব্যাপী বিস্তার', 'Global Reach') ?></div>
+        </div>
+      </div>
+      <div class="hidden sm:block w-px h-7 bg-white/20"></div>
+      <div class="flex items-center gap-2.5">
+        <i class="fa-solid fa-certificate text-rose-400 text-[18px]"></i>
+        <div class="text-left">
+          <div class="font-bold text-[17px] sm:text-[19px] leading-tight font-mono text-white"><?= __('১০০%', '100%') ?></div>
+          <div class="text-[10px] sm:text-[11px] text-slate-300 font-mono uppercase tracking-wider"><?= __('ভেরিফাইড আইডি', 'Verified ID') ?></div>
         </div>
       </div>
     </div>
+
   </div>
 
-  <!-- Scroll indicator -->
-  <div class="flex justify-center pb-8 relative z-10">
-    <a href="#directory" class="flex flex-col items-center gap-2 text-[#9CA3AF] hover:text-[#800020] transition-colors">
-      <span class="text-[10px] font-mono tracking-widest"><?= __('নিচে দেখুন', 'SCROLL') ?></span>
-      <div class="w-5 h-8 rounded-full border-2 border-current flex justify-center pt-1.5">
-        <div class="w-1 h-2 rounded-full bg-current scroll-dot"></div>
-      </div>
-    </a>
-  </div>
 </section>
 
-<!-- ── Hero JS: typewriter + count-up + 3D tilt + particle canvas ── -->
+<!-- ── Video Hero Controller & Statistics Observer ── -->
 <script>
 (function(){
-  /* 1. COUNT-UP */
-  const countEls=document.querySelectorAll('[data-count]');
-  if('IntersectionObserver' in window){
-    const obs=new IntersectionObserver(entries=>{
-      entries.forEach(e=>{
-        if(!e.isIntersecting)return; obs.unobserve(e.target);
-        const el=e.target,target=parseInt(el.dataset.count,10),suf=el.dataset.suffix||'';
-        const dur=1400,start=performance.now();
-        function tick(now){
-          const p=Math.min((now-start)/dur,1),ease=1-Math.pow(1-p,3);
-          el.textContent=Math.floor(ease*target)+suf;
-          if(p<1)requestAnimationFrame(tick); else el.textContent=target+suf;
+  const heroVideo = document.getElementById('hero-bg-video');
+  let introRevealed = false;
+
+  // ── Typewriter Effect for "এক অ্যালামনাই পরিবার।" ──
+  const typeTarget = document.getElementById('hero-typing-target');
+  const typeCursor = document.getElementById('hero-typing-cursor');
+  const textToType = typeTarget ? (typeTarget.getAttribute('data-type-text') || '<?= addslashes(__('এক অ্যালামনাই পরিবার।', 'One Alumni Family.')) ?>') : '';
+  let typeStarted = false;
+
+  function startTypewriter() {
+    if (typeStarted || !typeTarget || !textToType) return;
+    typeStarted = true;
+
+    // Use Intl.Segmenter for flawless Bengali conjunct/diacritic cluster segmentation
+    let graphemes;
+    if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+      const segmenter = new Intl.Segmenter('bn', { granularity: 'grapheme' });
+      graphemes = Array.from(segmenter.segment(textToType), s => s.segment);
+    } else {
+      graphemes = Array.from(textToType);
+    }
+
+    typeTarget.textContent = '';
+    let idx = 0;
+    const speed = 90; // ms per Bengali grapheme
+
+    function step() {
+      if (idx < graphemes.length) {
+        typeTarget.textContent += graphemes[idx];
+        idx++;
+        setTimeout(step, speed);
+      } else if (typeCursor) {
+        setTimeout(function(){
+          typeCursor.classList.add('cursor-soft');
+        }, 3000);
+      }
+    }
+    setTimeout(step, 180);
+  }
+
+  // Check if intro has already been seen on a previous visit
+  const introKey = 'iph_hero_intro_seen_v3';
+  let hasSeenIntro = false;
+  let hasPlayed = false;
+  try {
+    hasSeenIntro = localStorage.getItem(introKey) === '1' || document.cookie.indexOf(introKey + '=1') !== -1;
+  } catch(e) {}
+
+  window.revealHeroIntro = function(isInstant, markAsSeen) {
+    if (introRevealed) return;
+    introRevealed = true;
+
+    if (markAsSeen) {
+      try {
+        localStorage.setItem(introKey, '1');
+        document.cookie = introKey + "=1; path=/; max-age=31536000; SameSite=Lax";
+      } catch(e) {}
+    }
+
+    if (heroVideo) {
+      try {
+        heroVideo.pause();
+      } catch(e) {}
+    }
+
+    document.body.classList.remove('home-intro-playing');
+    document.body.classList.add('home-intro-revealed');
+    document.documentElement.classList.add('hero-intro-seen');
+
+    // Trigger typewriter animation once headline appears
+    setTimeout(startTypewriter, isInstant ? 200 : 500);
+  };
+
+  if (hasSeenIntro) {
+    // ── Returning Visitor: Intro already seen, hold last scene as background image ──
+    window.revealHeroIntro(true, false);
+    if (heroVideo) {
+      heroVideo.removeAttribute('autoplay');
+      heroVideo.pause();
+      const setLastFrame = function() {
+        try {
+          if (heroVideo.duration > 0) {
+            heroVideo.currentTime = Math.max(0, heroVideo.duration - 0.08);
+          } else {
+            heroVideo.currentTime = 7.92;
+          }
+          heroVideo.pause();
+        } catch(e) {}
+      };
+      if (heroVideo.readyState >= 1) {
+        setLastFrame();
+      } else {
+        heroVideo.addEventListener('loadedmetadata', setLastFrame, { once: true });
+      }
+    }
+  } else {
+    // ── First Time Visitor: Play full intro video once, then hold last scene as image ──
+    document.body.classList.add('home-intro-playing');
+
+    if (heroVideo) {
+      heroVideo.muted = true;
+      heroVideo.defaultMuted = true;
+      heroVideo.playsInline = true;
+
+      // 1. When video ends naturally
+      heroVideo.addEventListener('ended', function() {
+        window.revealHeroIntro(false, true);
+      });
+
+      // 2. Near end scene safeguard (pauses exactly on final frame)
+      heroVideo.addEventListener('timeupdate', function() {
+        if (heroVideo.currentTime > 0.4) hasPlayed = true;
+        if (heroVideo.duration > 0 && heroVideo.currentTime >= heroVideo.duration - 0.12) {
+          window.revealHeroIntro(false, true);
+        }
+      });
+
+      // 3. Initiate playback smoothly across all mobile & desktop browsers
+      function startVideoPlay() {
+        heroVideo.muted = true;
+        const playPromise = heroVideo.play();
+        if (playPromise !== undefined) {
+          playPromise.then(function() {
+            hasPlayed = true;
+          }).catch(function() {
+            // Mobile browser restricted autoplay before first touch:
+            const onFirstTouch = function() {
+              heroVideo.play().then(function(){ hasPlayed = true; }).catch(function(){});
+              window.removeEventListener('touchstart', onFirstTouch);
+              window.removeEventListener('click', onFirstTouch);
+            };
+            window.addEventListener('touchstart', onFirstTouch, { passive: true, once: true });
+            window.addEventListener('click', onFirstTouch, { once: true });
+          });
+        }
+      }
+
+      if (heroVideo.readyState >= 2) {
+        startVideoPlay();
+      } else {
+        heroVideo.addEventListener('canplay', startVideoPlay, { once: true });
+        heroVideo.addEventListener('loadeddata', startVideoPlay, { once: true });
+      }
+
+      heroVideo.addEventListener('error', function() {
+        window.revealHeroIntro(false, false);
+      });
+
+      // Fallback only after 14s in case cellular network is very slow
+      setTimeout(function() {
+        if (!introRevealed) {
+          window.revealHeroIntro(false, hasPlayed);
+        }
+      }, 14000);
+    } else {
+      window.revealHeroIntro(false, true);
+    }
+  }
+
+  /* COUNT-UP OBSERVER (for stats across page) */
+  const countEls = document.querySelectorAll('[data-count]');
+  if ('IntersectionObserver' in window && countEls.length > 0) {
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        obs.unobserve(e.target);
+        const el = e.target, target = parseInt(el.dataset.count, 10), suf = el.dataset.suffix || '';
+        const dur = 1400, start = performance.now();
+        function tick(now) {
+          const p = Math.min((now - start) / dur, 1), ease = 1 - Math.pow(1 - p, 3);
+          el.textContent = Math.floor(ease * target) + suf;
+          if (p < 1) requestAnimationFrame(tick); else el.textContent = target + suf;
         }
         requestAnimationFrame(tick);
       });
-    },{threshold:0.5});
-    countEls.forEach(el=>obs.observe(el));
-  }
-
-  /* 3. 3D TILT */
-  const tilt=document.getElementById('hero-tilt');
-  if(tilt){
-    const shine=tilt.querySelector('.tilt-shine');
-    tilt.addEventListener('mousemove',e=>{
-      const r=tilt.getBoundingClientRect();
-      const rx=((e.clientY-r.top-r.height/2)/(r.height/2))*-9;
-      const ry=((e.clientX-r.left-r.width/2)/(r.width/2))*9;
-      tilt.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg)`;
-      if(shine){
-        const mx=((e.clientX-r.left)/r.width*100).toFixed(1);
-        const my=((e.clientY-r.top)/r.height*100).toFixed(1);
-        shine.style.setProperty('--mx',mx+'%');
-        shine.style.setProperty('--my',my+'%');
-      }
-    });
-    tilt.addEventListener('mouseleave',()=>{
-      tilt.style.transform='rotateX(0deg) rotateY(0deg)';
-      if(shine)shine.style.opacity='0';
-    });
-  }
-
-  /* 4. PARTICLE CANVAS */
-  const canvas=document.getElementById('hero-canvas');
-  if(canvas){
-    const ctx=canvas.getContext('2d'); let W,H,dots=[];
-    function resize(){W=canvas.width=canvas.parentElement.offsetWidth;H=canvas.height=canvas.parentElement.offsetHeight;}
-    window.addEventListener('resize',resize); resize();
-    function Dot(){this.x=Math.random()*W;this.y=Math.random()*H;this.r=Math.random()*2+0.5;this.dx=(Math.random()-.5)*.28;this.dy=(Math.random()-.5)*.28;this.a=Math.random()*.35+.1;this.col=Math.random()<.55?'128,0,32':'47,136,99';}
-    for(let n=0;n<58;n++)dots.push(new Dot());
-    function draw(){
-      ctx.clearRect(0,0,W,H);
-      for(let i=0;i<dots.length;i++){
-        const d=dots[i]; d.x+=d.dx; d.y+=d.dy;
-        if(d.x<0||d.x>W)d.dx*=-1; if(d.y<0||d.y>H)d.dy*=-1;
-        ctx.beginPath();ctx.arc(d.x,d.y,d.r,0,Math.PI*2);
-        ctx.fillStyle=`rgba(${d.col},${d.a})`;ctx.fill();
-        for(let j=i+1;j<dots.length;j++){
-          const d2=dots[j],dx=d.x-d2.x,dy=d.y-d2.y,dist=Math.sqrt(dx*dx+dy*dy);
-          if(dist<115){ctx.beginPath();ctx.moveTo(d.x,d.y);ctx.lineTo(d2.x,d2.y);ctx.strokeStyle=`rgba(128,0,32,${.065*(1-dist/115)})`;ctx.lineWidth=.5;ctx.stroke();}
-        }
-      }
-      requestAnimationFrame(draw);
-    }
-    draw();
+    }, { threshold: 0.5 });
+    countEls.forEach(el => obs.observe(el));
   }
 })();
 </script>
@@ -308,130 +455,199 @@ $headlineLine1En = $diffYears . ' Years of Student Legacy (' . $startYear . '–
   </div>
 </div>
 
-<!-- ════════════════════════ DIRECTORY PREVIEW ════════════════════════════ -->
-<section id="directory" class="max-w-7xl mx-auto px-6 py-14">
-  <div class="flex justify-between items-end gap-5 mb-8 flex-wrap">
+<!-- ════════════════════════ FEATURED ALUMNI ════════════════════════════ -->
+<section id="featured-alumni" class="max-w-7xl mx-auto px-6 py-16">
+  <div class="flex justify-between items-end gap-5 mb-10 flex-wrap">
     <div>
-      <span class="font-mono text-[11px] tracking-widest text-[#2F8863] block mb-2 uppercase">
-        <?= __('অ্যালামনাই ডিরেক্টরি', 'Alumni Directory') ?>
-      </span>
-      <h2 class="font-serif text-[clamp(24px,3vw,34px)] font-semibold text-[#101820]">
-        <?= __('প্রতিটি ভেরিফাইড প্রোফাইল,<br>মাত্র এক ক্লিকে।', 'Every verified profile,<br>just one click away.') ?>
+      <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-[11px] font-mono font-semibold tracking-wider uppercase mb-3"
+           style="background:rgba(212,165,74,0.12);color:#B45309;border:1px solid rgba(212,165,74,0.3);">
+        <i class="fa-solid fa-star text-amber-500 text-[10px]"></i>
+        <?= __('বিশিষ্ট অ্যালামনাই', 'Featured Alumni') ?>
+      </div>
+      <h2 class="font-serif text-[clamp(26px,3.5vw,36px)] font-semibold text-[#101820] leading-tight">
+        <?= __('আমাদের গর্বিত ও অগ্রণী অ্যালামনাইবৃন্দ', 'Our Proud & Distinguished Alumni') ?>
       </h2>
+      <p class="text-[14.5px] text-[#6B7178] mt-2 max-w-xl">
+        <?= __('জনস্বাস্থ্য, চিকিৎসা ও বিভিন্ন ক্ষেত্রে সফলতার সাথে অবদান রাখা আইপিএইচ প্রাক্তন শিক্ষার্থী ও প্রথিতযশা পেশাজীবীগণ।',
+              'Celebrating the legacy, leadership, and accomplishments of Institute of Public Health graduates.') ?>
+      </p>
     </div>
-    <p class="text-[14px] text-[#6B7178] max-w-[320px]">
-      <?= __('ব্যাচ, পেশা ও অবস্থান অনুযায়ী সার্চ করুন — প্রতিটি প্রোফাইল অ্যাডমিন কর্তৃক অনুমোদিত।',
-            'Search by batch, profession, or location — every profile is admin-approved.') ?>
-    </p>
+    <div class="flex items-center gap-3">
+      <a href="<?= url('/directory?is_featured=1') ?>"
+         class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-semibold text-amber-900 bg-amber-50 border border-amber-200 hover:bg-amber-100 transition-all">
+        <i class="fa-solid fa-star text-amber-500"></i>
+        <?= __('সকল বিশিষ্ট অ্যালামনাই', 'View All Featured') ?>
+      </a>
+      <a href="<?= url('/directory') ?>"
+         class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-semibold text-[#800020] bg-[#800020]/5 border border-[#800020]/20 hover:bg-[#800020]/10 transition-all">
+        <?= __('সম্পূর্ণ ডিরেক্টরি', 'Full Directory') ?> →
+      </a>
+    </div>
   </div>
 
   <?php if (empty($alumni_featured)): ?>
-  <div class="text-center py-16 text-[#9CA3AF] text-[14px]">
-    <?= __('অ্যালামনাই প্রোফাইলগুলো ভেরিফাই হওয়ার পর এখানে দেখা যাবে।', 'Alumni profiles will appear here once verified.') ?>
+  <div class="text-center py-16 text-[#9CA3AF] text-[14px] rounded-3xl border border-gray-100 bg-white/60">
+    <?= __('অ্যালামনাই প্রোফাইলগুলো ভেরিফাই হওয়ার পর এখানে দেখা যাবে।', 'Featured alumni profiles will appear here.') ?>
   </div>
   <?php else: ?>
-  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
     <?php foreach ($alumni_featured as $alum): ?>
-    <a href="<?= url('/directory/' . $alum['id']) ?>"
-       class="p-5 rounded-2xl text-center block hover-lift"
-       style="background:rgba(255,255,255,0.72);border:1px solid rgba(16,24,32,0.07);backdrop-filter:blur(14px);">
-      <div class="w-14 h-14 rounded-full mx-auto mb-3 flex items-center justify-center font-serif font-semibold text-[18px] overflow-hidden"
-           style="background:linear-gradient(135deg,#153548,#2F8863);color:#FAFAFA;border:2px solid rgba(16,24,32,0.08);">
-        <?php if (!empty($alum['avatar'])): ?>
-          <img src="<?= avatar_url($alum['avatar']) ?>" alt="<?= e($alum['name'] ?? '') ?>" class="w-full h-full object-cover" onerror="this.onerror=null; this.parentElement.innerHTML='<?= initials($alum['name'] ?? 'A') ?>';">
+    <div class="relative p-6 rounded-3xl flex flex-col justify-between group transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-amber-500/30"
+         style="background:rgba(255,255,255,0.85);border:1px solid rgba(16,24,32,0.08);backdrop-filter:blur(16px);">
+      
+      <!-- Top Badges -->
+      <div class="flex items-center justify-between gap-2 mb-4">
+        <?php if (!empty($alum['is_featured'])): ?>
+        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10.5px] font-bold bg-amber-500/15 text-amber-700 border border-amber-500/30">
+          <i class="fa-solid fa-star text-[9px] text-amber-500"></i> <?= __('Featured', 'Featured') ?>
+        </span>
         <?php else: ?>
-          <?= initials($alum['name'] ?? 'A') ?>
+        <span class="inline-flex items-center gap-1 font-mono text-[10px] text-[#2F8863] px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#2F8863]"></span><?= __('Verified', 'Verified') ?>
+        </span>
+        <?php endif; ?>
+
+        <?php if (!empty($alum['batch_year'])): ?>
+        <span class="text-[11px] font-mono px-2 py-0.5 rounded-md bg-gray-100 text-gray-600">
+          <?= __('ব্যাচ ', 'Batch ') . $alum['batch_year'] ?>
+        </span>
         <?php endif; ?>
       </div>
-      <div class="font-semibold text-[14px] text-[#101820] leading-tight"><?= e($alum['name'] ?? '') ?></div>
-      <div class="text-[11.5px] text-[#9CA3AF] mt-0.5">
-        <?= $alum['batch_year'] ? __('ব্যাচ ', 'Batch ') . $alum['batch_year'] : '' ?>
-        <?= !empty($alum['job_title']) ? ' · ' . e($alum['job_title']) : '' ?>
+
+      <!-- Avatar & Info -->
+      <div class="text-center mb-5">
+        <div class="relative w-20 h-20 rounded-full mx-auto mb-3.5 p-1 border-2 <?= !empty($alum['is_featured']) ? 'border-amber-400/60 shadow-amber-500/20' : 'border-gray-100' ?> shadow-md">
+          <div class="w-full h-full rounded-full overflow-hidden flex items-center justify-center font-serif font-bold text-[22px] text-white"
+               style="background:linear-gradient(135deg,#153548,#2F8863);">
+            <?php if (!empty($alum['avatar'])): ?>
+              <img src="<?= avatar_url($alum['avatar']) ?>" alt="<?= e($alum['name'] ?? '') ?>" class="w-full h-full object-cover" onerror="this.onerror=null; this.parentElement.innerHTML='<?= initials($alum['name'] ?? 'A') ?>';">
+            <?php else: ?>
+              <?= initials($alum['name'] ?? 'A') ?>
+            <?php endif; ?>
+          </div>
+        </div>
+
+        <h3 class="font-serif font-semibold text-[17px] text-[#101820] group-hover:text-[#800020] transition-colors line-clamp-1">
+          <?= e($alum['name'] ?? '') ?>
+        </h3>
+
+        <?php if (!empty($alum['job_title'])): ?>
+        <p class="text-[13px] font-medium text-[#800020] mt-1 line-clamp-1">
+          <?= e($alum['job_title']) ?>
+        </p>
+        <?php endif; ?>
+
+        <?php if (!empty($alum['organization'])): ?>
+        <p class="text-[12px] text-[#6B7178] mt-0.5 line-clamp-1">
+          <i class="fa-solid fa-building text-[10px] text-gray-400 mr-1"></i>
+          <?= e($alum['organization']) ?>
+        </p>
+        <?php endif; ?>
       </div>
-      <span class="inline-flex items-center gap-1 font-mono text-[10px] text-[#2F8863] mt-2.5 px-2.5 py-1 rounded-full"
-            style="background:rgba(47,136,99,0.1);border:1px solid rgba(47,136,99,0.2);">
-        <span class="w-1.5 h-1.5 rounded-full bg-[#2F8863]"></span><?= __('ভেরিফাইড', 'Verified') ?>
-      </span>
-    </a>
+
+      <!-- Bottom Actions -->
+      <div class="pt-3 border-t border-gray-100 flex items-center gap-2">
+        <a href="<?= url('/directory/' . $alum['id']) ?>"
+           class="flex-1 py-2 rounded-xl text-center text-[12.5px] font-semibold text-[#800020] bg-[#800020]/5 hover:bg-[#800020] hover:text-white transition-all">
+          <?= __('প্রোফাইল দেখুন', 'View Profile') ?>
+        </a>
+        <a href="<?= url('/directory/' . $alum['id']) ?>#contact-request"
+           class="px-3 py-2 rounded-xl text-center text-[12px] font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 transition-all"
+           title="<?= __('যোগাযোগের রিকোয়েস্ট পাঠান', 'Request Contact') ?>">
+          <i class="fa-regular fa-paper-plane"></i>
+        </a>
+      </div>
+
+    </div>
     <?php endforeach; ?>
   </div>
   <?php endif; ?>
-
-  <div class="text-center mt-8">
-    <a href="<?= url('/directory') ?>"
-       class="inline-flex items-center gap-2 px-7 py-3 rounded-2xl text-[14px] font-semibold text-[#800020] transition-all hover:-translate-y-0.5 hover:shadow-md"
-       style="background:rgba(128,0,32,0.06);border:1px solid rgba(128,0,32,0.2);">
-      <?= __('সম্পূর্ণ ডিরেক্টরি দেখুন', 'View Full Directory') ?>
-      <i class="fa-solid fa-arrow-right text-[12px]"></i>
-    </a>
-  </div>
 </section>
 
-<!-- ══════════════════════ SUCCESS STORIES ════════════════════════════════ -->
+<!-- ══════════════════════ BLOGS & ARTICLES ════════════════════════════════ -->
 <section id="stories" class="max-w-7xl mx-auto px-6 py-14">
   <!-- Soft divider line -->
   <div class="h-px mb-14 bg-gradient-to-r from-transparent via-[#800020]/20 to-transparent"></div>
 
   <div class="flex justify-between items-end gap-5 mb-8 flex-wrap">
     <div>
-      <span class="font-mono text-[11px] tracking-widest text-[#2F8863] block mb-2 uppercase">
-        <?= __('সফলতার গল্প', 'Success Stories') ?>
+      <span class="font-mono text-[11px] tracking-widest text-[#2F8863] block mb-2 uppercase font-bold flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full bg-[#2F8863] inline-block animate-pulse"></span>
+        <?= __('ব্লগ ও আর্টিকেল', 'Blogs & Articles') ?>
       </span>
       <h2 class="font-serif text-[clamp(24px,3vw,34px)] font-semibold text-[#101820]">
-        <?= __('আইপিএইচের ভিত্তি থেকে<br>গড়ে ওঠা বাস্তব ক্যারিয়ার।', 'Real careers built<br>on IPH foundations.') ?>
+        <?= __('আইপিএইচ অ্যালামনাইদের জ্ঞানগর্ভ<br>লেখা, অভিজ্ঞতা ও সাম্প্রতিক আর্টিকেল।', 'Insights, research articles & stories<br>shared by our alumni.') ?>
       </h2>
     </div>
-    <a href="<?= url('/stories') ?>" class="text-[14px] text-[#800020] font-semibold hover:underline flex items-center gap-1">
-      <?= __('সব গল্প দেখুন', 'All Stories') ?>
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    <a href="<?= url('/stories') ?>" class="text-[14px] text-[#800020] font-semibold hover:underline flex items-center gap-1.5 group">
+      <?= __('সব আর্টিকেল দেখুন', 'All Blogs & Articles') ?>
+      <i class="fa-solid fa-arrow-right text-[12px] group-hover:translate-x-1 transition-transform"></i>
     </a>
   </div>
 
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
     <?php
     $displayStories = !empty($successStories) ? $successStories : [
       ['batch_year' => '2010',
-       'title'      => __('জাতীয় নীতিনির্ধারণে নেতৃত্ব', 'From district health office to national policy'),
-       'excerpt'    => __('একটি জেলা স্বাস্থ্য অফিস থেকে জাতীয় পর্যায়ে নীতিনির্ধারণী ভূমিকায়।', 'Started at a district health office, now shapes national public health policy.'),
+       'title'      => __('জাতীয় নীতিনির্ধারণে জনস্বাস্থ্যের ভূমিকা', 'From district health office to national policy'),
+       'excerpt'    => __('একটি জেলা স্বাস্থ্য অফিস থেকে জাতীয় পর্যায়ে নীতিনির্ধারণী ভূমিকা ও মাঠপর্যায়ের অভিজ্ঞতা।', 'Started at a district health office, now shapes national public health policy.'),
+       'cover_image'=> '',
        'slug' => '#'],
       ['batch_year' => '2015',
-       'title'      => __('WHO বুলেটিনে গবেষণা প্রকাশ', 'Research featured in the WHO Bulletin'),
-       'excerpt'    => __('ঢাকায় একটি এপিডেমিওলজি ল্যাব পরিচালনা করছেন যার ফলাফল আন্তর্জাতিক মহলে স্বীকৃত।', 'Now leads an epidemiology lab in Dhaka whose findings have gained international recognition.'),
+       'title'      => __('WHO বুলেটিনে গবেষণা ও এপিডেমিওলজি পর্যালোচনা', 'Research featured in the WHO Bulletin'),
+       'excerpt'    => __('ঢাকায় একটি এপিডেমিওলজি ল্যাব পরিচালনা এবং জনস্বাস্থ্য গবেষণার আন্তর্জাতিক স্বীকৃতি।', 'Now leads an epidemiology lab in Dhaka whose findings have gained international recognition.'),
+       'cover_image'=> '',
        'slug' => '#'],
       ['batch_year' => '2020',
-       'title'      => __('বছরে ৩০০+ স্বাস্থ্যকর্মীর প্রশিক্ষক', 'Training 300+ health workers every year'),
-       'excerpt'    => __('অ্যাসোসিয়েশন-অনুমোদিত সার্টিফিকেশন প্রোগ্রামের মাধ্যমে স্বাস্থ্য খাতে দক্ষ মানবসম্পদ গড়ছেন।', 'Runs the association-endorsed certification track, building skilled health workers across the country.'),
+       'title'      => __('কমিউনিটি স্বাস্থ্যসেবা ও দক্ষ মানবসম্পদ উন্নয়ন', 'Training 300+ health workers every year'),
+       'excerpt'    => __('অ্যাসোসিয়েশন-অনুমোদিত ট্রেনিং ট্র্যাকের মাধ্যমে তৃণমূল স্বাস্থ্য কর্মীদের দক্ষতা বৃদ্ধির বাস্তব গল্প।', 'Building skilled community health workers across the country through association tracks.'),
+       'cover_image'=> '',
        'slug' => '#'],
     ];
     foreach ($displayStories as $story):
       $link = ($story['slug'] === '#') ? '#' : url('/stories/' . e($story['slug']));
     ?>
-    <a href="<?= $link ?>"
-       class="p-7 rounded-2xl block hover-lift group"
-       style="background:rgba(255,255,255,0.72);border:1px solid rgba(16,24,32,0.07);backdrop-filter:blur(14px);">
-      <span class="inline-block font-mono text-[10.5px] text-[#A22638] px-2.5 py-1 rounded-full mb-4"
-            style="background:rgba(162,38,56,0.08);border:1px solid rgba(162,38,56,0.2);">
-        <?= __('ব্যাচ ', 'Batch ') ?><?= e($story['batch_year']) ?>
-      </span>
-      <h4 class="font-serif text-[18px] font-semibold text-[#101820] mb-3 leading-snug group-hover:text-[#800020] transition-colors">
-        <?= e($story['title']) ?>
-      </h4>
-      <p class="text-[13.5px] text-[#6B7178] leading-relaxed"><?= e($story['excerpt']) ?></p>
-      <div class="mt-4 text-[13px] font-medium text-[#800020] flex items-center gap-1">
-        <?= __('পড়ুন', 'Read more') ?>
-        <svg class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    <div class="rounded-2xl overflow-hidden flex flex-col hover-lift group"
+         style="background:rgba(255,255,255,0.78);border:1px solid rgba(16,24,32,0.08);backdrop-filter:blur(14px);box-shadow:0 6px 24px -10px rgba(16,24,32,0.08);">
+      
+      <?php if (!empty($story['cover_image'])): ?>
+      <div class="h-44 w-full overflow-hidden bg-gray-100">
+        <img src="<?= asset('storage/stories/' . e($story['cover_image'])) ?>" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
       </div>
-    </a>
+      <?php endif; ?>
+
+      <div class="p-6 flex-1 flex flex-col justify-between">
+        <div>
+          <?php if (!empty($story['batch_year']) && $story['batch_year'] !== '0000'): ?>
+          <span class="inline-block font-mono text-[10.5px] text-[#A22638] px-2.5 py-0.5 rounded-full mb-3"
+                style="background:rgba(162,38,56,0.08);border:1px solid rgba(162,38,56,0.2);">
+            <?= e(str_starts_with(strtoupper($story['batch_year']), 'BATCH') ? $story['batch_year'] : ('Batch ' . $story['batch_year'])) ?>
+          </span>
+          <?php endif; ?>
+          <h4 class="font-serif text-[17.5px] font-semibold text-[#101820] mb-2.5 leading-snug group-hover:text-[#800020] transition-colors">
+            <?= e($story['title']) ?>
+          </h4>
+          <p class="text-[13.5px] text-[#6B7178] leading-relaxed line-clamp-3">
+            <?= e($story['excerpt'] ?? mb_strimwidth(strip_tags((string)($story['content'] ?? '')), 0, 120, '…')) ?>
+          </p>
+        </div>
+        <div class="mt-5 pt-3 border-t border-gray-100">
+          <a href="<?= $link ?>" class="text-[13.5px] font-semibold text-[#800020] hover:underline inline-flex items-center gap-1.5 group-hover:gap-2 transition-all">
+            <?= __('আর্টিকেলটি পড়ুন', 'Read Article') ?> →
+          </a>
+        </div>
+      </div>
+    </div>
     <?php endforeach; ?>
   </div>
 </section>
 
-<!-- ══════════════════════════ COMMITTEE ORGANOGRAM ══════════════════════ -->
+<!-- ══════════════════════════ COMMITTEE ORGANOGRAM (DESKTOP ONLY) ══════════════════════ -->
 <style>
   .laser-flow-line { animation: laser-flow 2s linear infinite; }
   @keyframes laser-flow { to { stroke-dashoffset: -40; } }
 </style>
-<section class="max-w-7xl mx-auto px-4 py-16">
+<section class="hidden lg:block max-w-7xl mx-auto px-4 py-16">
   <div class="p-8 sm:p-14 rounded-[36px] relative overflow-hidden"
        style="background: linear-gradient(145deg, #1A070B 0%, #0F1923 50%, #150609 100%);
               border: 1px solid rgba(162,38,56,0.25);
@@ -696,7 +912,7 @@ $headlineLine1En = $diffYears . ' Years of Student Legacy (' . $startYear . '–
         ['<i class="fa-solid fa-earth-americas" style="color:#2F8863;font-size:18px;"></i>', __('গ্লোবাল নেটওয়ার্ক', 'Global Network'),           __('বিশ্বজুড়ে জনস্বাস্থ্য পেশাদার ও গবেষকদের বিশাল নেটওয়ার্কে সরাসরি যোগাযোগ করুন।', 'Connect directly with a global network of public health professionals and researchers.'), '#2F8863'],
         ['<i class="fa-solid fa-id-card" style="color:#A22638;font-size:18px;"></i>',         __('ডিজিটাল আইডি কার্ড', 'Digital ID Card'),          __('QR-কোড সম্বলিত ভেরিফাইড আইডি কার্ড — সেমিনার ও ইভেন্টে দ্রুত এবং নির্বিঘ্ন প্রবেশের নিশ্চয়তা।', 'A QR-enabled verified ID card for fast, seamless access to seminars and events.'), '#A22638'],
         ['<i class="fa-solid fa-flask" style="color:#2F8863;font-size:18px;"></i>',           __('গবেষণা ও বৃত্তি', 'Research & Grants'),            __('জনস্বাস্থ্য গবেষণা দল, আন্তর্জাতিক সেমিনার কোলাবোরেশন ও বৃত্তির আপডেট।', 'Updates on public health research groups, international collaborations, and scholarship opportunities.'), '#2F8863'],
-        ['<i class="fa-solid fa-ticket" style="color:#A22638;font-size:18px;"></i>',          __('অগ্রাধিকার প্রবেশাধিকার', 'Priority Access'),       __('বার্ষিক মিলনমেলা, পুনর্মিলনী এবং বিশেষ ওয়ার্কশপে অগ্রাধিকার বুকিং ও আসন সুবিধা।', 'Priority booking and seating at the annual reunion, conferences, and special workshops.'), '#A22638'],
+        ['<i class="fa-solid fa-ticket" style="color:#A22638;font-size:18px;"></i>',          __('ইভেন্টে অগ্রাধিকার', 'Priority Access'),           __('বার্ষিক মিলনমেলা, পুনর্মিলনী এবং বিশেষ ওয়ার্কশপে অগ্রাধিকার বুকিং ও আসন সুবিধা।', 'Priority booking and seating at the annual reunion, conferences, and special workshops.'), '#A22638'],
       ];
       foreach ($benefits as [$icon, $title, $desc, $accent]):
       ?>

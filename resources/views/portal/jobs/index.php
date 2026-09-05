@@ -91,6 +91,7 @@
             </a>
 
             <form method="POST" action="<?= url('/portal/jobs/toggle-status') ?>" class="inline">
+              <?= csrf_field() ?>
               <input type="hidden" name="job_id" value="<?= $j['id'] ?>">
               <button type="submit" class="px-3 py-1.5 rounded-lg text-[12px] font-medium text-[#6B7178] border border-gray-200 hover:bg-gray-100 transition-colors">
                 <?= $j['status'] === 'active' ? 'Close Job' : 'Reopen' ?>

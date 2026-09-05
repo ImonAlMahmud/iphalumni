@@ -149,6 +149,17 @@ class AlumniController extends BaseController
         return redirect('/admin/alumni/' . $id)->with('success', 'Status updated to ' . $status);
     }
 
+    public function toggleFeatured(Request $request, $id)
+    {
+        $id = (int)$id;
+        $curr = (int) DB::table('alumni_profiles')->where('id', $id)->value('is_featured');
+        $newVal = $curr ? 0 : 1;
+        DB::table('alumni_profiles')->where('id', $id)->update(['is_featured' => $newVal, 'updated_at' => now()]);
+
+        $msg = $newVal ? 'অ্যালামনাই মেম্বারকে সফলভাবে Featured করা হয়েছে।' : 'অ্যালামনাই মেম্বারকে Unfeatured করা হয়েছে।';
+        return back()->with('success', $msg);
+    }
+
     private function logHistory(int $profileId, string $action, string $note, int $actorId): void
     {
         try {
@@ -321,5 +332,81 @@ class AlumniController extends BaseController
             ->toArray();
 
         return $this->legacyView('admin/alumni/contact_requests', compact('requests'), 'admin', 'Contact Requests Monitoring');
+    }
+
+    public function exportCardsSvg(Request $request, \App\Services\IdCardSvgService $svgService)
+    {
+        $status = $request->input('status');
+        $search = trim((string)$request->input('q', ''));
+
+        $query = DB::table('alumni_profiles as ap')
+            ->join('users as u', 'u.id', '=', 'ap.user_id')
+            ->select('ap.id')
+            ->whereNull('ap.deleted_at')
+            ->whereNull('u.deleted_at');
+
+        if (!empty($status)) {
+            $query->where('ap.status', $status);
+        } else {
+            $query->whereIn('ap.status', ['approved', 'verified', 'active']);
+        }
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('u.name', 'like', "%{$search}%")
+                  ->orWhere('u.email', 'like', "%{$search}%")
+                  ->orWhere('ap.phone', 'like', "%{$search}%")
+                  ->orWhere('ap.batch_year', 'like', "%{$search}%");
+            });
+        }
+
+        $profileIds = $query->orderBy('ap.id', 'asc')->pluck('ap.id')->toArray();
+
+        if (empty($profileIds)) {
+            return redirect('/admin/alumni')->with('error', 'কোনো মেম্বার পাওয়া যায়নি আইডি কার্ড এক্সপোর্টের জন্য।');
+        }
+
+        try {
+            $zipPath  = $svgService->generateZipArchive($profileIds);
+            $filename = 'IPH_Alumni_Member_Cards_SVG_' . date('Ymd_His') . '.zip';
+            return response()->download($zipPath, $filename)->deleteFileAfterSend(true);
+        } catch (\Throwable $e) {
+            return redirect('/admin/alumni')->with('error', 'SVG কার্ড এক্সপোর্টে সমস্যা হয়েছে: ' . $e->getMessage());
+        }
+    }
+
+    public function downloadSingleCardSvg(Request $request, $id, $side, \App\Services\IdCardSvgService $svgService)
+    {
+        $id   = (int)$id;
+        $side = strtolower((string)$side);
+        $data = $svgService->getCardData($id);
+
+        if (!$data) {
+            abort(404, 'Alumni profile not found');
+        }
+
+        $cleanName = preg_replace('/[^A-Za-z0-9_\-]/', '_', trim($data['name']));
+        $cleanName = preg_replace('/_+/', '_', (string)$cleanName);
+        $prefix    = $data['member_no'] . '_' . $cleanName;
+
+        if ($side === 'front') {
+            $svg = $svgService->renderFrontSvg($data);
+            return response($svg, 200, [
+                'Content-Type'        => 'image/svg+xml',
+                'Content-Disposition' => "attachment; filename=\"{$prefix}_front.svg\"",
+            ]);
+        }
+
+        if ($side === 'back') {
+            $svg = $svgService->renderBackSvg($data);
+            return response($svg, 200, [
+                'Content-Type'        => 'image/svg+xml',
+                'Content-Disposition' => "attachment; filename=\"{$prefix}_back.svg\"",
+            ]);
+        }
+
+        // Default to ZIP containing both sides
+        $zipPath = $svgService->generateZipArchive([$id]);
+        return response()->download($zipPath, "{$prefix}_ID_Card_SVG.zip")->deleteFileAfterSend(true);
     }
 }

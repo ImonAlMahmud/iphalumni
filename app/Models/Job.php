@@ -76,16 +76,10 @@ class Job extends Model
         return $result ? (array)$result : null;
     }
 
-    public function isUserVerifiedStudent(int $userId, ?string $inputName = null, ?string $inputPhone = null): ?array
+    public function verifyStudentReference(?string $inputName = null, ?string $inputPhone = null, ?string $inputEmail = null): ?array
     {
-        $uResult = DB::selectOne(
-            "SELECT u.*, ap.batch_year, ap.phone FROM users u LEFT JOIN alumni_profiles ap ON ap.user_id = u.id WHERE u.id = ? AND u.deleted_at IS NULL LIMIT 1",
-            [$userId]
-        );
-        if (!$uResult) return null;
-        $user = (array)$uResult;
-
-        $cleanName = function(string $n): string {
+        $cleanName = function(?string $n): string {
+            if (!$n) return '';
             $n = mb_strtolower(trim($n));
             $n = preg_replace('/^(md|mst|dr|prof|mr|mrs|ms)\b\.?\s*/i', '', $n);
             return trim(str_replace(['.', '-', ' '], '', $n));
@@ -97,8 +91,13 @@ class Job extends Model
             return $p;
         };
 
-        $targetName  = $cleanName($inputName ?: $user['name']);
-        $targetPhone = $cleanPhone($inputPhone ?: ($user['phone'] ?? ''));
+        $targetName  = $cleanName($inputName);
+        $targetPhone = $cleanPhone($inputPhone);
+        $targetEmail = strtolower(trim($inputEmail ?? ''));
+
+        if ($targetName === '' && $targetPhone === '' && $targetEmail === '') {
+            return null;
+        }
 
         $candidates = array_map(fn($r) => (array)$r, DB::table('students_reference')->get()->toArray());
 
@@ -107,16 +106,36 @@ class Job extends Model
             $candBng = $cleanName($cand['name_bangla'] ?? '');
             $candMob = $cleanPhone($cand['mobile'] ?? '');
             $candGrd = $cleanPhone($cand['guardian_mobile'] ?? '');
+            $candMail = strtolower(trim($cand['email'] ?? ''));
 
             $nameMatches  = ($targetName !== '' && ($targetName === $candEng || $targetName === $candBng));
             $phoneMatches = ($targetPhone !== '' && ($targetPhone === $candMob || $targetPhone === $candGrd));
+            $emailMatches = ($targetEmail !== '' && $candMail !== '' && $targetEmail === $candMail);
 
             if ($nameMatches && $phoneMatches) return $cand;
-            if ($nameMatches && empty($inputPhone)) return $cand;
-            if (!empty($user['email']) && !empty($cand['email']) && strtolower($user['email']) === strtolower($cand['email'])) return $cand;
+            if ($nameMatches && empty($targetPhone)) return $cand;
+            if ($emailMatches && !empty($targetEmail)) return $cand;
         }
 
         return null;
+    }
+
+    public function isUserVerifiedStudent(?int $userId, ?string $inputName = null, ?string $inputPhone = null, ?string $inputEmail = null): ?array
+    {
+        if ($userId && $userId > 0) {
+            $uResult = DB::selectOne(
+                "SELECT u.*, ap.batch_year, ap.phone FROM users u LEFT JOIN alumni_profiles ap ON ap.user_id = u.id WHERE u.id = ? AND u.deleted_at IS NULL LIMIT 1",
+                [$userId]
+            );
+            if ($uResult) {
+                $user = (array)$uResult;
+                $inputName = $inputName ?: ($user['name'] ?? '');
+                $inputPhone = $inputPhone ?: ($user['phone'] ?? '');
+                $inputEmail = $inputEmail ?: ($user['email'] ?? '');
+            }
+        }
+
+        return $this->verifyStudentReference($inputName, $inputPhone, $inputEmail);
     }
 
     public function getApplicationsForJob(int $jobId): array
@@ -130,20 +149,28 @@ class Job extends Model
         return array_map(fn($r) => (array)$r, DB::select($sql, [$jobId]));
     }
 
-    public function hasApplied(int $jobId, int $userId): bool
+    public function hasApplied(int $jobId, ?int $userId = null, ?string $email = null): bool
     {
-        return DB::table('job_applications')
+        $query = DB::table('job_applications')
             ->where('job_id', $jobId)
-            ->where('user_id', $userId)
-            ->whereNull('deleted_at')
-            ->exists();
+            ->whereNull('deleted_at');
+
+        if ($userId && $userId > 0) {
+            $query->where('user_id', $userId);
+        } elseif (!empty($email)) {
+            $query->where('applicant_email', trim($email));
+        } else {
+            return false;
+        }
+
+        return $query->exists();
     }
 
     public function apply(array $data): int|bool
     {
         return DB::table('job_applications')->insertGetId([
             'job_id'                 => $data['job_id'],
-            'user_id'                => $data['user_id'],
+            'user_id'                => !empty($data['user_id']) ? (int)$data['user_id'] : null,
             'student_reference_id'   => $data['student_reference_id'] ?? null,
             'applicant_name'         => $data['applicant_name'],
             'applicant_email'        => $data['applicant_email'],

@@ -41,11 +41,64 @@ $batch       = !empty($refData['batch']) ? $refData['batch'] : (!empty($refData[
 $phone       = !empty($profile['phone']) ? $profile['phone'] : ($refData['mobile'] ?? 'N/A');
 $nidNumber   = !empty($profile['nid_number']) ? $profile['nid_number'] : 'N/A';
 $bloodGroup  = !empty($profile['blood_group']) ? $profile['blood_group'] : 'N/A';
-$designation = !empty($profile['designation']) ? $profile['designation'] : (!empty($profile['organization']) ? $profile['organization'] : 'IPH Alumni Member');
+
+// Build Full Present Location
+$presentParts = [];
+if (($profile['location_type'] ?? 'bangladesh') === 'abroad') {
+    if (!empty($profile['province_city'])) $presentParts[] = trim((string)$profile['province_city']);
+    if (!empty($profile['country']) && strtolower(trim((string)$profile['country'])) !== 'bangladesh') {
+        $presentParts[] = trim((string)$profile['country']);
+    }
+    if (empty($presentParts) && !empty($profile['current_location'])) {
+        $presentParts[] = trim((string)$profile['current_location']);
+    }
+} else {
+    if (!empty($profile['thana_upazila'])) {
+        $presentParts[] = trim((string)$profile['thana_upazila']);
+    }
+    if (!empty($profile['current_location'])) {
+        $curLoc = trim((string)$profile['current_location']);
+        if (empty($presentParts) || !str_contains(strtolower($presentParts[0]), strtolower($curLoc))) {
+            $presentParts[] = $curLoc;
+        }
+    }
+    if (empty($presentParts) && !empty($profile['country'])) {
+        $presentParts[] = trim((string)$profile['country']);
+    }
+}
+$presentLocation = !empty($presentParts) ? implode(', ', $presentParts) : 'N/A';
+
+// Build Full Permanent Location
+$permParts = [];
+if (!empty($profile['permanent_location'])) {
+    $permParts[] = trim((string)$profile['permanent_location']);
+}
+if (!empty($profile['permanent_upazila'])) {
+    $pUpazila = trim((string)$profile['permanent_upazila']);
+    $existing = implode(' ', $permParts);
+    if (!str_contains(strtolower($existing), strtolower($pUpazila))) {
+        $permParts[] = $pUpazila;
+    }
+}
+if (!empty($profile['permanent_district'])) {
+    $pDist = trim((string)$profile['permanent_district']);
+    $existing = implode(' ', $permParts);
+    if (!str_contains(strtolower($existing), strtolower($pDist))) {
+        $permParts[] = $pDist;
+    }
+}
+$permLocation = !empty($permParts) ? implode(', ', $permParts) : 'N/A';
+
+// Dynamic Committee Position: If member is in an active committee, show position; otherwise 'IPH Alumni Member'
+$cmStmt = $pdo->prepare("SELECT designation FROM committee_members WHERE user_id = ? AND is_active = 1 AND deleted_at IS NULL ORDER BY sort_order ASC, id ASC LIMIT 1");
+$cmStmt->execute([$user['id']]);
+$cmMember = $cmStmt->fetch();
+$memberTitle = !empty($cmMember['designation']) ? $cmMember['designation'] : 'IPH Alumni Member';
+
 $issueDate   = !empty($profile['created_at']) ? date('d M Y', strtotime($profile['created_at'])) : date('d M Y');
 
 $verificationUrl = url('/directory/' . ($profile['id'] ?? $user['id']));
-$qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=' . urlencode($verificationUrl);
+$qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=0&data=' . urlencode($verificationUrl);
 ?>
 <style>
 @page {
@@ -134,20 +187,30 @@ $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=' . urle
       <div class="absolute -bottom-12 -left-12 w-48 h-48 rounded-full bg-[#2F8863]/30 blur-2xl pointer-events-none"></div>
 
       <!-- Header -->
-      <div class="flex justify-between items-center relative z-10 border-b border-white/10 pb-2">
-        <div class="flex items-center gap-2.5">
-          <img src="<?= asset('images/LOGO.png') ?>" alt="Logo" class="w-9 h-9 object-contain filter drop-shadow-md">
-          <div>
-            <div class="font-bold text-[13px] leading-tight text-white tracking-wide">
-              <?= e(__('ইন্সটিটিউট অব পাবলিক হেলথ এলামনাই অ্যাসোসিয়েশন', 'IPH Alumni Association')) ?>
+      <div class="relative z-10 border-b border-white/10 pb-2">
+        <!-- Organization & Logo Line -->
+        <div class="flex justify-between items-center">
+          <div class="flex items-center gap-2.5">
+            <img src="<?= asset('images/LOGO.png') ?>" alt="Logo" class="w-8 h-8 object-contain filter drop-shadow-md">
+            <div>
+              <div class="font-bold text-[11px] leading-snug text-white tracking-normal">
+                <?= e(__('ইন্সটিটিউট অব পাবলিক হেলথ এলামনাই অ্যাসোসিয়েশন', 'IPH Alumni Association')) ?>
+              </div>
+              <div class="font-mono text-[7px] text-rose-300 tracking-wider uppercase">INSTITUTE OF PUBLIC HEALTH ALUMNI ASSOCIATION</div>
             </div>
-            <div class="font-mono text-[8px] text-rose-300 tracking-widest uppercase">INSTITUTE OF PUBLIC HEALTH ALUMNI</div>
           </div>
+
+          <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono text-[8px] font-bold uppercase tracking-wider flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> VERIFIED
+          </span>
         </div>
 
-        <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono text-[8.5px] font-bold uppercase tracking-wider flex items-center gap-1">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> VERIFIED
-        </span>
+        <!-- Membership Card Title (After Logo & Title) -->
+        <div class="mt-1.5 pt-1 border-t border-white/5 flex items-center justify-between">
+          <div class="font-mono text-[9px] font-bold text-amber-300 tracking-wider uppercase">
+            IPH Alumni Association Membership Card
+          </div>
+        </div>
       </div>
 
       <!-- Card Body Details -->
@@ -169,7 +232,7 @@ $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=' . urle
         <!-- Alumni Info Grid -->
         <div class="min-w-0 flex-1 space-y-1">
           <h3 class="font-bold text-[16px] text-white truncate leading-tight"><?= e($user['name']) ?></h3>
-          <div class="text-[11px] font-semibold text-rose-200 truncate"><?= e($designation) ?></div>
+          <div class="text-[11px] font-semibold text-rose-200 truncate"><?= e($memberTitle) ?></div>
           
           <div class="grid grid-cols-2 gap-x-2 gap-y-0.5 font-mono text-[10px] text-slate-300 pt-1">
             <div><span class="text-slate-400">ID NO:</span> <span class="text-white font-bold"><?= e($memberNo) ?></span></div>
@@ -182,13 +245,20 @@ $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=' . urle
       </div>
 
       <!-- Footer -->
-      <div class="flex justify-between items-end relative z-10 border-t border-white/10 pt-2">
-        <div>
-          <div class="font-mono text-[8.5px] text-amber-300 font-bold uppercase tracking-wider">ISSUED BY IPH ALUMNI ASSOCIATION</div>
+      <div class="flex justify-between items-end relative z-10 border-t border-white/10 pt-1.5">
+        <div class="space-y-0.5 pb-0.5">
+          <div class="font-mono text-[8.5px] text-amber-300 font-bold uppercase tracking-wider flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            ISSUED BY IPH ALUMNI ASSOCIATION
+          </div>
           <div class="text-[9.5px] text-slate-300">Mohakhali, Dhaka-1212, Bangladesh</div>
         </div>
-        <div class="w-10 h-10 rounded-lg bg-white p-0.5 shrink-0 shadow-md">
-          <img src="<?= $qrUrl ?>" alt="QR Code" class="w-full h-full object-contain">
+
+        <div class="flex flex-col items-center">
+          <div class="w-12 h-12 rounded-xl bg-white p-1 shadow-lg border border-white/80 ring-2 ring-amber-400/25 shrink-0 flex items-center justify-center">
+            <img src="<?= $qrUrl ?>" alt="QR Code" class="w-full h-full object-contain rounded-md">
+          </div>
+          <span class="font-mono text-[6.5px] text-amber-300 font-bold uppercase tracking-widest mt-1">SCAN TO VERIFY</span>
         </div>
       </div>
     </div>
@@ -199,8 +269,7 @@ $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=' . urle
       
       <!-- Top Bar -->
       <div class="border-b border-white/10 pb-2 flex justify-between items-center">
-        <div class="font-mono text-[10px] font-bold text-amber-300 tracking-wider">MEMBER ADDITIONAL INFORMATION</div>
-        <div class="font-mono text-[9px] text-slate-400">FRONT & BACK CARD</div>
+        <div class="font-mono text-[10px] font-bold text-amber-300 tracking-wider uppercase">MEMBER ADDITIONAL INFORMATION</div>
       </div>
 
       <!-- Back Info Content -->
@@ -216,14 +285,18 @@ $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=' . urle
           </div>
         </div>
 
-        <div class="p-2 rounded-xl bg-white/5 border border-white/10 space-y-1">
-          <div class="flex justify-between text-[10px]">
-            <span class="text-slate-400">EMAIL:</span>
-            <span class="font-bold text-white truncate max-w-[240px]"><?= e($user['email']) ?></span>
+        <div class="p-2.5 rounded-xl bg-white/5 border border-white/10 space-y-1.5">
+          <div class="flex justify-between items-center text-[10px] gap-2">
+            <span class="text-slate-400 shrink-0 font-mono text-[9px]">EMAIL:</span>
+            <span class="font-bold text-white truncate max-w-[240px] text-right"><?= e($user['email']) ?></span>
           </div>
-          <div class="flex justify-between text-[10px]">
-            <span class="text-slate-400">LOCATION:</span>
-            <span class="font-bold text-white truncate max-w-[240px]"><?= e($profile['current_location'] ?? 'Dhaka, Bangladesh') ?></span>
+          <div class="flex justify-between items-start text-[10px] gap-2">
+            <span class="text-slate-400 shrink-0 font-mono text-[9px] pt-0.5">PRESENT LOCATION:</span>
+            <span class="font-bold text-white text-right leading-tight max-w-[250px]"><?= e($presentLocation) ?></span>
+          </div>
+          <div class="flex justify-between items-start text-[10px] gap-2">
+            <span class="text-slate-400 shrink-0 font-mono text-[9px] pt-0.5">PERMANENT LOCATION:</span>
+            <span class="font-bold text-white text-right leading-tight max-w-[250px]"><?= e($permLocation) ?></span>
           </div>
         </div>
 

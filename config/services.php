@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'uddoktapay' => [
+        'api_key' => env('UDDOKTAPAY_API_KEY', ''),
+        'api_url' => env('UDDOKTAPAY_API_URL', 'https://sandbox.uddoktapay.com/api/checkout-v2'),
+        'mode'    => env('UDDOKTAPAY_MODE', 'sandbox'),
+    ],
+
 ];

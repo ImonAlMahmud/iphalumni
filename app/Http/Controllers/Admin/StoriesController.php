@@ -19,15 +19,23 @@ class StoriesController extends BaseController
 
     public function index(Request $request)
     {
-        $stories = DB::table('success_stories')->whereNull('deleted_at')->orderBy('created_at', 'desc')->get()->map(fn($r) => (array)$r)->toArray();
+        $stories = DB::table('success_stories as s')
+            ->leftJoin('alumni_profiles as ap', 'ap.id', '=', 's.profile_id')
+            ->leftJoin('users as u', 'u.id', '=', 'ap.user_id')
+            ->select('s.*', 'u.name as author_name', 'u.email as author_email')
+            ->whereNull('s.deleted_at')
+            ->orderBy('s.created_at', 'desc')
+            ->get()
+            ->map(fn($r) => (array)$r)
+            ->toArray();
 
-        return $this->legacyView('admin/stories/index', compact('stories'), 'admin', 'Success Stories');
+        return $this->legacyView('admin/stories/index', compact('stories'), 'admin', 'Blogs & Articles');
     }
 
     public function create(Request $request)
     {
         $story = null;
-        return $this->legacyView('admin/stories/form', compact('story'), 'admin', 'Create Success Story');
+        return $this->legacyView('admin/stories/form', compact('story'), 'admin', 'Create Blog Post');
     }
 
     public function store(Request $request)
@@ -60,7 +68,7 @@ class StoriesController extends BaseController
             'updated_at'  => now(),
         ]);
 
-        return redirect('/admin/stories')->with('success', 'Success story created.');
+        return redirect('/admin/stories')->with('success', 'ব্লগটি সফলভাবে তৈরি করা হয়েছে।');
     }
 
     public function edit(Request $request, $id)
@@ -68,17 +76,20 @@ class StoriesController extends BaseController
         $id    = (int)$id;
         $story = DB::table('success_stories')->where('id', $id)->whereNull('deleted_at')->first();
         if (!$story) {
-            abort(404);
+            return redirect('/admin/stories')->with('error', 'ব্লগটি খুঁজে পাওয়া যায়নি।');
         }
         $story = (array)$story;
 
-        return $this->legacyView('admin/stories/form', compact('story'), 'admin', 'Edit Success Story');
+        return $this->legacyView('admin/stories/form', compact('story'), 'admin', 'Edit Blog Post');
     }
 
     public function update(Request $request, $id)
     {
         $id = (int)$id;
         $oldStory = DB::table('success_stories')->where('id', $id)->first();
+        if (!$oldStory) {
+            return redirect('/admin/stories')->with('error', 'ব্লগটি খুঁজে পাওয়া যায়নি।');
+        }
         $cover_image = $oldStory->cover_image ?? null;
 
         $file = $request->file('cover_image');
@@ -88,7 +99,6 @@ class StoriesController extends BaseController
         }
 
         $title       = trim((string)$request->input('title', ''));
-        $slug        = $this->slugify($title);
         $batch_year  = trim((string)$request->input('batch_year', ''));
         $excerpt     = trim((string)$request->input('excerpt', ''));
         $content     = trim((string)$request->input('content', ''));
@@ -97,7 +107,6 @@ class StoriesController extends BaseController
 
         DB::table('success_stories')->where('id', $id)->update([
             'title'       => $title,
-            'slug'        => $slug,
             'batch_year'  => $batch_year,
             'excerpt'     => $excerpt,
             'content'     => $content,
@@ -107,14 +116,14 @@ class StoriesController extends BaseController
             'updated_at'  => now(),
         ]);
 
-        return redirect('/admin/stories')->with('success', 'Success story updated.');
+        return redirect('/admin/stories')->with('success', 'ব্লগ পোস্টটি সফলভাবে আপডেট করা হয়েছে।');
     }
 
     public function delete(Request $request, $id)
     {
         $id = (int)$id;
-        DB::table('success_stories')->where('id', $id)->update(['deleted_at' => now()]);
-        return redirect('/admin/stories')->with('success', 'Success story deleted.');
+        DB::table('success_stories')->where('id', $id)->update(['deleted_at' => now(), 'updated_at' => now()]);
+        return redirect('/admin/stories')->with('success', 'ব্লগ পোস্টটি সফলভাবে ডিলিট করা হয়েছে।');
     }
 
     public function approve(Request $request, $id)

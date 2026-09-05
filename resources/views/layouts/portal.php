@@ -1,6 +1,10 @@
 <?php
 $appName   = env('APP_NAME', 'IPH Alumni Association');
 $user      = auth();
+$userAvatar = !empty($user['avatar']) ? $user['avatar'] : null;
+if (!$userAvatar && !empty($user['id'])) {
+    $userAvatar = \Illuminate\Support\Facades\DB::table('alumni_profiles')->where('user_id', $user['id'])->value('avatar');
+}
 $title     = isset($title) ? e($title) . ' — Portal · ' . $appName : 'Portal · ' . $appName;
 $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 function portalActive(string $path): string {
@@ -14,6 +18,12 @@ function portalActive(string $path): string {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?= $title ?></title>
+<meta name="theme-color" content="#800020">
+<link rel="manifest" href="<?= asset('manifest.webmanifest') ?>">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="IPH Alumni">
 <link rel="icon" type="image/png" href="<?= asset('images/LOGO.png') ?>">
 <link rel="apple-touch-icon" href="<?= asset('images/LOGO.png') ?>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -60,6 +70,15 @@ if (!empty($user['id'])) {
     $hasFinancePerm = ((int)$stmtPerm->fetchColumn() > 0);
 }
 
+function isPortalNavActive(string $path): bool {
+    $currentUri = trim(request()->path(), '/');
+    $target = trim(str_replace('/public', '', $path), '/');
+    if ($target === 'portal') {
+        return $currentUri === 'portal';
+    }
+    return $currentUri === $target || str_starts_with($currentUri, $target . '/');
+}
+
 $navItems = [
   ['/portal',                  'Dashboard',        'fa-solid fa-gauge-high'],
   ['/portal/id-card',          'Digital ID Card',  'fa-solid fa-id-card'],
@@ -67,7 +86,7 @@ $navItems = [
   ['/portal/jobs',             'Job Postings',     'fa-solid fa-briefcase'],
   ['/portal/profile',          'My Profile',       'fa-solid fa-user-circle'],
   ['/portal/membership',       'Membership',      'fa-solid fa-id-card-clip'],
-  ['/portal/stories',          'My Blogs',        'fa-solid fa-pen-to-square'],
+  ['/portal/stories',          'My Blogs & Articles', 'fa-solid fa-pen-to-square'],
 ];
 
 if ($hasFinancePerm) {
@@ -106,9 +125,13 @@ $navItems[] = ['/portal/settings',    'Settings',     'fa-solid fa-gear'];
       <!-- User info -->
       <div class="px-5 py-4 border-b border-slate-100">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full flex items-center justify-center font-serif font-semibold text-[14px] shrink-0"
+          <div class="w-10 h-10 rounded-full flex items-center justify-center font-serif font-semibold text-[14px] shrink-0 overflow-hidden border border-slate-200 shadow-sm"
                style="background:linear-gradient(135deg,#153548,#2F8863);color:#FAFAFA;">
-            <?= initials($user['name'] ?? 'A') ?>
+            <?php if (!empty($userAvatar)): ?>
+              <img src="<?= avatar_url($userAvatar) ?>" alt="<?= e($user['name'] ?? 'Avatar') ?>" class="w-full h-full object-cover">
+            <?php else: ?>
+              <?= initials($user['name'] ?? 'A') ?>
+            <?php endif; ?>
           </div>
           <div class="min-w-0">
             <div class="text-[13.5px] font-semibold text-[#101820] truncate"><?= e($user['name'] ?? '') ?></div>
@@ -120,18 +143,16 @@ $navItems[] = ['/portal/settings',    'Settings',     'fa-solid fa-gear'];
       <!-- Nav -->
       <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         <?php foreach ($navItems as [$path, $label, $icon]): 
-          $scriptDir = dirname($_SERVER['SCRIPT_NAME'] ?? '/public/index.php');
-          $cp = str_replace($scriptDir, '', $currentPath);
-          $normPath = str_replace('/public', '', $path);
-          if ($normPath === '/portal') {
-              $active = ($cp === '/portal' || $cp === '/portal/');
-          } else {
-              $active = ($cp === $normPath || str_starts_with($cp, $normPath . '/'));
-          }
+          $active = isPortalNavActive($path);
         ?>
-        <a href="<?= url($path) ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13.5px] transition-all <?= $active ? 'bg-slate-100 text-[#800020] font-semibold shadow-sm' : 'text-[#6B7178] hover:text-[#101820] hover:bg-slate-50' ?>">
-          <i class="<?= $icon ?> text-[14px] w-4 text-center shrink-0 <?= $active ? 'text-[#800020]' : 'text-slate-400' ?>"></i>
+        <a href="<?= url($path) ?>" 
+           class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13.5px] transition-all duration-200 relative group <?= $active ? 'text-white font-semibold shadow-md' : 'text-[#4A5568] hover:text-[#101820] hover:bg-slate-100/80' ?>"
+           style="<?= $active ? 'background: linear-gradient(135deg, #800020, #A22638); box-shadow: 0 4px 14px -3px rgba(128,0,32,0.4);' : '' ?>">
+          <i class="<?= $icon ?> text-[14px] w-4 text-center shrink-0 <?= $active ? 'text-white' : 'text-[#8A94A0] group-hover:text-[#800020]' ?>"></i>
           <span><?= $label ?></span>
+          <?php if ($active): ?>
+          <span class="ml-auto w-1.5 h-1.5 rounded-full bg-white shadow-sm"></span>
+          <?php endif; ?>
         </a>
         <?php endforeach; ?>
       </nav>
@@ -165,9 +186,13 @@ $navItems[] = ['/portal/settings',    'Settings',     'fa-solid fa-gear'];
     <!-- User info -->
     <div class="px-5 py-4 border-b shrink-0" style="border-color:rgba(16,24,32,0.08);">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-full flex items-center justify-center font-serif font-semibold text-[14px] shrink-0"
+        <div class="w-10 h-10 rounded-full flex items-center justify-center font-serif font-semibold text-[14px] shrink-0 overflow-hidden border border-slate-200 shadow-sm"
              style="background:linear-gradient(135deg,#153548,#2F8863);color:#FAFAFA;">
-          <?= initials($user['name'] ?? 'A') ?>
+          <?php if (!empty($userAvatar)): ?>
+            <img src="<?= avatar_url($userAvatar) ?>" alt="<?= e($user['name'] ?? 'Avatar') ?>" class="w-full h-full object-cover">
+          <?php else: ?>
+            <?= initials($user['name'] ?? 'A') ?>
+          <?php endif; ?>
         </div>
         <div class="min-w-0">
           <div class="text-[13.5px] font-semibold text-[#101820] truncate"><?= e($user['name'] ?? '') ?></div>
@@ -179,24 +204,26 @@ $navItems[] = ['/portal/settings',    'Settings',     'fa-solid fa-gear'];
     <!-- Nav -->
     <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
       <?php foreach ($navItems as [$path, $label, $icon]): 
-        $scriptDir = dirname($_SERVER['SCRIPT_NAME'] ?? '/public/index.php');
-        $cp = str_replace($scriptDir, '', $currentPath);
-        $normPath = str_replace('/public', '', $path);
-        if ($normPath === '/portal') {
-            $active = ($cp === '/portal' || $cp === '/portal/');
-        } else {
-            $active = ($cp === $normPath || str_starts_with($cp, $normPath . '/'));
-        }
+        $active = isPortalNavActive($path);
       ?>
-      <a href="<?= url($path) ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13.5px] transition-all <?= $active ? 'bg-white/90 text-[#101820] font-semibold shadow-sm' : 'text-[#6B7178] hover:text-[#101820] hover:bg-white/60' ?>">
-        <i class="<?= $icon ?> text-[14px] w-4 text-center shrink-0 <?= $active ? 'text-[#800020]' : 'text-slate-400' ?>"></i>
+      <a href="<?= url($path) ?>" 
+         class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13.5px] transition-all duration-200 relative group <?= $active ? 'text-white font-semibold shadow-md' : 'text-[#4A5568] hover:text-[#101820] hover:bg-white/80' ?>"
+         style="<?= $active ? 'background: linear-gradient(135deg, #800020, #A22638); box-shadow: 0 4px 14px -3px rgba(128,0,32,0.4);' : '' ?>">
+        <i class="<?= $icon ?> text-[14px] w-4 text-center shrink-0 <?= $active ? 'text-white' : 'text-[#8A94A0] group-hover:text-[#800020]' ?>"></i>
         <span><?= $label ?></span>
+        <?php if ($active): ?>
+        <span class="ml-auto w-1.5 h-1.5 rounded-full bg-white shadow-sm"></span>
+        <?php endif; ?>
       </a>
       <?php endforeach; ?>
     </nav>
 
     <!-- Bottom links -->
     <div class="px-3 py-4 border-t space-y-1 shrink-0" style="border-color:rgba(16,24,32,0.08);">
+      <button type="button" onclick="toggleGoogleTranslate()" class="notranslate w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-[#6B7178] hover:text-[#800020] hover:bg-white/60 transition-all cursor-pointer text-left" translate="no">
+        <i class="fa-solid fa-language w-4 text-center text-[#800020]"></i>
+        <span class="gt-lang-label notranslate" translate="no">English</span>
+      </button>
       <a href="<?= url('/') ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-[#6B7178] hover:text-[#101820] hover:bg-white/60 transition-all">
         <i class="fa-solid fa-arrow-up-right-from-square w-4 text-center"></i>
         Public Site
@@ -222,7 +249,13 @@ $navItems[] = ['/portal/settings',    'Settings',     'fa-solid fa-gear'];
           IPH Alumni
         </a>
       </div>
-      <a href="<?= url('/logout') ?>" class="text-[13px] font-medium text-red-600 hover:underline">Logout</a>
+      <div class="flex items-center gap-3">
+        <button type="button" onclick="toggleGoogleTranslate()" class="notranslate text-[12.5px] font-semibold text-[#800020] px-2.5 py-1 rounded-lg border border-slate-200 flex items-center gap-1.5 cursor-pointer" translate="no">
+          <i class="fa-solid fa-language text-[12px]"></i>
+          <span class="gt-lang-label notranslate" translate="no">English</span>
+        </button>
+        <a href="<?= url('/logout') ?>" class="text-[13px] font-medium text-red-600 hover:underline">Logout</a>
+      </div>
     </header>
 
     <!-- Page content -->
@@ -231,6 +264,12 @@ $navItems[] = ['/portal/settings',    'Settings',     'fa-solid fa-gear'];
     </main>
   </div>
 </div>
+
+<!-- Google Translate Partial (Top bar hidden, clean toggle) -->
+<?php require view_path('partials/google_translate.php'); ?>
+
+<!-- Mobile Bottom Navigation Dock & PWA Controller -->
+<?php require view_path('partials/mobile_bottom_nav.php'); ?>
 
 <script>
 setTimeout(() => {

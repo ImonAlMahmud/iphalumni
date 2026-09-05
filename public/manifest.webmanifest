@@ -1,0 +1,49 @@
+{
+  "name": "আইপিএইচ অ্যালামনাই অ্যাসোসিয়েশন (IPH Alumni Association)",
+  "short_name": "IPH Alumni",
+  "description": "Official Alumni Portal of Institute of Public Health (IPH), Mohakhali, Dhaka.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#800020",
+  "background_color": "#FAFAFA",
+  "lang": "bn-BD",
+  "icons": [
+    {
+      "src": "images/LOGO.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "images/LOGO.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "অ্যালামনাই ডিরেক্টরি",
+      "short_name": "ডিরেক্টরি",
+      "description": "সার্চ করুন আইপিএইচ প্রাক্তন শিক্ষার্থী ও সহপাঠীদের",
+      "url": "directory",
+      "icons": [{ "src": "images/LOGO.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "চাকরির বিজ্ঞপ্তি",
+      "short_name": "জব সার্কুলার",
+      "description": "দেখুন নতুন স্বাস্থ্য ও চিকিৎসা খাতের চাকরি",
+      "url": "jobs",
+      "icons": [{ "src": "images/LOGO.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "অ্যালামনাই পোর্টাল",
+      "short_name": "পোর্টাল",
+      "description": "আইডি কার্ড ও প্রোফাইল ড্যাশবোর্ড",
+      "url": "portal",
+      "icons": [{ "src": "images/LOGO.png", "sizes": "192x192" }]
+    }
+  ]
+}

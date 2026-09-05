@@ -56,7 +56,7 @@
           <?php
           $platformLinks = [
             ['/directory', 'fa-solid fa-address-book',   __('অ্যালামনাই ডিরেক্টরি', 'Alumni Directory')],
-            ['/stories',   'fa-solid fa-trophy',          __('সফলতার গল্প',          'Success Stories')],
+            ['/stories',   'fa-solid fa-newspaper',       __('ব্লগ ও আর্টিকেল',      'Blogs & Articles')],
             ['/events',    'fa-solid fa-calendar-days',   __('ইভেন্ট ও অনুষ্ঠান',    'Events')],
             ['/news',      'fa-solid fa-newspaper',       __('সংবাদ ও আপডেট',        'News & Updates')],
             ['/gallery',   'fa-solid fa-images',          __('ফটো গ্যালারি',          'Photo Gallery')],

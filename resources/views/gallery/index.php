@@ -27,24 +27,24 @@
             <span class="text-white/20 text-[26px]">🖼️</span>
           </div>
         <?php elseif (count($album['photos']) === 1): ?>
-          <img src="<?= asset('storage/gallery/' . $album['id'] . '/' . e($album['photos'][0])) ?>" alt="" class="w-full h-full object-cover">
+          <img src="<?= asset('storage/gallery/' . $album['id'] . '/' . e($album['photos'][0])) ?>" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
         <?php elseif (count($album['photos']) === 2): ?>
           <div class="grid grid-cols-2 h-full gap-0.5">
-            <img src="<?= asset('storage/gallery/' . $album['id'] . '/' . e($album['photos'][0])) ?>" alt="" class="w-full h-full object-cover">
-            <img src="<?= asset('storage/gallery/' . $album['id'] . '/' . e($album['photos'][1])) ?>" alt="" class="w-full h-full object-cover">
+            <img src="<?= asset('storage/gallery/' . $album['id'] . '/' . e($album['photos'][0])) ?>" alt="" class="w-full h-full object-cover" loading="lazy">
+            <img src="<?= asset('storage/gallery/' . $album['id'] . '/' . e($album['photos'][1])) ?>" alt="" class="w-full h-full object-cover" loading="lazy">
           </div>
         <?php elseif (count($album['photos']) === 3): ?>
           <div class="grid grid-cols-3 h-full gap-0.5">
-            <img src="<?= asset('storage/gallery/' . $album['id'] . '/' . e($album['photos'][0])) ?>" alt="" class="w-full h-full object-cover col-span-2">
+            <img src="<?= asset('storage/gallery/' . $album['id'] . '/' . e($album['photos'][0])) ?>" alt="" class="w-full h-full object-cover col-span-2" loading="lazy">
             <div class="grid grid-rows-2 gap-0.5 h-full">
-              <img src="<?= asset('storage/gallery/' . $album['id'] . '/' . e($album['photos'][1])) ?>" alt="" class="w-full h-full object-cover">
-              <img src="<?= asset('storage/gallery/' . $album['id'] . '/' . e($album['photos'][2])) ?>" alt="" class="w-full h-full object-cover">
+              <img src="<?= asset('storage/gallery/' . $album['id'] . '/' . e($album['photos'][1])) ?>" alt="" class="w-full h-full object-cover" loading="lazy">
+              <img src="<?= asset('storage/gallery/' . $album['id'] . '/' . e($album['photos'][2])) ?>" alt="" class="w-full h-full object-cover" loading="lazy">
             </div>
           </div>
         <?php else: ?>
           <div class="grid grid-cols-2 grid-rows-2 h-full gap-0.5">
             <?php foreach ($album['photos'] as $p): ?>
-              <img src="<?= asset('storage/gallery/' . $album['id'] . '/' . e($p)) ?>" alt="" class="w-full h-full object-cover">
+              <img src="<?= asset('storage/gallery/' . $album['id'] . '/' . e($p)) ?>" alt="" class="w-full h-full object-cover" loading="lazy">
             <?php endforeach; ?>
           </div>
         <?php endif; ?>

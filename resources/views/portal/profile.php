@@ -29,10 +29,14 @@ $actType = $profile['activity_type'] ?? 'work';
       <form method="POST" action="<?= url('/portal/profile') ?>" class="space-y-6">
         <?= csrf_field() ?>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
             <label class="form-label" for="name">Full Name *</label>
-            <input id="name" type="text" name="name" value="<?= e($user['name']) ?>" required class="form-input">
+            <input id="name" type="text" name="name" value="<?= e($user['name'] ?? '') ?>" required class="form-input">
+          </div>
+          <div>
+            <label class="form-label" for="email">Email Address (ইমেইল ঠিকানা) *</label>
+            <input id="email" type="email" name="email" value="<?= e($user['email'] ?? '') ?>" required class="form-input" placeholder="e.g. member@iphalumni.org">
           </div>
           <div>
             <label class="form-label" for="phone">Phone Number</label>
@@ -68,8 +72,8 @@ $actType = $profile['activity_type'] ?? 'work';
               </select>
           </div>
           <div>
-            <label class="form-label" for="batch_year">Batch Year</label>
-            <input id="batch_year" type="number" min="1950" max="<?= date('Y') ?>" name="batch_year" value="<?= e($profile['batch_year'] ?? '') ?>" placeholder="e.g. 2018" class="form-input">
+            <label class="form-label" for="batch_year">Batch (ব্যাচ)</label>
+            <input id="batch_year" type="text" name="batch_year" value="<?= e($profile['batch_year'] ?? '') ?>" placeholder="e.g. L-4, F-1, 2018-19" class="form-input">
           </div>
         </div>
 
@@ -326,10 +330,6 @@ $actType = $profile['activity_type'] ?? 'work';
         <h4 class="font-serif text-[15px] font-semibold text-gray-800 pt-3 border-t border-gray-100 mb-4">🎓 Academic Details & IPH History</h4>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="form-label" for="hall_hostel">Hall / Hostel Name (হলের নাম)</label>
-            <input id="hall_hostel" type="text" name="hall_hostel" value="<?= e($profile['hall_hostel'] ?? '') ?>" placeholder="e.g. IPH Hostel / Main Campus Hostel" class="form-input">
-          </div>
-          <div>
             <label class="form-label" for="session_years">Session / Academic Years (শিক্ষাবর্ষ)</label>
             <input id="session_years" type="text" name="session_years" value="<?= e($profile['session_years'] ?? '') ?>" placeholder="e.g. 2014-2015" class="form-input">
           </div>
@@ -374,6 +374,11 @@ $actType = $profile['activity_type'] ?? 'work';
 
         <h4 class="font-serif text-[15px] font-semibold text-gray-800 pt-3 border-t border-gray-100 mb-4">🏠 Permanent Address & Emergency Contact</h4>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="md:col-span-2">
+            <label class="form-label" for="permanent_location">Permanent Location / Address (স্থায়ী অবস্থান বা ঠিকানা)</label>
+            <input id="permanent_location" type="text" name="permanent_location" value="<?= e($profile['permanent_location'] ?? '') ?>" placeholder="e.g. Mohakhali, Dhaka or Bogura Sadar, Bogura" class="form-input">
+            <p class="text-[11px] text-gray-400 mt-1">এটি আপনার ডিজিটাল মেম্বারশিপ আইডি কার্ডের পেছনের অংশে "PERMANENT LOCATION" হিসেবে প্রদর্শিত হবে।</p>
+          </div>
           <div>
             <label class="form-label" for="permanent_district">Permanent District (স্থায়ী জেলা)</label>
             <select id="permanent_district" name="permanent_district" class="form-input">

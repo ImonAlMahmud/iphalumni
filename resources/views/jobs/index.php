@@ -3,6 +3,8 @@
  * Public Job Circulars Index View
  * Variables: $result, $q, $type
  */
+$q = $q ?? '';
+$type = $type ?? '';
 ?>
 <div class="max-w-7xl mx-auto px-6 py-14">
 
@@ -60,6 +62,74 @@
       </div>
     </div>
   </form>
+
+  <!-- Job Alert Email Subscription Banner -->
+  <div class="mb-10 p-6 sm:p-7 rounded-3xl border border-rose-100/80 shadow-sm relative overflow-hidden"
+       style="background: linear-gradient(135deg, rgba(128,0,32,0.04) 0%, rgba(255,255,255,0.95) 100%), #FFFFFF;">
+    
+    <div class="absolute -right-8 -bottom-8 w-40 h-40 bg-gradient-to-br from-[#800020]/10 to-transparent rounded-full blur-2xl pointer-events-none"></div>
+
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
+      <div class="max-w-xl">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-semibold text-[#800020] bg-[#800020]/10 mb-2.5">
+          <i class="fa-solid fa-bell text-rose-600 animate-pulse"></i>
+          <?= __('ইমেইল জব নোটিফিকেশন', 'Email Job Notification') ?>
+        </div>
+        <h3 class="font-serif text-[20px] sm:text-[22px] font-bold text-[#101820] leading-snug">
+          <?= __('নতুন চাকরির খবর সরাসরি পেতে চান?', 'Get New Job Alerts Directly in Your Inbox') ?>
+        </h3>
+        <p class="text-[13.5px] text-[#6B7178] mt-1">
+          <?= __('আইপিএইচ অ্যালামনাইদের পোস্ট করা নতুন কোনো সরকারি, বেসরকারি বা আন্তর্জাতিক স্বাস্থ্য সংস্থার জব সার্কুলার প্রকাশিত হলেই আমরা আপনাকে তাৎক্ষণিক ইমেইল পাঠিয়ে জানাব।',
+                'Never miss an opening. Subscribe once and get notified whenever a new relevant job is published.') ?>
+        </p>
+      </div>
+
+      <form method="POST" action="<?= url('/jobs/subscribe') ?>" class="w-full lg:w-auto flex-1 max-w-xl">
+        <?= csrf_field() ?>
+        <div class="flex flex-col sm:flex-row gap-2.5 mb-3">
+          <div class="flex-1 relative">
+            <i class="fa-regular fa-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-[13px]"></i>
+            <input type="email" name="email" required
+                   value="<?= e(auth_user()['email'] ?? '') ?>"
+                   placeholder="<?= __('আপনার ইমেইল ঠিকানা দিন...', 'Enter your email address...') ?>"
+                   class="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-gray-200 text-[13.5px] text-[#101820] focus:outline-none focus:border-[#800020] bg-white">
+          </div>
+
+          <?php if (empty($isLoggedIn) && !empty($subCaptcha)): ?>
+          <div class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-gray-200 shrink-0">
+            <span class="font-mono font-semibold text-[13px] text-[#800020]"><?= $subCaptcha ?> =</span>
+            <input type="number" name="sub_captcha_answer" required placeholder="?"
+                   class="w-12 text-center py-1 rounded-lg border border-gray-300 text-[13px] font-bold focus:outline-none focus:border-[#800020]">
+          </div>
+          <?php endif; ?>
+
+          <button type="submit"
+                  class="px-6 py-2.5 rounded-xl text-[13.5px] font-semibold text-white transition-all hover:opacity-95 shadow shrink-0 cursor-pointer"
+                  style="background: linear-gradient(135deg, #A22638, #800020);">
+            <i class="fa-solid fa-paper-plane mr-1 text-[11px]"></i> <?= __('সাবস্ক্রাইব করুন', 'Subscribe Free') ?>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-4 text-[12px] text-[#6B7178] flex-wrap">
+          <span class="font-medium text-gray-400"><?= __('পছন্দ:', 'Preference:') ?></span>
+          <label class="inline-flex items-center gap-1.5 cursor-pointer">
+            <input type="checkbox" name="job_types[]" value="Full-time" checked class="rounded text-[#800020] focus:ring-0"> Full-time
+          </label>
+          <label class="inline-flex items-center gap-1.5 cursor-pointer">
+            <input type="checkbox" name="job_types[]" value="Contract" checked class="rounded text-[#800020] focus:ring-0"> Contract
+          </label>
+          <label class="inline-flex items-center gap-1.5 cursor-pointer">
+            <input type="checkbox" name="job_types[]" value="Remote" checked class="rounded text-[#800020] focus:ring-0"> Remote
+          </label>
+          <label class="inline-flex items-center gap-1.5 cursor-pointer">
+            <input type="checkbox" name="job_types[]" value="Internship" checked class="rounded text-[#800020] focus:ring-0"> Internship
+          </label>
+          <span class="text-emerald-700 text-[11.5px] ml-auto font-medium"><i class="fa-solid fa-shield-halved mr-1"></i>১০০% স্প্যাম-মুক্ত</span>
+        </div>
+      </form>
+    </div>
+
+  </div>
 
   <!-- Job Cards Grid -->
   <?php if (empty($result['items'])): ?>

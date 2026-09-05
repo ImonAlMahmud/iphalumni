@@ -57,23 +57,23 @@ class AuthController extends BaseController
 
     public function register(Request $request)
     {
-        $name       = trim($request->input('name', ''));
-        $email      = trim($request->input('email', ''));
-        $password   = $request->input('password', '');
-        $confirm    = $request->input('password_confirm', '');
-        $batch      = $request->input('batch_year', '');
-        $studentId  = trim($request->input('student_id', ''));
-        $phone      = trim($request->input('phone', ''));
-        $nidNumber  = trim($request->input('nid_number', ''));
-        $gender     = $request->input('gender', '');
-        $dob        = $request->input('dob', '');
-        $bloodGroup = $request->input('blood_group', '');
-        $location   = trim($request->input('current_location', ''));
-        $website    = trim($request->input('website', ''));
-        $linkedin   = trim($request->input('linkedin_url', ''));
-        $facebook   = trim($request->input('facebook_url', ''));
-        $spouseName = trim($request->input('spouse_name', ''));
-        $children   = trim($request->input('children_info', ''));
+        $name       = trim((string)$request->input('name', ''));
+        $email      = trim((string)$request->input('email', ''));
+        $password   = (string)$request->input('password', '');
+        $confirm    = (string)$request->input('password_confirm', '');
+        $batch      = (string)$request->input('batch_year', '');
+        $studentId  = trim((string)$request->input('student_id', ''));
+        $phone      = trim((string)$request->input('phone', ''));
+        $nidNumber  = trim((string)$request->input('nid_number', ''));
+        $gender     = (string)$request->input('gender', '');
+        $dob        = (string)$request->input('dob', '');
+        $bloodGroup = (string)$request->input('blood_group', '');
+        $location   = trim((string)$request->input('current_location', ''));
+        $website    = trim((string)$request->input('website', ''));
+        $linkedin   = trim((string)$request->input('linkedin_url', ''));
+        $facebook   = trim((string)$request->input('facebook_url', ''));
+        $spouseName = trim((string)$request->input('spouse_name', ''));
+        $children   = trim((string)$request->input('children_info', ''));
 
         // Validation
         $errors = [];
@@ -81,7 +81,8 @@ class AuthController extends BaseController
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'Please enter a valid email address.';
         if (strlen($password) < 8) $errors[] = 'Password must be at least 8 characters.';
         if ($password !== $confirm) $errors[] = 'Passwords do not match.';
-        if (empty($batch)) $errors[] = 'Batch year is required.';
+        if (empty($batch)) $errors[] = 'Batch is required.';
+        if (empty($studentId)) $errors[] = 'Dhaka University Registration ID is required.';
 
         // Document upload
         $file = $request->file('proof_document');
@@ -104,82 +105,98 @@ class AuthController extends BaseController
             return back()->with('error', 'This email is already registered. Please log in.')->withInput();
         }
 
-        // Clean names function for auto-verification
-        $cleanName = function (string $n): string {
-            $n = mb_strtolower($n, 'UTF-8');
-            $prefixes = ['md.', 'md', 'mst.', 'mst', 'most.', 'most', 'dr.', 'dr', 'mo:', 'মো:', 'মোঃ', 'মোহাম্মদ', 'মোসাম্মৎ'];
-            foreach ($prefixes as $prefix) {
-                if (str_starts_with($n, $prefix . ' ')) {
-                    $n = substr($n, strlen($prefix) + 1);
-                }
-            }
-            return trim(str_replace(['.', '-', ' '], '', $n));
-        };
-
-        // Auto verification check
-        $autoVerified      = false;
-        $matchedStudentRef = null;
         try {
-            $candidates     = array_map(fn($r) => (array)$r, DB::select("SELECT * FROM students_reference WHERE session LIKE ?", [$batch . '%']));
-            $inputCleanName = $cleanName($name);
-            foreach ($candidates as $cand) {
-                if ($inputCleanName === $cleanName($cand['name_english']) || $inputCleanName === $cleanName($cand['name_bangla'] ?? '')) {
-                    $autoVerified      = true;
-                    $matchedStudentRef = $cand;
-                    break;
+            // Clean names function for auto-verification
+            $cleanName = function (string $n): string {
+                $n = mb_strtolower($n, 'UTF-8');
+                $prefixes = ['md.', 'md', 'mst.', 'mst', 'most.', 'most', 'dr.', 'dr', 'mo:', 'মো:', 'মোঃ', 'মোহাম্মদ', 'মোসাম্মৎ'];
+                foreach ($prefixes as $prefix) {
+                    if (str_starts_with($n, $prefix . ' ')) {
+                        $n = substr($n, strlen($prefix) + 1);
+                    }
                 }
+                return trim(str_replace(['.', '-', ' '], '', $n));
+            };
+
+            // Auto verification check
+            $autoVerified      = false;
+            $matchedStudentRef = null;
+            try {
+                $candidates     = array_map(fn($r) => (array)$r, DB::select("SELECT * FROM students_reference WHERE session LIKE ?", [$batch . '%']));
+                $inputCleanName = $cleanName($name);
+                foreach ($candidates as $cand) {
+                    if ($inputCleanName === $cleanName((string)($cand['name_english'] ?? '')) || $inputCleanName === $cleanName((string)($cand['name_bangla'] ?? ''))) {
+                        $autoVerified      = true;
+                        $matchedStudentRef = $cand;
+                        break;
+                    }
+                }
+            } catch (\Throwable $e) {}
+
+            $userStatus    = $autoVerified ? 'active' : 'pending';
+            $profileStatus = $autoVerified ? 'verified' : 'pending';
+
+            // Create user
+            $userId = DB::table('users')->insertGetId([
+                'name'       => $name,
+                'email'      => $email,
+                'password'   => Hash::make($password),
+                'role'       => 'alumni',
+                'status'     => $userStatus,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // Create alumni profile
+            $studentRefId  = $matchedStudentRef['id'] ?? null;
+            $finalStudentId = $studentId ?: ($matchedStudentRef['roll'] ?? null);
+            $finalPhone     = $phone ?: ($matchedStudentRef['mobile'] ?? null);
+            $finalGender    = $gender ?: ($matchedStudentRef['gender'] ?? null);
+            $finalLocation  = $location ?: ($matchedStudentRef['district'] ?? null);
+
+            DB::table('alumni_profiles')->insert([
+                'user_id'              => $userId,
+                'student_reference_id' => $studentRefId,
+                'batch_year'           => $batch,
+                'student_id'           => $finalStudentId,
+                'phone'                => $finalPhone,
+                'nid_number'           => $nidNumber ?: null,
+                'dob'                  => $dob ?: null,
+                'gender'               => $finalGender,
+                'blood_group'          => $bloodGroup ?: null,
+                'current_location'     => $finalLocation,
+                'website'              => $website ?: null,
+                'linkedin_url'         => $linkedin ?: null,
+                'facebook_url'         => $facebook ?: null,
+                'spouse_name'          => $spouseName ?: null,
+                'children_info'        => $children ?: null,
+                'proof_document'       => $proofDoc,
+                'status'               => $profileStatus,
+                'is_featured'          => 0,
+                'created_at'           => now(),
+                'updated_at'           => now(),
+            ]);
+
+            // Send Welcome Email
+            try {
+                $templates = MailService::getTemplates();
+                if (isset($templates['new_member_welcome'])) {
+                    $welcomeTpl = $templates['new_member_welcome'];
+                    MailService::send($email, $welcomeTpl['subject'] ?? 'Welcome to IPH Alumni Association!', $welcomeTpl);
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Welcome email sending error: ' . $e->getMessage());
             }
-        } catch (\Exception $e) {}
 
-        $userStatus    = $autoVerified ? 'active' : 'pending';
-        $profileStatus = $autoVerified ? 'verified' : 'pending';
+            $msg = $autoVerified
+                ? 'Your profile has been automatically verified! You can now log in.'
+                : 'Registration submitted! Your profile will be verified within 48 hours. You can log in once approved.';
 
-        // Create user
-        $userId = DB::table('users')->insertGetId([
-            'name'       => $name,
-            'email'      => $email,
-            'password'   => Hash::make($password),
-            'role'       => 'alumni',
-            'status'     => $userStatus,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        // Create alumni profile
-        $studentRefId  = $matchedStudentRef['id'] ?? null;
-        $finalStudentId = $studentId ?: ($matchedStudentRef['roll'] ?? null);
-        $finalPhone     = $phone ?: ($matchedStudentRef['mobile'] ?? null);
-        $finalGender    = $gender ?: ($matchedStudentRef['gender'] ?? null);
-        $finalLocation  = $location ?: ($matchedStudentRef['district'] ?? null);
-
-        DB::table('alumni_profiles')->insert([
-            'user_id'              => $userId,
-            'student_reference_id' => $studentRefId,
-            'batch_year'           => $batch,
-            'student_id'           => $finalStudentId,
-            'phone'                => $finalPhone,
-            'nid_number'           => $nidNumber ?: null,
-            'dob'                  => $dob ?: null,
-            'gender'               => $finalGender,
-            'blood_group'          => $bloodGroup ?: null,
-            'current_location'     => $finalLocation,
-            'website'              => $website ?: null,
-            'linkedin_url'         => $linkedin ?: null,
-            'facebook_url'         => $facebook ?: null,
-            'spouse_name'          => $spouseName ?: null,
-            'children_info'        => $children ?: null,
-            'proof_document'       => $proofDoc,
-            'status'               => $profileStatus,
-            'is_featured'          => 0,
-            'created_at'           => now(),
-            'updated_at'           => now(),
-        ]);
-
-        $msg = $autoVerified
-            ? 'Your profile has been automatically verified! You can now log in.'
-            : 'Registration submitted! Your profile will be verified within 48 hours. You can log in once approved.';
-
-        return redirect('/login')->with('success', $msg);
+            return redirect('/login')->with('success', $msg);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Registration error: ' . $e->getMessage());
+            return back()->with('error', 'রেজিস্ট্রেশন জমা দিতে সমস্যা হয়েছে: ' . $e->getMessage())->withInput();
+        }
     }
 
     public function logout(Request $request)
@@ -264,8 +281,8 @@ class AuthController extends BaseController
 
     public function sendVerificationCode(Request $request)
     {
-        $email = trim($request->input('email', ''));
-        $code  = trim($request->input('code', ''));
+        $email = trim((string)$request->input('email', ''));
+        $code  = trim((string)$request->input('code', ''));
 
         if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return response()->json(['success' => false, 'message' => 'Please enter a valid email address.']);
@@ -274,22 +291,28 @@ class AuthController extends BaseController
             return response()->json(['success' => false, 'message' => 'Verification code is missing.']);
         }
 
-        $mailService = new MailService();
-        $appName     = config('app.name');
-        $subject     = "Verification Code: {$code} - {$appName}";
+        $appName = (string)config('app.name', 'IPH Alumni Association');
+        $subject = "Verification Code: {$code} - {$appName}";
 
-        $bodyHtml = "<p>Hello,</p>
-            <p>Your email verification code for registration on <strong>{$appName}</strong> is:</p>
-            <div style='text-align:center;margin:25px 0;'>
-                <span style='display:inline-block;padding:12px 30px;background:#800020;color:#fff;font-size:24px;font-weight:bold;letter-spacing:6px;border-radius:10px;'>{$code}</span>
+        $bodyHtml = "<p>প্রিয় সদস্য,</p>
+            <p><strong>{$appName}</strong> পোর্টালে আপনার অ্যাকাউন্ট রেজিস্ট্রেশন সম্পন্ন করতে ইমেইল ভেরিফিকেশন ওটিপি (OTP) কোডটি নিচে দেওয়া হলো:</p>
+            <div style='text-align:center;margin:24px 0;'>
+                <span style='display:inline-block;padding:12px 32px;background:#800020;color:#ffffff;font-size:26px;font-weight:bold;letter-spacing:6px;border-radius:12px;box-shadow:0 4px 15px rgba(128,0,32,0.3);'>{$code}</span>
             </div>
-            <p style='font-size:13px;color:#777;'>This code is valid for 10 minutes.</p>";
+            <p style='font-size:13px;color:#64748b;'>এই ভেরিফিকেশন কোডটির মেয়াদ ১০ মিনিট থাকবে। আপনি যদি এই রেজিস্ট্রেশন রিকোয়েস্ট না করে থাকেন, তবে এই ইমেইলটি উপেক্ষা করুন।</p>";
 
-        $sent = $mailService->send($email, $subject, $bodyHtml);
+        $result = MailService::send($email, $subject, [
+            'title'       => 'ইমেইল ভেরিফিকেশন কোড (OTP)',
+            'badge'       => 'EMAIL VERIFICATION',
+            'content'     => $bodyHtml,
+            'footer_note' => 'Official automated security message from IPH Alumni Association.',
+        ]);
 
         return response()->json([
-            'success' => $sent,
-            'message' => $sent ? 'Verification code sent to your email!' : 'Failed to send email. Please verify your SMTP settings.',
+            'success' => (bool)($result['success'] ?? false),
+            'message' => ($result['success'] ?? false)
+                ? 'আপনার ইমেইলে ভেরিফিকেশন কোড পাঠানো হয়েছে!'
+                : ($result['message'] ?? 'Failed to send verification email. Please verify SMTP settings.'),
         ]);
     }
 }

@@ -249,7 +249,7 @@ $isLoggedIn = auth() !== null;
     <div class="lg:col-span-8 space-y-8">
       
       <!-- Specialization & Skills Card -->
-      <?php if (!empty($alumni['specialization']) || !empty($alumni['skills']) || !empty($alumni['experience_years']) || !empty($alumni['hall_hostel'])): ?>
+      <?php if (!empty($alumni['specialization']) || !empty($alumni['skills']) || !empty($alumni['experience_years']) || !empty($alumni['session_years'])): ?>
       <div class="p-8 rounded-3xl bg-white border border-slate-200/80 shadow-sm space-y-5">
         <h3 class="font-serif text-[20px] font-bold text-gray-800 flex items-center gap-2">
           <span>⚡</span> <?= __('বিশেষজ্ঞতা ও দক্ষতা', 'Specialization & Expertise') ?>
@@ -267,13 +267,6 @@ $isLoggedIn = auth() !== null;
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
             <span class="text-[11px] font-mono text-gray-400 uppercase block mb-1">TOTAL EXPERIENCE</span>
             <span class="font-bold text-[#800020] text-[15px] font-mono"><?= e($alumni['experience_years']) ?></span>
-          </div>
-          <?php endif; ?>
-
-          <?php if (!empty($alumni['hall_hostel'])): ?>
-          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
-            <span class="text-[11px] font-mono text-gray-400 uppercase block mb-1">IPH HALL / HOSTEL</span>
-            <span class="font-medium text-gray-800 text-[14px]">🏛️ <?= e($alumni['hall_hostel']) ?></span>
           </div>
           <?php endif; ?>
 

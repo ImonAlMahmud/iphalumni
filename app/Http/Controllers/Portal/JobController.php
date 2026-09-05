@@ -82,7 +82,48 @@ class JobController extends BaseController
         ]);
 
         if ($jobId) {
-            return redirect('/portal/jobs')->with('success', 'জব সার্কুলারটি সফলভাবে পোস্ট করা হয়েছে!');
+            // Dispatch alerts to active job subscribers
+            try {
+                $subscribers = DB::table('job_alert_subscriptions')
+                    ->where('status', 'active')
+                    ->limit(100)
+                    ->get();
+
+                foreach ($subscribers as $sub) {
+                    if (!empty($sub->job_types) && !str_contains(strtolower($sub->job_types), strtolower($jobType))) {
+                        continue;
+                    }
+
+                    $unsubLink = url('/jobs/unsubscribe/' . $sub->token);
+                    $emailBody = '
+                        <div style="line-height: 1.7; color: #1e293b;">
+                            <p style="font-size: 16px;">প্রিয় <strong>' . htmlspecialchars($sub->name ?: 'মেম্বার / আবেদনকারী') . '</strong>,</p>
+                            <p>আইপিএইচ জব পোর্টালে একটি নতুন পদ প্রকাশিত হয়েছে:</p>
+                            <div style="margin: 18px 0; padding: 18px; background: #fdf2f4; border: 1px solid #fecdd3; border-radius: 12px;">
+                                <h3 style="margin: 0 0 8px 0; color: #800020; font-size: 18px;">' . htmlspecialchars($title) . '</h3>
+                                <p style="margin: 4px 0; font-size: 14px; color: #475569;"><strong>প্রতিষ্ঠান:</strong> ' . htmlspecialchars($company) . '</p>
+                                <p style="margin: 4px 0; font-size: 14px; color: #475569;"><strong>চাকরির ধরন:</strong> ' . htmlspecialchars($jobType) . ' ' . ($location ? '· 📍 ' . htmlspecialchars($location) : '') . '</p>
+                                ' . ($deadline ? '<p style="margin: 4px 0; font-size: 14px; color: #e11d48;"><strong>আবেদনের শেষ তারিখ:</strong> ' . htmlspecialchars(date('d M Y', strtotime($deadline))) . '</p>' : '') . '
+                            </div>
+                            <p style="font-size: 13px; color: #64748b;">বিস্তারিত দেখতে ও সরাসরি আবেদন করতে নিচের বাটনে ক্লিক করুন।</p>
+                            <p style="font-size: 12px; color: #94a3b8; margin-top: 25px;">ভবিষ্যতে নোটিফিকেশন না চাইলে <a href="' . $unsubLink . '" style="color: #800020; text-decoration: underline;">আনসাবস্ক্রাইব করুন</a>।</p>
+                        </div>
+                    ';
+
+                    \App\Services\MailService::send($sub->email, 'নতুন জব সার্কুলার: ' . $title . ' — ' . $company, [
+                        'title'       => 'নতুন জব বিজ্ঞপ্তি প্রকাশিত হয়েছে',
+                        'subtitle'    => htmlspecialchars($company),
+                        'badge'       => 'NEW JOB ALERT',
+                        'content'     => $emailBody,
+                        'action_text' => 'জব সার্কুলারটি দেখুন ও আবেদন করুন',
+                        'action_url'  => url('/jobs/' . $jobId),
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Dispatching job alerts error: ' . $e->getMessage());
+            }
+
+            return redirect('/portal/jobs')->with('success', 'জব সার্কুলারটি সফলভাবে পোস্ট করা হয়েছে এবং সাবস্ক্রাইবারদের নিকট নোটিফিকেশন পাঠানো হয়েছে!');
         }
 
         return redirect('/portal/jobs/create')->with('error', 'জব সার্কুলার পোস্ট করতে সমস্যা হয়েছে।');

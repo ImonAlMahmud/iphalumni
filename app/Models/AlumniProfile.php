@@ -16,7 +16,8 @@ class AlumniProfile extends Model
     protected $fillable = [
         'user_id', 'batch_year', 'phone', 'bio', 'avatar', 'signature',
         'gender', 'dob', 'blood_group', 'nid_number', 'student_id',
-        'current_location', 'thana_upazila', 'province_city', 'country',
+        'current_location', 'permanent_location', 'permanent_district', 'permanent_upazila',
+        'thana_upazila', 'province_city', 'country',
         'location_type', 'website', 'linkedin', 'status', 'is_featured',
     ];
 
@@ -71,6 +72,15 @@ class AlumniProfile extends Model
         if ($location !== '') { $where[] = "(ap.current_location LIKE ? OR ap.thana_upazila LIKE ?)"; $params[] = "%{$location}%"; $params[] = "%{$location}%"; }
         if ($country !== '') { $where[] = "(ap.country LIKE ? OR ap.province_city LIKE ?)"; $params[] = "%{$country}%"; $params[] = "%{$country}%"; }
         if ($locType !== '') { $where[] = "ap.location_type = ?"; $params[] = $locType; }
+        if (!empty($filters['is_featured'])) { $where[] = "ap.is_featured = 1"; }
+
+        $requireMembership = isset($filters['require_membership'])
+            ? !empty($filters['require_membership'])
+            : ((new Setting())->get('directory_require_membership', '0') === '1');
+
+        if ($requireMembership) {
+            $where[] = "m.status = 'active' AND m.deleted_at IS NULL";
+        }
 
         $whereStr = implode(' AND ', $where);
         $offset   = ($page - 1) * $perPage;
@@ -83,19 +93,20 @@ class AlumniProfile extends Model
                 JOIN users u ON u.id = ap.user_id
                 LEFT JOIN alumni_employment ae ON ae.alumni_profile_id = ap.id AND ae.is_current = 1
                 LEFT JOIN alumni_education aedu ON aedu.alumni_profile_id = ap.id AND aedu.is_primary = 1
-                LEFT JOIN memberships m ON m.alumni_profile_id = ap.id AND m.status = 'active'
+                LEFT JOIN memberships m ON m.alumni_profile_id = ap.id AND m.status = 'active' AND m.deleted_at IS NULL
                 LEFT JOIN membership_types mt ON mt.id = m.membership_type_id
                 WHERE {$whereStr} AND ap.status IN ('approved', 'verified', 'active')
                 ORDER BY u.name ASC
                 LIMIT ? OFFSET ?";
 
-        $countSql = "SELECT COUNT(DISTINCT ap.id) FROM alumni_profiles ap
+        $countSql = "SELECT COUNT(DISTINCT ap.id) as cnt FROM alumni_profiles ap
                      JOIN users u ON u.id = ap.user_id
                      LEFT JOIN alumni_employment ae ON ae.alumni_profile_id = ap.id AND ae.is_current = 1
                      LEFT JOIN alumni_education aedu ON aedu.alumni_profile_id = ap.id AND aedu.is_primary = 1
+                     LEFT JOIN memberships m ON m.alumni_profile_id = ap.id AND m.status = 'active' AND m.deleted_at IS NULL
                      WHERE {$whereStr} AND ap.status IN ('approved', 'verified', 'active')";
 
-        $total = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM ($countSql) sub", $params)->cnt;
+        $total = (int) (DB::selectOne($countSql, $params)->cnt ?? 0);
 
         $params[] = $perPage;
         $params[] = $offset;

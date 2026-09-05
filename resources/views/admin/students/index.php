@@ -161,6 +161,7 @@ $missingInfo = $_GET['missing_info'] ?? '';
             <!-- Delete Form -->
             <form method="POST" action="<?= url('/admin/students/' . $s['id'] . '/delete') ?>" 
                   onsubmit="return confirm('Are you sure you want to delete <?= e(addslashes($s['name_english'])) ?> from the student reference database? This action cannot be undone.');">
+              <?= csrf_field() ?>
               <button type="submit" 
                       class="px-2.5 py-1 bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 border border-rose-500/30 rounded-lg text-[12px] font-semibold transition-colors flex items-center gap-1"
                       title="Delete Record">
@@ -200,6 +201,7 @@ $missingInfo = $_GET['missing_info'] ?? '';
     </div>
 
     <form id="editStudentForm" method="POST" action="" class="space-y-4">
+      <?= csrf_field() ?>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <!-- Roll -->
         <div>

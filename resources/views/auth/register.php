@@ -40,6 +40,25 @@
       <form method="POST" action="<?= url('/register') ?>" id="reg-form" enctype="multipart/form-data" @submit="submitForm">
         <?= csrf_field() ?>
 
+        <!-- Hidden Form Fields for real POST submission always in DOM -->
+        <input type="hidden" name="name" :value="formData.name">
+        <input type="hidden" name="email" :value="formData.email">
+        <input type="hidden" name="password" :value="formData.password">
+        <input type="hidden" name="password_confirm" :value="formData.password_confirm">
+        <input type="hidden" name="gender" :value="formData.gender">
+        <input type="hidden" name="dob" :value="formData.dob">
+        <input type="hidden" name="blood_group" :value="formData.blood_group">
+        <input type="hidden" name="phone" :value="formData.phone">
+        <input type="hidden" name="nid_number" :value="formData.nid_number">
+        <input type="hidden" name="current_location" :value="formData.current_location">
+        <input type="hidden" name="website" :value="formData.website">
+        <input type="hidden" name="linkedin_url" :value="formData.linkedin_url">
+        <input type="hidden" name="facebook_url" :value="formData.facebook_url">
+        <input type="hidden" name="spouse_name" :value="formData.spouse_name">
+        <input type="hidden" name="children_info" :value="formData.children_info">
+        <input type="hidden" name="batch_year" :value="formData.batch_year">
+        <input type="hidden" name="student_id" :value="formData.student_id">
+
         <!-- STEP 1: TERMS -->
         <div x-show="step === 1" x-transition class="space-y-4">
           <div class="text-center mb-6">
@@ -94,14 +113,26 @@
               <?= __('আমরা এখানে একটি ভেরিফিকেশন কোড পাঠিয়েছি:', 'We sent a verification code to') ?> <span class="font-semibold text-gray-700" x-text="formData.email"></span>
             </div>
             <div>
-              <label class="form-label"><?= __('৬-ডিজিটের কোড লিখুন', 'Enter 6-Digit Code') ?></label>
-              <input type="text" maxlength="6" x-model="verificationCode" class="form-input text-center text-[18px] tracking-[0.3em] font-semibold" placeholder="123456">
+              <label class="form-label" for="verification_otp_input"><?= __('৬-ডিজিটের কোড লিখুন', 'Enter 6-Digit Code') ?></label>
+              <input type="text"
+                     id="verification_otp_input"
+                     name="verification_otp_input"
+                     maxlength="6"
+                     inputmode="numeric"
+                     pattern="[0-9]*"
+                     autocomplete="one-time-code"
+                     autocorrect="off"
+                     autocapitalize="off"
+                     spellcheck="false"
+                     x-model="verificationCode"
+                     class="form-input text-center text-[22px] tracking-[0.3em] font-bold"
+                     placeholder="123456">
             </div>
             <button type="button" @click="verifyCode()" class="btn btn-gold w-full">
               <?= __('কোড নিশ্চিত করুন', 'Confirm Code') ?>
             </button>
             <div class="text-center">
-              <button type="button" @click="codeSent = false" class="text-[12px] text-blue-600 hover:underline"><?= __('ইমেইল/ফোন পরিবর্তন করুন', 'Change email/phone') ?></button>
+              <button type="button" @click="codeSent = false; verificationCode = '';" class="text-[12px] text-blue-600 hover:underline"><?= __('ইমেইল/ফোন পরিবর্তন করুন', 'Change email/phone') ?></button>
             </div>
           </div>
 
@@ -241,8 +272,8 @@
               </select>
             </div>
             <div>
-              <label class="form-label"><?= __('ঢাকা বিশ্ববিদ্যালয় রেজিস্ট্রেশন আইডি (ঐচ্ছিক)', 'Dhaka University Registration ID (Optional)') ?></label>
-              <input type="text" x-model="formData.student_id" class="form-input" placeholder="e.g. 2018-123456">
+              <label class="form-label"><?= __('ঢাকা বিশ্ববিদ্যালয় রেজিস্ট্রেশন আইডি', 'Dhaka University Registration ID') ?> <span class="text-red-500">*</span></label>
+              <input type="text" x-model="formData.student_id" required class="form-input" placeholder="e.g. 2018-123456">
             </div>
             <div class="md:col-span-2">
               <label class="form-label"><?= __('ছাত্রত্ব / গ্রাজুয়েশন প্রমাণপত্র', 'Proof of Studentship / Graduation') ?> <span class="text-red-500">*</span></label>
@@ -282,29 +313,14 @@
               <div class="font-semibold text-gray-800" x-text="formData.current_location || '—'"></div>
             </div>
             <div>
+              <div class="text-gray-400"><?= __('ঢাকা বিশ্ববিদ্যালয় রেজিস্ট্রেশন আইডি', 'DU Registration ID') ?></div>
+              <div class="font-semibold text-gray-800" x-text="formData.student_id || '—'"></div>
+            </div>
+            <div>
               <div class="text-gray-400"><?= __('লিঙ্গ / রক্তের গ্রুপ', 'Gender / Blood Group') ?></div>
               <div class="font-semibold text-gray-800" x-text="(formData.gender || '—') + ' / ' + (formData.blood_group || '—')"></div>
             </div>
           </div>
-
-          <!-- Hidden Form Fields for real POST submission -->
-          <input type="hidden" name="name" :value="formData.name">
-          <input type="hidden" name="email" :value="formData.email">
-          <input type="hidden" name="password" :value="formData.password">
-          <input type="hidden" name="password_confirm" :value="formData.password_confirm">
-          <input type="hidden" name="gender" :value="formData.gender">
-          <input type="hidden" name="dob" :value="formData.dob">
-          <input type="hidden" name="blood_group" :value="formData.blood_group">
-          <input type="hidden" name="phone" :value="formData.phone">
-          <input type="hidden" name="nid_number" :value="formData.nid_number">
-          <input type="hidden" name="current_location" :value="formData.current_location">
-          <input type="hidden" name="website" :value="formData.website">
-          <input type="hidden" name="linkedin_url" :value="formData.linkedin_url">
-          <input type="hidden" name="facebook_url" :value="formData.facebook_url">
-          <input type="hidden" name="spouse_name" :value="formData.spouse_name">
-          <input type="hidden" name="children_info" :value="formData.children_info">
-          <input type="hidden" name="batch_year" :value="formData.batch_year">
-          <input type="hidden" name="student_id" :value="formData.student_id">
         </div>
       </form>
 
@@ -397,7 +413,7 @@ function registerFlow() {
       if (this.step === 3) return this.formData.name.trim().length >= 2;
       if (this.step === 4) return true; // Optional fields
       if (this.step === 5) return true; // Optional fields
-      if (this.step === 6) return this.formData.batch_year !== '' && this.formData.has_proof;
+      if (this.step === 6) return this.formData.batch_year !== '' && this.formData.student_id.trim() !== '' && this.formData.has_proof;
       return true;
     },
 
@@ -425,31 +441,40 @@ function registerFlow() {
     isSendingCode: false,
 
     sendCode() {
-      if (!this.formData.email) return;
+      if (!this.formData.email) {
+        alert('Please enter your email address first.');
+        return;
+      }
+      this.verificationCode = '';
       this.isSendingCode = true;
       this.generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
 
       const body = new URLSearchParams();
       body.append('email', this.formData.email);
       body.append('code', this.generatedCode);
+      body.append('_token', '<?= csrf_token() ?>');
 
       fetch('<?= url('/send-verification-code') ?>', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRF-TOKEN': '<?= csrf_token() ?>',
+          'Accept': 'application/json'
+        },
         body: body.toString()
       })
-      .then(res => res.json())
-      .then(data => {
+      .then(async (res) => {
+        const data = await res.json().catch(() => null);
         this.isSendingCode = false;
-        if (data.success) {
+        if (data && data.success) {
           this.codeSent = true;
         } else {
-          alert(data.message || 'Failed to send verification code. Please check SMTP settings.');
+          alert((data && data.message) ? data.message : 'Failed to send verification code. Please check SMTP configuration.');
         }
       })
       .catch(err => {
         this.isSendingCode = false;
-        alert('Network error while sending verification email.');
+        alert('Network error while sending verification email. Please try again.');
       });
     },
 
@@ -462,7 +487,7 @@ function registerFlow() {
     },
 
     submitForm(e) {
-      if (!this.formData.terms || !this.formData.name || !this.formData.batch_year || !this.formData.has_proof) {
+      if (!this.formData.terms || !this.formData.name || !this.formData.batch_year || !this.formData.student_id || !this.formData.has_proof) {
         e.preventDefault();
         alert('Please complete all required fields.');
       }

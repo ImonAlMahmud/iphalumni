@@ -23,8 +23,9 @@ $fOrg         = $filters['organization'] ?? '';
 $fLoc         = $filters['location'] ?? '';
 $fCountry     = $filters['country'] ?? '';
 $fLocType     = $filters['location_type'] ?? '';
+$fFeatured    = !empty($filters['is_featured']);
 
-$hasSearch = ($fQ || $fBatch || $fUni || $fProg || $fPhone || $fDesig || $fOrg || $fLoc || $fCountry || $fLocType);
+$hasSearch = ($fQ || $fBatch || $fUni || $fProg || $fPhone || $fDesig || $fOrg || $fLoc || $fCountry || $fLocType || $fFeatured);
 ?>
 <div class="max-w-7xl mx-auto px-6 py-14">
 
@@ -105,7 +106,18 @@ $hasSearch = ($fQ || $fBatch || $fUni || $fProg || $fPhone || $fDesig || $fOrg |
         <span>📞 Phone & Batch / ফোন ও ব্যাচ</span>
         <span x-text="showContact ? '✓' : '+'" class="font-bold text-[11px]"></span>
       </button>
+
+      <!-- Featured Alumni Toggle -->
+      <a href="<?= url('/directory?' . http_build_query(array_filter(array_merge($filters, ['is_featured' => $fFeatured ? '' : '1'])))) ?>"
+         class="px-3.5 py-1.5 rounded-xl font-medium border transition-all flex items-center gap-1.5 cursor-pointer <?= $fFeatured ? 'bg-amber-500 text-white border-amber-600 shadow-sm' : 'bg-amber-50/80 text-amber-800 border-amber-200 hover:bg-amber-100' ?>">
+        <span>⭐ <?= __('বিশিষ্ট অ্যালামনাই (Featured)', 'Featured Alumni') ?></span>
+        <span class="font-bold text-[11px]"><?= $fFeatured ? '✓' : '+' ?></span>
+      </a>
     </div>
+
+    <?php if ($fFeatured): ?>
+    <input type="hidden" name="is_featured" value="1">
+    <?php endif; ?>
 
     <!-- Dynamic Category Sections -->
     <div class="space-y-4 pt-1" x-show="showEdu || showWork || showLoc || showContact" x-transition>
@@ -172,11 +184,11 @@ $hasSearch = ($fQ || $fBatch || $fUni || $fProg || $fPhone || $fDesig || $fOrg |
             <input type="text" name="phone" value="<?= e($fPhone) ?>" placeholder="e.g. +88017..." class="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#800020]/30">
           </div>
           <div>
-            <label class="block text-[11px] font-mono text-gray-500 uppercase mb-1">🎓 <?= __('ব্যাচ বছর (Batch Year)', 'Batch Year') ?></label>
+            <label class="block text-[11px] font-mono text-gray-500 uppercase mb-1">🎓 <?= __('ব্যাচ (Batch)', 'Batch') ?></label>
             <select name="batch" class="w-full px-3 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#800020]/30 bg-white">
               <option value=""><?= __('সকল ব্যাচ (All Batches)', 'All Batches') ?></option>
               <?php foreach ($batches as $b): ?>
-              <option value="<?= $b ?>" <?= (string)$fBatch === (string)$b ? 'selected' : '' ?>><?= $b ?> Batch</option>
+              <option value="<?= $b ?>" <?= (string)$fBatch === (string)$b ? 'selected' : '' ?>><?= e(str_starts_with(strtoupper((string)$b), 'BATCH') ? $b : ('Batch ' . $b)) ?></option>
               <?php endforeach; ?>
             </select>
           </div>
@@ -212,8 +224,13 @@ $hasSearch = ($fQ || $fBatch || $fUni || $fProg || $fPhone || $fDesig || $fOrg |
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
     <?php foreach ($result['items'] as $alum): ?>
     <a href="<?= url('/directory/' . $alum['id']) ?>"
-       class="block p-5 rounded-2xl group transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+       class="block p-5 rounded-2xl group transition-all duration-200 hover:-translate-y-1 hover:shadow-lg relative"
        style="background:rgba(255,255,255,0.82);border:1px solid rgba(16,24,32,0.07);backdrop-filter:blur(14px);">
+      <?php if (!empty($alum['is_featured'])): ?>
+      <span class="absolute top-3.5 right-3.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-700 border border-amber-500/30 flex items-center gap-1">
+        ★ <?= __('Featured', 'Featured') ?>
+      </span>
+      <?php endif; ?>
       <!-- Avatar -->
       <div class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center font-serif font-semibold text-[20px] overflow-hidden border-2 border-white shadow-md"
            style="background:linear-gradient(135deg,#153548,#2F8863);color:#FAFAFA;">
@@ -247,7 +264,7 @@ $hasSearch = ($fQ || $fBatch || $fUni || $fProg || $fPhone || $fDesig || $fOrg |
           <?php endif; ?>
 
           <?php if (!empty($alum['batch_year'])): ?>
-            <span class="ml-1 font-mono text-gray-600">(Batch '<?= substr((string)$alum['batch_year'], -2) ?>)</span>
+            <span class="ml-1 font-mono text-gray-600 font-semibold">(Batch <?= e($alum['batch_year']) ?>)</span>
           <?php endif; ?>
         </div>
 

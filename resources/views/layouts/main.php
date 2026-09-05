@@ -8,6 +8,24 @@ $appUrl    = env('APP_URL', 'http://localhost/alumni/public');
 $title     = isset($title) ? e($title) . ' — ' . $appName : $appName;
 $desc      = $description ?? 'IPH Alumni Association — Institute of Public Health Alumni Network';
 $bodyClass = $bodyClass ?? '';
+
+$reqUri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+$appUrlPath = parse_url(env('APP_URL', 'http://localhost/alumni/public'), PHP_URL_PATH);
+if ($appUrlPath && $appUrlPath !== '/') {
+    $basePath = rtrim($appUrlPath, '/');
+    if (str_starts_with($reqUri, $basePath)) {
+        $reqUri = substr($reqUri, strlen($basePath));
+    }
+}
+$isHome = ($reqUri === '' || $reqUri === '/' || str_ends_with($reqUri, '/public') || str_ends_with($reqUri, '/public/index.php'));
+if ($isHome) {
+    $bodyClass .= ' is-home-page';
+    if (!empty($_COOKIE['iph_hero_intro_seen'])) {
+        $bodyClass .= ' home-intro-revealed';
+    } else {
+        $bodyClass .= ' home-intro-playing';
+    }
+}
 ?>
 <?php
 $currentLocale = $_SESSION['lang'] ?? 'bn';
@@ -16,9 +34,21 @@ $currentLocale = $_SESSION['lang'] ?? 'bn';
 <html lang="<?= $currentLocale ?>">
 <head>
 <meta charset="UTF-8">
+<script>
+  try {
+    if (localStorage.getItem('iph_hero_intro_seen') === '1') {
+      document.documentElement.classList.add('hero-intro-seen');
+    }
+  } catch(e) {}
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?= $title ?></title>
 <meta name="theme-color" content="#800020">
+<link rel="manifest" href="<?= asset('manifest.webmanifest') ?>">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="IPH Alumni">
 <link rel="icon" type="image/png" href="<?= asset('images/LOGO.png') ?>">
 <link rel="apple-touch-icon" href="<?= asset('images/LOGO.png') ?>">
 
@@ -180,6 +210,12 @@ $keywordsStr = $metaKeywords ?? 'IPH Alumni Association, Institute of Public Hea
 
 <!-- Footer -->
 <?php require view_path('partials/footer.php'); ?>
+
+<!-- Google Translate Partial (Top bar hidden, clean toggle) -->
+<?php require view_path('partials/google_translate.php'); ?>
+
+<!-- Mobile Bottom Navigation Dock & PWA Controller -->
+<?php require view_path('partials/mobile_bottom_nav.php'); ?>
 
 <script>
 // Auto-dismiss flash after 4s

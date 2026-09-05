@@ -1,8 +1,10 @@
 <?php
 /**
  * Alumni Portal Contact Requests View
- * Variables: $requests
+ * Variables: $requests, $user, $profile
  */
+$user = $user ?? (auth_user() ?? []);
+$requests = $requests ?? [];
 ?>
 <div class="max-w-6xl mx-auto space-y-6 font-['Kalpurush']">
   
@@ -90,7 +92,7 @@
 
             <div>
               <label class="block text-[12.5px] font-bold text-emerald-900 mb-1">যোগাযোগের বিবরণ (Contact Details / Number / Email)</label>
-              <input type="text" name="accepted_contact_details" required placeholder="e.g. +8801700000000 or email@domain.com" value="<?= e($user['email']) ?>" class="w-full px-3.5 py-2 rounded-xl border border-emerald-300 bg-white text-[13.5px]">
+              <input type="text" name="accepted_contact_details" required placeholder="e.g. +8801700000000 or email@domain.com" value="<?= e(is_array($user) ? ($user['email'] ?? '') : ($user->email ?? '')) ?>" class="w-full px-3.5 py-2 rounded-xl border border-emerald-300 bg-white text-[13.5px]">
             </div>
 
             <div>
