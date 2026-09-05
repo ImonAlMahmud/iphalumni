@@ -375,9 +375,9 @@ $actType = $profile['activity_type'] ?? 'work';
         <h4 class="font-serif text-[15px] font-semibold text-gray-800 pt-3 border-t border-gray-100 mb-4">🏠 Permanent Address & Emergency Contact</h4>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="md:col-span-2">
-            <label class="form-label" for="permanent_location">Permanent Location / Address (স্থায়ী অবস্থান বা ঠিকানা)</label>
+            <label class="form-label" for="permanent_location">Permanent Address (স্থায়ী ঠিকানা)</label>
             <input id="permanent_location" type="text" name="permanent_location" value="<?= e($profile['permanent_location'] ?? '') ?>" placeholder="e.g. Mohakhali, Dhaka or Bogura Sadar, Bogura" class="form-input">
-            <p class="text-[11px] text-gray-400 mt-1">এটি আপনার ডিজিটাল মেম্বারশিপ আইডি কার্ডের পেছনের অংশে "PERMANENT LOCATION" হিসেবে প্রদর্শিত হবে।</p>
+            <p class="text-[11px] text-gray-400 mt-1">এটি আপনার ডিজিটাল মেম্বারশিপ আইডি কার্ডের পেছনের অংশে "PERMANENT ADDRESS" হিসেবে প্রদর্শিত হবে।</p>
           </div>
           <div>
             <label class="form-label" for="permanent_district">Permanent District (স্থায়ী জেলা)</label>

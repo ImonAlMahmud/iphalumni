@@ -291,11 +291,11 @@ $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=0&data
             <span class="font-bold text-white truncate max-w-[240px] text-right"><?= e($user['email']) ?></span>
           </div>
           <div class="flex justify-between items-start text-[10px] gap-2">
-            <span class="text-slate-400 shrink-0 font-mono text-[9px] pt-0.5">PRESENT LOCATION:</span>
+            <span class="text-slate-400 shrink-0 font-mono text-[9px] pt-0.5">PRESENT ADDRESS:</span>
             <span class="font-bold text-white text-right leading-tight max-w-[250px]"><?= e($presentLocation) ?></span>
           </div>
           <div class="flex justify-between items-start text-[10px] gap-2">
-            <span class="text-slate-400 shrink-0 font-mono text-[9px] pt-0.5">PERMANENT LOCATION:</span>
+            <span class="text-slate-400 shrink-0 font-mono text-[9px] pt-0.5">PERMANENT ADDRESS:</span>
             <span class="font-bold text-white text-right leading-tight max-w-[250px]"><?= e($permLocation) ?></span>
           </div>
         </div>

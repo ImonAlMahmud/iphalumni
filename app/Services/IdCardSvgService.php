@@ -374,13 +374,13 @@ SVG;
       <text x="738" y="34" font-family="'SFMono-Regular', Consolas, Menlo, monospace" font-size="18" font-weight="bold" fill="#FFFFFF" text-anchor="end">{$email}</text>
       <line x1="22" y1="48" x2="738" y2="48" stroke="#FFFFFF" stroke-opacity="0.06" stroke-width="1"/>
 
-      <!-- PRESENT LOCATION -->
-      <text x="22" y="82" font-family="'SFMono-Regular', Consolas, Menlo, monospace" font-size="17" fill="#94A3B8">PRESENT LOCATION:</text>
+      <!-- PRESENT ADDRESS -->
+      <text x="22" y="82" font-family="'SFMono-Regular', Consolas, Menlo, monospace" font-size="17" fill="#94A3B8">PRESENT ADDRESS:</text>
       <text x="738" y="82" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="{$presFontSize}" font-weight="bold" fill="#FFFFFF" text-anchor="end">{$presentLocation}</text>
       <line x1="22" y1="96" x2="738" y2="96" stroke="#FFFFFF" stroke-opacity="0.06" stroke-width="1"/>
 
-      <!-- PERMANENT LOCATION -->
-      <text x="22" y="130" font-family="'SFMono-Regular', Consolas, Menlo, monospace" font-size="17" fill="#94A3B8">PERMANENT LOCATION:</text>
+      <!-- PERMANENT ADDRESS -->
+      <text x="22" y="130" font-family="'SFMono-Regular', Consolas, Menlo, monospace" font-size="17" fill="#94A3B8">PERMANENT ADDRESS:</text>
       <text x="738" y="130" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="{$permFontSize}" font-weight="bold" fill="#FFFFFF" text-anchor="end">{$permLocation}</text>
     </g>
 
