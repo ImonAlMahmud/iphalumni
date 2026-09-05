@@ -288,20 +288,28 @@ Route::prefix('/admin')->middleware('auth.admin')->name('admin.')->group(functio
 Route::match(['GET', 'POST'], '/webhook/deploy', [\App\Http\Controllers\Webhook\DeployController::class, 'handle'])->name('webhook.deploy');
 Route::post('/webhook/uddoktapay', [UddoktaPayController::class, 'webhook'])->name('webhook.uddoktapay');
 
-// ── Public Storage Serving Route (Fallback for cPanel / Shared Hosting) ─────
+// Secure storage serving (only serve storage/app/public or public/storage)
 Route::get('/storage/{path}', function (string $path) {
-    $candidates = [
-        public_path('storage/' . $path),
-        storage_path('app/public/' . $path),
-        storage_path($path),
-        public_path('uploads/' . $path),
-        storage_path('app/' . $path),
+    $allowedRoots = [
+        realpath(storage_path('app/public')),
+        realpath(public_path('storage')),
     ];
-    foreach ($candidates as $filePath) {
-        if (file_exists($filePath) && is_file($filePath)) {
-            return response()->file($filePath);
+
+    // normalize requested path
+    $candidate1 = storage_path('app/public/' . $path);
+    $candidate2 = public_path('storage/' . $path);
+    $requested = realpath($candidate1) ?: realpath($candidate2);
+
+    if (!$requested) {
+        abort(404);
+    }
+
+    foreach ($allowedRoots as $root) {
+        if ($root && str_starts_with($requested, $root)) {
+            return response()->file($requested);
         }
     }
+
     abort(404);
 })->where('path', '.*')->name('storage.serve');
 
