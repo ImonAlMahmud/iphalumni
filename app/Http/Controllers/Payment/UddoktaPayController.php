@@ -241,47 +241,27 @@ class UddoktaPayController extends BaseController
     public function webhook(Request $request)
     {
         $raw = $request->getContent();
-        $signature = (string) $request->header('RT-UDDOKTAPAY-SIGN', $request->header('rt-uddoktapay-sign', ''));
-        $secret = (string) env('UDDOKTAPAY_WEBHOOK_SECRET', $this->uddoktaPay->getWebhookSecret());
-
-        if (! empty($secret)) {
-            if (empty($signature) || ! hash_equals(hash_hmac('sha256', $raw, $secret), $signature)) {
-                Log::warning('UddoktaPay Webhook: signature mismatch', ['signature' => $signature]);
-
-                return response()->json(['error' => 'Unauthorized'], 401);
-            }
-        } else {
-            $apiKeyHeader = (string) $request->header('RT-UDDOKTAPAY-API-KEY', $request->header('rt-uddoktapay-api-key', ''));
-            if (! $this->uddoktaPay->validateWebhookHeader($apiKeyHeader)) {
-                Log::warning('UddoktaPay Webhook: Invalid API key header received.');
-
-                return response()->json(['error' => 'Unauthorized header'], 401);
-            }
+        $signature = $request->header('RT-UDDOKTAPAY-SIGN', '');
+        $secret = $this->uddoktaPay->getWebhookSecret() ?: env('UDDOKTAPAY_WEBHOOK_SECRET', '');
+        if (empty($secret) || empty($signature) || !hash_equals(hash_hmac('sha256', $raw, $secret), trim($signature))) {
+            Log::warning('UddoktaPay Webhook: invalid signature', ['ip' => $request->ip()]);
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
 
         $payload = $request->all();
-        Log::info('UddoktaPay Webhook Received:', $payload);
+        // idempotency check:
+        $trxId = (string)($payload['transaction_id'] ?? ($payload['invoice_id'] ?? ''));
+        if (!empty($trxId) && DB::table('membership_payments')->where('transaction_id', $trxId)->where('status', 'paid')->exists()) {
+            Log::info('Webhook duplicate trx ignored', ['trx' => $trxId]);
+            return response()->json(['status' => 'already_processed'], 200);
+        }
 
         $status = strtoupper((string) ($payload['status'] ?? ''));
         $metadata = $payload['metadata'] ?? [];
         $membershipId = (int) ($metadata['membership_id'] ?? 0);
         $method = (string) ($payload['payment_method'] ?? 'uddoktapay');
-        $trxId = (string) ($payload['transaction_id'] ?? ($payload['invoice_id'] ?? ''));
         $invoiceId = (string) ($payload['invoice_id'] ?? '');
         $amount = (float) ($payload['amount'] ?? 0);
-
-        // Idempotency check before processing
-        if (! empty($trxId)) {
-            $existing = DB::table('membership_payments')
-                ->where('transaction_id', $trxId)
-                ->where('status', 'paid')
-                ->first();
-            if ($existing) {
-                Log::info('Webhook: duplicate transaction ignored', ['trx' => $trxId]);
-
-                return response()->json(['status' => 'already_processed'], 200);
-            }
-        }
 
         if ($status === 'COMPLETED' && $membershipId > 0) {
             $this->activateMembership($membershipId, $method, $trxId, $invoiceId, $amount);
