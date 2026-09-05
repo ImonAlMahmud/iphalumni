@@ -163,10 +163,13 @@ $navItems[] = ['/portal/settings',    'Settings',     'fa-solid fa-gear'];
           <i class="fa-solid fa-arrow-up-right-from-square w-4 text-center"></i>
           Public Site
         </a>
-        <a href="<?= url('/logout') ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-[#6B7178] hover:text-red-600 hover:bg-red-50 transition-all">
+        <form id="logout-form-portal" action="<?= route('logout') ?>" method="POST" style="display:none;">
+          <?= csrf_field() ?>
+        </form>
+        <button type="button" onclick="document.getElementById('logout-form-portal').submit();" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-[#6B7178] hover:text-red-600 hover:bg-red-50 transition-all cursor-pointer text-left">
           <i class="fa-solid fa-right-from-bracket w-4 text-center"></i>
           Logout
-        </a>
+        </button>
       </div>
     </aside>
   </div>
@@ -228,10 +231,10 @@ $navItems[] = ['/portal/settings',    'Settings',     'fa-solid fa-gear'];
         <i class="fa-solid fa-arrow-up-right-from-square w-4 text-center"></i>
         Public Site
       </a>
-      <a href="<?= url('/logout') ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-[#6B7178] hover:text-red-600 hover:bg-red-50 transition-all">
+      <button type="button" onclick="document.getElementById('logout-form-portal').submit();" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-[#6B7178] hover:text-red-600 hover:bg-red-50 transition-all cursor-pointer text-left">
         <i class="fa-solid fa-right-from-bracket w-4 text-center"></i>
         Logout
-      </a>
+      </button>
     </div>
   </aside>
 
@@ -254,7 +257,7 @@ $navItems[] = ['/portal/settings',    'Settings',     'fa-solid fa-gear'];
           <i class="fa-solid fa-language text-[12px]"></i>
           <span class="gt-lang-label notranslate" translate="no">English</span>
         </button>
-        <a href="<?= url('/logout') ?>" class="text-[13px] font-medium text-red-600 hover:underline">Logout</a>
+        <button type="button" onclick="document.getElementById('logout-form-portal').submit();" class="text-[13px] font-medium text-red-600 hover:underline cursor-pointer">Logout</button>
       </div>
     </header>
 

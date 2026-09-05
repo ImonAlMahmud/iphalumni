@@ -99,8 +99,7 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::post('/send-verification-code', [AuthController::class, 'sendVerificationCode'])->name('auth.verify_code');
-Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
-Route::post('/logout', [AuthController::class, 'logout']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 // ── Alumni Portal Routes ──────────────────────────────────────────────────────
 

@@ -143,10 +143,13 @@ $navGroups = [
           <i class="fa-solid fa-arrow-up-right-from-square w-4 text-center"></i>
           Public Site
         </a>
-        <a href="<?= url('/logout') ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] transition-all hover:bg-red-950 hover:text-red-400 text-white/60">
+        <form id="logout-form-admin" action="<?= route('logout') ?>" method="POST" style="display:none;">
+          <?= csrf_field() ?>
+        </form>
+        <button type="button" onclick="document.getElementById('logout-form-admin').submit();" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] transition-all hover:bg-red-950 hover:text-red-400 text-white/60 cursor-pointer text-left">
           <i class="fa-solid fa-right-from-bracket w-4 text-center"></i>
           Logout
-        </a>
+        </button>
       </div>
     </aside>
   </div>
@@ -201,10 +204,10 @@ $navGroups = [
         <i class="fa-solid fa-arrow-up-right-from-square w-4 text-center"></i>
         Public Site
       </a>
-      <a href="<?= url('/logout') ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] transition-all hover:bg-red-950 hover:text-red-400 text-white/60">
+      <button type="button" onclick="document.getElementById('logout-form-admin').submit();" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] transition-all hover:bg-red-950 hover:text-red-400 text-white/60 cursor-pointer text-left">
         <i class="fa-solid fa-right-from-bracket w-4 text-center"></i>
         Logout
-      </a>
+      </button>
     </div>
   </aside>
 

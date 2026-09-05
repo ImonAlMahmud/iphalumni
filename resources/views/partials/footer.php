@@ -114,11 +114,15 @@
             <i class="fa-solid fa-user-pen w-4 text-center text-[11px] text-slate-400 group-hover:text-rose-300 transition-colors"></i>
             <?= __('প্রোফাইল সম্পাদন', 'Edit Profile') ?>
           </a>
-          <a href="<?= url('/logout') ?>"
-             class="flex items-center gap-2 text-[13.5px] text-rose-400 hover:text-rose-300 transition-colors">
+          <form id="logout-form-footer" action="<?= route('logout') ?>" method="POST" style="display:none;">
+            <?= csrf_field() ?>
+          </form>
+          <button type="button"
+             onclick="document.getElementById('logout-form-footer').submit();"
+             class="flex items-center gap-2 text-[13.5px] text-rose-400 hover:text-rose-300 transition-colors cursor-pointer text-left">
             <i class="fa-solid fa-arrow-right-from-bracket w-4 text-center text-[11px]"></i>
             <?= __('লগআউট', 'Logout') ?>
-          </a>
+          </button>
           <?php else: ?>
           <a href="<?= url('/register') ?>"
              class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-semibold text-white mb-1 transition-all hover:scale-105 shadow-lg"

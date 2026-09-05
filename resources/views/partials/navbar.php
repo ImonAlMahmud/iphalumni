@@ -179,12 +179,16 @@ foreach ($exploreSubmenu as [$subHref]) {
             <?= __('পোর্টাল', 'Portal') ?>
           </a>
 
-          <a href="<?= url('/logout') ?>"
-             class="px-3 py-1.5 rounded-xl text-[13px] font-medium text-[#6B7178] hover:text-red-600 transition-colors"
+          <form id="logout-form-nav" action="<?= route('logout') ?>" method="POST" style="display:none;">
+            <?= csrf_field() ?>
+          </form>
+          <button type="button"
+             onclick="document.getElementById('logout-form-nav').submit();"
+             class="px-3 py-1.5 rounded-xl text-[13px] font-medium text-[#6B7178] hover:text-red-600 transition-colors cursor-pointer"
              style="border:1px solid rgba(16,24,32,0.07);"
              title="<?= __('লগআউট', 'Logout') ?>">
             <i class="fa-solid fa-arrow-right-from-bracket"></i>
-          </a>
+          </button>
 
         <?php else: ?>
           <a href="<?= url('/login') ?>"
@@ -300,11 +304,12 @@ foreach ($exploreSubmenu as [$subHref]) {
           <?php endif; ?>
           <?= __('আমার পোর্টাল', 'My Portal') ?>
         </a>
-        <a href="<?= url('/logout') ?>"
-           class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[14px] text-red-500 hover:bg-red-50 transition-colors">
+        <button type="button"
+           onclick="document.getElementById('logout-form-nav').submit();"
+           class="w-full text-left flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[14px] text-red-500 hover:bg-red-50 transition-colors cursor-pointer">
           <i class="fa-solid fa-arrow-right-from-bracket w-4 text-center"></i>
           <?= __('লগআউট', 'Logout') ?>
-        </a>
+        </button>
         <?php endif; ?>
       </div>
     </div>
