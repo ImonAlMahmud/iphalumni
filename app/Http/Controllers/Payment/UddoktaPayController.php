@@ -277,86 +277,101 @@ class UddoktaPayController extends BaseController
      */
     protected function activateMembership(int $membershipId, string $method, string $trxId, ?string $invoiceId, float $amount): void
     {
-        DB::transaction(function () use ($membershipId, $method, $trxId, $invoiceId, $amount) {
-            $membership = DB::table('memberships')->where('id', $membershipId)->first();
-            if (! $membership) {
-                return;
-            }
+        try {
+            DB::transaction(function () use ($membershipId, $method, $trxId, $invoiceId, $amount) {
+                // Duplicate check on transaction_id
+                if (!empty($trxId)) {
+                    $existingPayment = DB::table('membership_payments')
+                        ->where('transaction_id', $trxId)
+                        ->where('status', 'paid')
+                        ->first();
+                    if ($existingPayment) {
+                        return;
+                    }
+                }
 
-            // 1. Update Membership status to active
-            DB::table('memberships')->where('id', $membershipId)->update([
-                'status' => 'active',
-                'approved_at' => now(),
-                'updated_at' => now(),
-            ]);
+                $membership = DB::table('memberships')->where('id', $membershipId)->first();
+                if (! $membership) {
+                    return;
+                }
 
-            // 2. Update or insert membership_payments
-            $paymentExists = DB::table('membership_payments')->where('membership_id', $membershipId)->exists();
-            if ($paymentExists) {
-                DB::table('membership_payments')->where('membership_id', $membershipId)->update([
-                    'method' => $method,
-                    'transaction_id' => $trxId,
-                    'status' => 'paid',
-                    'paid_at' => now(),
+                // 1. Update Membership status to active
+                DB::table('memberships')->where('id', $membershipId)->update([
+                    'status' => 'active',
+                    'approved_at' => now(),
                     'updated_at' => now(),
                 ]);
-            } else {
-                DB::table('membership_payments')->insert([
-                    'membership_id' => $membershipId,
-                    'amount' => $amount,
-                    'currency' => 'BDT',
-                    'method' => $method,
-                    'transaction_id' => $trxId,
-                    'status' => 'paid',
-                    'paid_at' => now(),
-                    'created_at' => now(),
-                ]);
-            }
 
-            // 3. Record in Association Funds
-            $ref = 'MEM-'.$membershipId;
-            $fundExists = DB::table('association_funds')->where('reference_no', $ref)->exists();
-
-            $mDetail = DB::table('memberships as m')
-                ->join('membership_types as mt', 'mt.id', '=', 'm.membership_type_id')
-                ->join('alumni_profiles as ap', 'ap.id', '=', 'm.alumni_profile_id')
-                ->join('users as u', 'u.id', '=', 'ap.user_id')
-                ->select('m.*', 'mt.name as type_name', 'mt.fee', 'u.id as user_id', 'u.name as user_name')
-                ->where('m.id', $membershipId)
-                ->first();
-
-            if (! $fundExists && $mDetail && (float) $mDetail->fee > 0) {
-                DB::table('association_funds')->insert([
-                    'title' => 'মেম্বারশিপ ফি সংগ্রহ: '.$mDetail->user_name.' ('.$mDetail->type_name.')',
-                    'source' => 'Membership Collection (UddoktaPay)',
-                    'amount' => $amount > 0 ? $amount : (float) $mDetail->fee,
-                    'fund_date' => now()->toDateString(),
-                    'reference_no' => $ref,
-                    'notes' => 'Online Payment via UddoktaPay ['.strtoupper($method).'] - Trx: '.$trxId.($invoiceId ? ' (Invoice: '.$invoiceId.')' : ''),
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
-
-            // 4. Send notification to user
-            if ($mDetail) {
-                $notifExists = DB::table('notifications')
-                    ->where('user_id', $mDetail->user_id)
-                    ->where('type', 'membership_approved')
-                    ->whereDate('created_at', now()->toDateString())
-                    ->exists();
-
-                if (! $notifExists) {
-                    DB::table('notifications')->insert([
-                        'user_id' => $mDetail->user_id,
-                        'type' => 'membership_approved',
-                        'title' => 'মেম্বারশিপ সক্রিয় হয়েছে',
-                        'message' => "অভিনন্দন! আপনার {$mDetail->type_name} মেম্বারশিপটি অনলাইন পেমেন্টের (UddoktaPay) মাধ্যমে সফলভাবে সক্রিয় করা হয়েছে।",
-                        'is_read' => 0,
+                // 2. Update or insert membership_payments
+                $paymentExists = DB::table('membership_payments')->where('membership_id', $membershipId)->exists();
+                if ($paymentExists) {
+                    DB::table('membership_payments')->where('membership_id', $membershipId)->update([
+                        'method' => $method,
+                        'transaction_id' => $trxId,
+                        'status' => 'paid',
+                        'paid_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                } else {
+                    DB::table('membership_payments')->insert([
+                        'membership_id' => $membershipId,
+                        'amount' => $amount,
+                        'currency' => 'BDT',
+                        'method' => $method,
+                        'transaction_id' => $trxId,
+                        'status' => 'paid',
+                        'paid_at' => now(),
                         'created_at' => now(),
                     ]);
                 }
-            }
-        });
+
+                // 3. Record in Association Funds (duplicate check via reference_no)
+                $ref = 'MEM-'.$membershipId;
+                $fundExists = DB::table('association_funds')->where('reference_no', $ref)->exists();
+
+                $mDetail = DB::table('memberships as m')
+                    ->join('membership_types as mt', 'mt.id', '=', 'm.membership_type_id')
+                    ->join('alumni_profiles as ap', 'ap.id', '=', 'm.alumni_profile_id')
+                    ->join('users as u', 'u.id', '=', 'ap.user_id')
+                    ->select('m.*', 'mt.name as type_name', 'mt.fee', 'u.id as user_id', 'u.name as user_name')
+                    ->where('m.id', $membershipId)
+                    ->first();
+
+                if (! $fundExists && $mDetail && (float) $mDetail->fee > 0) {
+                    DB::table('association_funds')->insert([
+                        'title' => 'মেম্বারশিপ ফি সংগ্রহ: '.$mDetail->user_name.' ('.$mDetail->type_name.')',
+                        'source' => 'Membership Collection (UddoktaPay)',
+                        'amount' => $amount > 0 ? $amount : (float) $mDetail->fee,
+                        'fund_date' => now()->toDateString(),
+                        'reference_no' => $ref,
+                        'notes' => 'Online Payment via UddoktaPay ['.strtoupper($method).'] - Trx: '.$trxId.($invoiceId ? ' (Invoice: '.$invoiceId.')' : ''),
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+
+                // 4. Send notification to user
+                if ($mDetail) {
+                    $notifExists = DB::table('notifications')
+                        ->where('user_id', $mDetail->user_id)
+                        ->where('type', 'membership_approved')
+                        ->whereDate('created_at', now()->toDateString())
+                        ->exists();
+
+                    if (! $notifExists) {
+                        DB::table('notifications')->insert([
+                            'user_id' => $mDetail->user_id,
+                            'type' => 'membership_approved',
+                            'title' => 'মেম্বারশিপ সক্রিয় হয়েছে',
+                            'message' => "অভিনন্দন! আপনার {$mDetail->type_name} মেম্বারশিপটি অনলাইন পেমেন্টের (UddoktaPay) মাধ্যমে সফলভাবে সক্রিয় করা হয়েছে।",
+                            'is_read' => 0,
+                            'created_at' => now(),
+                        ]);
+                    }
+                }
+            }, 5);
+        } catch (\Throwable $e) {
+            Log::error('activateMembership failed', ['error' => $e->getMessage(), 'membership_id' => $membershipId]);
+        }
     }
 }
