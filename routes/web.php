@@ -1,35 +1,37 @@
 <?php
+
 declare(strict_types=1);
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\DirectoryController;
-use App\Http\Controllers\EventController;
-use App\Http\Controllers\NewsController;
-use App\Http\Controllers\GalleryController;
-use App\Http\Controllers\StoriesController;
-use App\Http\Controllers\DonationController;
-use App\Http\Controllers\JobController;
-use App\Http\Controllers\Portal\DashboardController as PortalDashboard;
-use App\Http\Controllers\Portal\ProfileController;
-use App\Http\Controllers\Portal\MembershipController as PortalMembership;
-use App\Http\Controllers\Portal\JobController as PortalJobController;
-use App\Http\Controllers\Portal\StoryController;
-use App\Http\Controllers\Portal\FinancialController;
-use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Admin\AlumniController as AdminAlumni;
-use App\Http\Controllers\Admin\StudentsController as AdminStudents;
-use App\Http\Controllers\Admin\MembershipController as AdminMembership;
-use App\Http\Controllers\Admin\NewsController as AdminNews;
+use App\Http\Controllers\Admin\CommitteeController as AdminCommittee;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
+use App\Http\Controllers\Admin\EmailTemplatesController;
 use App\Http\Controllers\Admin\EventController as AdminEvent;
 use App\Http\Controllers\Admin\GalleryController as AdminGallery;
-use App\Http\Controllers\Admin\CommitteeController as AdminCommittee;
-use App\Http\Controllers\Admin\StoriesController as AdminStories;
+use App\Http\Controllers\Admin\MembershipController as AdminMembership;
+use App\Http\Controllers\Admin\NewsController as AdminNews;
 use App\Http\Controllers\Admin\ReportController as AdminReport;
 use App\Http\Controllers\Admin\SettingsController as AdminSettings;
-use App\Http\Controllers\Admin\EmailTemplatesController;
+use App\Http\Controllers\Admin\StoriesController as AdminStories;
+use App\Http\Controllers\Admin\StudentsController as AdminStudents;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DirectoryController;
+use App\Http\Controllers\DonationController;
+use App\Http\Controllers\EventController;
+use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\JobController;
+use App\Http\Controllers\NewsController;
 use App\Http\Controllers\Payment\UddoktaPayController;
+use App\Http\Controllers\Portal\DashboardController as PortalDashboard;
+use App\Http\Controllers\Portal\FinancialController;
+use App\Http\Controllers\Portal\JobController as PortalJobController;
+use App\Http\Controllers\Portal\MembershipController as PortalMembership;
+use App\Http\Controllers\Portal\ProfileController;
+use App\Http\Controllers\Portal\StoryController;
+use App\Http\Controllers\StoriesController;
+use App\Http\Controllers\Webhook\DeployController;
+use Illuminate\Support\Facades\Route;
 
 // ── Public Routes ─────────────────────────────────────────────────────────────
 
@@ -138,7 +140,7 @@ Route::prefix('/portal')->middleware('auth.alumni')->name('portal.')->group(func
     Route::get('/membership', [PortalMembership::class, 'index'])->name('membership');
     Route::post('/membership/apply', [PortalMembership::class, 'apply'])->name('membership.apply');
     Route::get('/membership/qr', [PortalMembership::class, 'qrId'])->name('membership.qr');
-    Route::post('/membership/payment/uddoktapay', [UddoktaPayController::class, 'initiate'])->name('membership.payment.uddoktapay');
+    Route::match(['GET', 'POST'], '/membership/payment/uddoktapay', [UddoktaPayController::class, 'initiate'])->name('membership.payment.uddoktapay');
     Route::get('/membership/payment/uddoktapay/success', [UddoktaPayController::class, 'success'])->name('membership.payment.uddoktapay.success');
     Route::get('/membership/payment/uddoktapay/cancel', [UddoktaPayController::class, 'cancel'])->name('membership.payment.uddoktapay.cancel');
 
@@ -284,7 +286,7 @@ Route::prefix('/admin')->middleware('auth.admin')->name('admin.')->group(functio
 });
 
 // ── Automated Webhook Deployment Route ───────────────────────────────────────
-Route::match(['GET', 'POST'], '/webhook/deploy', [\App\Http\Controllers\Webhook\DeployController::class, 'handle'])->name('webhook.deploy');
+Route::match(['GET', 'POST'], '/webhook/deploy', [DeployController::class, 'handle'])->name('webhook.deploy');
 Route::post('/webhook/uddoktapay', [UddoktaPayController::class, 'webhook'])->name('webhook.uddoktapay');
 
 // Secure storage serving (only serve storage/app/public or public/storage)
@@ -295,11 +297,11 @@ Route::get('/storage/{path}', function (string $path) {
     ];
 
     // normalize requested path
-    $candidate1 = storage_path('app/public/' . $path);
-    $candidate2 = public_path('storage/' . $path);
+    $candidate1 = storage_path('app/public/'.$path);
+    $candidate2 = public_path('storage/'.$path);
     $requested = realpath($candidate1) ?: realpath($candidate2);
 
-    if (!$requested) {
+    if (! $requested) {
         abort(404);
     }
 
@@ -311,5 +313,3 @@ Route::get('/storage/{path}', function (string $path) {
 
     abort(404);
 })->where('path', '.*')->name('storage.serve');
-
-
