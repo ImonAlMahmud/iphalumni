@@ -12,6 +12,7 @@ class UddoktaPayService
     protected string $apiKey;
     protected string $apiUrl;
     protected string $mode;
+    protected string $webhookSecret;
 
     public function __construct()
     {
@@ -20,6 +21,9 @@ class UddoktaPayService
         // 1. Check DB Settings first, then fallback to config/env
         $dbApiKey = (string) $settingModel->get('uddoktapay_api_key', '');
         $this->apiKey = !empty($dbApiKey) ? trim($dbApiKey) : (string) config('services.uddoktapay.api_key', env('UDDOKTAPAY_API_KEY', ''));
+
+        $dbSecret = (string) $settingModel->get('uddoktapay_webhook_secret', '');
+        $this->webhookSecret = !empty($dbSecret) ? trim($dbSecret) : (string) config('services.uddoktapay.webhook_secret', env('UDDOKTAPAY_WEBHOOK_SECRET', ''));
 
         $dbMode = (string) $settingModel->get('uddoktapay_mode', '');
         $this->mode = !empty($dbMode) ? trim($dbMode) : (string) config('services.uddoktapay.mode', env('UDDOKTAPAY_MODE', 'sandbox'));
@@ -226,14 +230,32 @@ class UddoktaPayService
         }
     }
 
+    public function getWebhookSecret(): string
+    {
+        return $this->webhookSecret;
+    }
+
     /**
-     * Validate webhook request authenticity
+     * Validate HMAC-SHA256 signature against the raw webhook body
+     */
+    public function validateWebhookSignature(string $rawBody, string $signature): bool
+    {
+        if (empty($this->webhookSecret) || empty($signature)) {
+            return false;
+        }
+        $expected = hash_hmac('sha256', $rawBody, $this->webhookSecret);
+        return hash_equals($expected, trim($signature));
+    }
+
+    /**
+     * Validate webhook request authenticity via API Key / Secret header
      */
     public function validateWebhookHeader(string $receivedKey): bool
     {
-        if (empty($this->apiKey) || empty($receivedKey)) {
+        $expected = !empty($this->webhookSecret) ? $this->webhookSecret : $this->apiKey;
+        if (empty($expected) || empty($receivedKey)) {
             return false;
         }
-        return hash_equals($this->apiKey, trim($receivedKey));
+        return hash_equals($expected, trim($receivedKey));
     }
 }
