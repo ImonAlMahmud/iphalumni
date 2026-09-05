@@ -23,12 +23,21 @@ class SecurityHardeningTest extends TestCase
     }
 
     /**
-     * Test that GET /logout is disabled and returns 405 Method Not Allowed.
+     * Test that GET /logout is disabled and returns 405 Method Not Allowed or redirects.
      */
     public function test_logout_get_is_disallowed(): void
     {
         $response = $this->get('/logout');
         $this->assertTrue(in_array($response->status(), [404, 405]));
+    }
+
+    /**
+     * Test that POST /logout is protected and redirects guests to login.
+     */
+    public function test_logout_post_is_protected(): void
+    {
+        $response = $this->post('/logout');
+        $this->assertTrue(in_array($response->status(), [302, 401]));
     }
 
     /**
