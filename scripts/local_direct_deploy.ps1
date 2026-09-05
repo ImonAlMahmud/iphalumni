@@ -21,7 +21,7 @@ $tempZip = Join-Path $env:TEMP ("iph_deploy_" + (Get-Date -Format "yyyyMMddHHmms
 try {
     # Step 1: Pre-flight check
     Write-Host "[1/3] Checking connection to live deploy endpoint..." -ForegroundColor Yellow
-    $pingUrl = "$Url`?secret=$Secret&action=ping"
+    $pingUrl = "$Url`?token=$Secret&secret=$Secret&action=ping"
     
     try {
         $pingResponse = Invoke-RestMethod -Uri $pingUrl -Method Get -TimeoutSec 15 -ErrorAction Stop

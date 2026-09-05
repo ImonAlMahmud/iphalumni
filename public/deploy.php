@@ -21,7 +21,7 @@ if (empty($deploySecret) && file_exists(__DIR__ . '/../.env')) {
         $deploySecret = trim($m[1], " \t\n\r\0\x0B\"'");
     }
 }
-$providedSecret = $_SERVER['HTTP_X_DEPLOY_TOKEN'] ?? $_GET['token'] ?? $_POST['token'] ?? null;
+$providedSecret = $_SERVER['HTTP_X_DEPLOY_TOKEN'] ?? $_GET['token'] ?? $_POST['token'] ?? ($_GET['secret'] ?? ($_POST['secret'] ?? null));
 if (empty($deploySecret) || !hash_equals((string)$deploySecret, (string)$providedSecret)) {
     http_response_code(403);
     echo json_encode(['status' => 'error', 'message' => 'Unauthorized.']);
@@ -37,11 +37,11 @@ function safe_filename(string $name): string {
 }
 
 function is_allowed_file(string $name): bool {
-    $badExt = ['env', 'php', 'phtml', 'phar', 'sh', 'exe', 'bat', 'cmd'];
+    if (str_starts_with($name, '.')) return false;
+    if (str_contains($name, '/.git') || str_contains($name, '/.env') || str_contains($name, '.env')) return false;
+    $badExt = ['env', 'phar', 'sh', 'exe', 'bat', 'cmd'];
     $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
     if (in_array($ext, $badExt, true)) return false;
-    if (str_starts_with($name, '.')) return false;
-    if (str_contains($name, '/.git') || str_contains($name, '/.env')) return false;
     return true;
 }
 
