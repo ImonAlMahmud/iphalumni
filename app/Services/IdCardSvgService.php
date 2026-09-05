@@ -61,7 +61,7 @@ class IdCardSvgService
         $memberTitle = !empty($cm->designation) ? (string)$cm->designation : 'IPH Alumni Member';
 
         $rawId       = $profile['id'] ?? $profile['user_id'];
-        $memberNo    = 'IPH-ALM-' . str_pad((string)$rawId, 5, '0', STR_PAD_LEFT);
+        $memberNo    = 'IPHAA-' . str_pad((string)$rawId, 5, '0', STR_PAD_LEFT);
         $degree      = !empty($latestDegree) ? $latestDegree : (!empty($profile['degree']) ? $profile['degree'] : ($refData['department'] ?? 'Public Health Graduate'));
         $batch       = !empty($refData['batch']) ? $refData['batch'] : (!empty($refData['session']) ? $refData['session'] : (!empty($profile['batch_year']) ? $profile['batch_year'] : 'N/A'));
         $phone       = !empty($profile['phone']) ? $profile['phone'] : ($refData['mobile'] ?? 'N/A');
@@ -405,7 +405,7 @@ SVG;
 
     /**
      * Generate a ZIP archive of all given alumni profile cards, organized folder-wise.
-     * Each member gets their own folder: e.g. "IPH-ALM-00001_Member_Name/" containing "front.svg" and "back.svg".
+     * Each member gets their own folder: e.g. "IPHAA-00001_Member_Name/" containing "front.svg" and "back.svg".
      */
     public function generateZipArchive(array $alumniProfileIds, ?string $zipFilePath = null): string
     {

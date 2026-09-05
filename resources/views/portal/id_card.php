@@ -35,7 +35,7 @@ if (!empty($lastEdu['degree'])) {
 }
 
 $rawId = !empty($profile['id']) ? $profile['id'] : $user['id'];
-$memberNo    = 'IPH-ALM-' . str_pad((string)$rawId, 5, '0', STR_PAD_LEFT);
+$memberNo    = 'IPHAA-' . str_pad((string)$rawId, 5, '0', STR_PAD_LEFT);
 $degree      = !empty($latestDegree) ? $latestDegree : (!empty($profile['degree']) ? $profile['degree'] : ($refData['department'] ?? 'Public Health Graduate'));
 $batch       = !empty($refData['batch']) ? $refData['batch'] : (!empty($refData['session']) ? $refData['session'] : (!empty($profile['batch_year']) ? $profile['batch_year'] : 'N/A'));
 $phone       = !empty($profile['phone']) ? $profile['phone'] : ($refData['mobile'] ?? 'N/A');
