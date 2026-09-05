@@ -191,8 +191,8 @@ class AuthController extends BaseController
 
             return redirect('/login')->with('success', $msg);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('Registration error', ['exception' => $e]);
-            return back()->with('error', 'Registration failed. Please try again or contact support.')->withInput();
+            \Illuminate\Support\Facades\Log::error('Registration error', ['err' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return back()->with('error', 'Registration failed. Please contact support.')->withInput();
         }
     }
 
