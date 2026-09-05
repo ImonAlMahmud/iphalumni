@@ -159,6 +159,12 @@ $navItems[] = ['/portal/settings',    'Settings',     'fa-solid fa-gear'];
 
       <!-- Bottom links -->
       <div class="px-3 py-4 border-t border-slate-100 space-y-1">
+        <?php if (is_admin()): ?>
+        <a href="<?= url('/admin') ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-amber-800 bg-amber-50 hover:bg-amber-100 font-semibold border border-amber-200 transition-all">
+          <i class="fa-solid fa-shield-halved w-4 text-center text-amber-600"></i>
+          Admin Panel
+        </a>
+        <?php endif; ?>
         <a href="<?= url('/') ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-[#6B7178] hover:text-[#101820] hover:bg-slate-50 transition-all">
           <i class="fa-solid fa-arrow-up-right-from-square w-4 text-center"></i>
           Public Site
@@ -223,6 +229,12 @@ $navItems[] = ['/portal/settings',    'Settings',     'fa-solid fa-gear'];
 
     <!-- Bottom links -->
     <div class="px-3 py-4 border-t space-y-1 shrink-0" style="border-color:rgba(16,24,32,0.08);">
+      <?php if (is_admin()): ?>
+      <a href="<?= url('/admin') ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-amber-800 bg-amber-50 hover:bg-amber-100 font-semibold border border-amber-200 transition-all">
+        <i class="fa-solid fa-shield-halved w-4 text-center text-amber-600"></i>
+        Admin Panel
+      </a>
+      <?php endif; ?>
       <button type="button" onclick="toggleGoogleTranslate()" class="notranslate w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-[#6B7178] hover:text-[#800020] hover:bg-white/60 transition-all cursor-pointer text-left" translate="no">
         <i class="fa-solid fa-language w-4 text-center text-[#800020]"></i>
         <span class="gt-lang-label notranslate" translate="no">English</span>

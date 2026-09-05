@@ -40,9 +40,6 @@ class AuthController extends BaseController
 
             AuditLogger::log('USER_LOGIN', "User logged in: {$email}");
 
-            if (in_array($user->role, ['super_admin', 'admin', 'editor'])) {
-                return redirect('/admin');
-            }
             return redirect('/portal');
         }
 

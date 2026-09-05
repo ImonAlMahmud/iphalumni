@@ -54,4 +54,33 @@ class SecurityHardeningTest extends TestCase
 
         $response->assertStatus(401);
     }
+
+    /**
+     * Test that Admin login redirects to member portal (/portal) instead of admin panel.
+     */
+    public function test_admin_login_redirects_to_portal(): void
+    {
+        $guard = \Mockery::mock(\Illuminate\Contracts\Auth\StatefulGuard::class);
+        $user = new \App\Models\User([
+            'id' => 999999,
+            'name' => 'Test Admin',
+            'email' => 'admin_test_unit@example.com',
+            'role' => 'admin',
+            'status' => 'active',
+        ]);
+        $guard->shouldReceive('attempt')->once()->andReturn(true);
+        $guard->shouldReceive('user')->andReturn($user);
+        \Illuminate\Support\Facades\Auth::swap($guard);
+
+        $request = \Illuminate\Http\Request::create('/login', 'POST', [
+            'email' => 'admin_test_unit@example.com',
+            'password' => 'secret123',
+        ]);
+        $request->setLaravelSession($this->app['session.store']);
+
+        $controller = new \App\Http\Controllers\AuthController();
+        $response = $controller->login($request);
+
+        $this->assertEquals(url('/portal'), $response->getTargetUrl());
+    }
 }
