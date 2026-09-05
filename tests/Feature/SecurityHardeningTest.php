@@ -56,6 +56,35 @@ class SecurityHardeningTest extends TestCase
     }
 
     /**
+     * Test that UddoktaPay webhook accepts valid HMAC-SHA256 signature and returns 200.
+     */
+    public function test_uddoktapay_webhook_accepts_valid_signature_and_returns_200(): void
+    {
+        $secret = 'test-secret-key';
+        config(['services.uddoktapay.webhook_secret' => $secret]);
+        putenv("UDDOKTAPAY_WEBHOOK_SECRET={$secret}");
+
+        $payload = json_encode(['invoice_id' => 'INV-TEST-100', 'status' => 'COMPLETED']);
+        $validSignature = hash_hmac('sha256', $payload, $secret);
+
+        $response = $this->call(
+            'POST',
+            '/webhook/uddoktapay',
+            [],
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_RT_UDDOKTAPAY_SIGN' => $validSignature,
+            ],
+            $payload
+        );
+
+        $response->assertStatus(200);
+        $this->assertEquals('ignored', $response->json('status'));
+    }
+
+    /**
      * Test that Admin login redirects to member portal (/portal) instead of admin panel.
      */
     public function test_admin_login_redirects_to_portal(): void
