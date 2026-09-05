@@ -914,16 +914,16 @@ body.home-intro-revealed .hero-delay-5 { animation-delay: 0.7s; }
         ['<i class="fa-solid fa-flask" style="color:#2F8863;font-size:18px;"></i>',           __('গবেষণা ও বৃত্তি', 'Research & Grants'),            __('জনস্বাস্থ্য গবেষণা দল, আন্তর্জাতিক সেমিনার কোলাবোরেশন ও বৃত্তির আপডেট।', 'Updates on public health research groups, international collaborations, and scholarship opportunities.'), '#2F8863'],
         ['<i class="fa-solid fa-ticket" style="color:#A22638;font-size:18px;"></i>',          __('ইভেন্টে অগ্রাধিকার', 'Priority Access'),           __('বার্ষিক মিলনমেলা, পুনর্মিলনী এবং বিশেষ ওয়ার্কশপে অগ্রাধিকার বুকিং ও আসন সুবিধা।', 'Priority booking and seating at the annual reunion, conferences, and special workshops.'), '#A22638'],
       ];
-      foreach ($benefits as [$icon, $title, $desc, $accent]):
+      foreach ($benefits as [$bIcon, $bTitle, $bDesc, $bAccent]):
       ?>
       <div class="p-6 rounded-2xl hover-lift"
            style="background:rgba(255,255,255,0.65);border:1px solid rgba(16,24,32,0.06);backdrop-filter:blur(10px);">
         <div class="w-11 h-11 rounded-2xl flex items-center justify-center mb-4"
-             style="background:<?= $accent ?>18;">
-          <?= $icon ?>
+             style="background:<?= $bAccent ?>18;">
+          <?= $bIcon ?>
         </div>
-        <h4 class="font-semibold text-[15px] text-[#101820] mb-2"><?= $title ?></h4>
-        <p class="text-[12.5px] text-[#6B7178] leading-relaxed"><?= $desc ?></p>
+        <h4 class="font-semibold text-[15px] text-[#101820] mb-2"><?= $bTitle ?></h4>
+        <p class="text-[12.5px] text-[#6B7178] leading-relaxed"><?= $bDesc ?></p>
       </div>
       <?php endforeach; ?>
     </div>

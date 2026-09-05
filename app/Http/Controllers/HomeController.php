@@ -53,7 +53,7 @@ class HomeController extends BaseController
         $successStories = array_map(fn($r) => (array)$r, DB::select("SELECT * FROM success_stories WHERE status = 'published' AND deleted_at IS NULL ORDER BY is_featured DESC, created_at DESC LIMIT 3"));
         $membershipTypes = array_map(fn($r) => (array)$r, DB::select("SELECT * FROM membership_types WHERE is_active = 1 ORDER BY sort_order ASC"));
 
-        $title       = 'Home';
+        $title       = 'IPH Alumni Association';
         $description = config('app.name') . ' — ' . env('APP_TAGLINE', 'Institute of Public Health Alumni Network');
 
         return $this->legacyView('home/index', compact(

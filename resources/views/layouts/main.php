@@ -5,7 +5,6 @@
  */
 $appName   = __('আইপিএইচ অ্যালামনাই অ্যাসোসিয়েশন', env('APP_NAME', 'IPH Alumni Association'));
 $appUrl    = env('APP_URL', 'http://localhost/alumni/public');
-$title     = isset($title) ? e($title) . ' — ' . $appName : $appName;
 $desc      = $description ?? 'IPH Alumni Association — Institute of Public Health Alumni Network';
 $bodyClass = $bodyClass ?? '';
 
@@ -25,6 +24,12 @@ if ($isHome) {
     } else {
         $bodyClass .= ' home-intro-playing';
     }
+}
+
+if ($isHome || empty($title) || $title === 'Home' || $title === 'IPH Alumni Association' || $title === 'আইপিএইচ অ্যালামনাই অ্যাসোসিয়েশন') {
+    $title = 'IPH Alumni Association';
+} else {
+    $title = e($title) . ' — ' . $appName;
 }
 ?>
 <?php

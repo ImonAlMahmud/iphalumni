@@ -32,10 +32,18 @@ abstract class BaseController extends Controller
             abort(404, "View not found: {$view}");
         }
 
+        // Preserve layout parameters
+        $layoutTitle = $title;
+        $layoutDesc  = $description;
+
         // Capture view content
         ob_start();
         require $viewFile;
         $content = ob_get_clean();
+
+        // Restore layout parameters
+        $title       = $layoutTitle;
+        $description = $layoutDesc;
 
         // Load layout
         $layoutFile = resource_path("views/layouts/{$layout}.php");
