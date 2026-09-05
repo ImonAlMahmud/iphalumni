@@ -222,13 +222,16 @@ class AuthController extends BaseController
 
         $user = DB::table('users')->where('email', $email)->first();
         if ($user) {
-            $token = bin2hex(random_bytes(32));
+            // Generate plain token for the URL, store only the SHA-256 hash in DB
+            $plainToken = bin2hex(random_bytes(32));
+            $hashedToken = hash('sha256', $plainToken);
+
             DB::table('users')->where('id', $user->id)->update([
-                'reset_token'      => $token,
+                'reset_token'      => $hashedToken,   // hashed — safe even if DB is compromised
                 'reset_expires_at' => now()->addHour(),
             ]);
 
-            $resetUrl = url('/reset-password?token=' . $token);
+            $resetUrl = url('/reset-password?token=' . $plainToken);
             $mail     = new MailService();
             $mail->send($email, 'Password Reset Request — IPH Alumni',
                 "<p>Hello " . e($user->name) . ",</p>
@@ -247,7 +250,12 @@ class AuthController extends BaseController
             return redirect('/login')->with('error', 'Invalid password reset token.');
         }
 
-        $user = DB::table('users')->where('reset_token', $token)->where('reset_expires_at', '>', now())->first();
+        // Hash the plain URL token to look up in DB
+        $hashedToken = hash('sha256', $token);
+        $user = DB::table('users')
+            ->where('reset_token', $hashedToken)
+            ->where('reset_expires_at', '>', now())
+            ->first();
         if (!$user) {
             return redirect('/forgot-password')->with('error', 'This password reset link is invalid or has expired.');
         }
@@ -265,7 +273,12 @@ class AuthController extends BaseController
         if (strlen($password) < 8) return back()->with('error', 'Password must be at least 8 characters.');
         if ($password !== $confirm) return back()->with('error', 'Passwords do not match.');
 
-        $user = DB::table('users')->where('reset_token', $token)->where('reset_expires_at', '>', now())->first();
+        // Hash the incoming plain token before looking up in DB
+        $hashedToken = hash('sha256', $token);
+        $user = DB::table('users')
+            ->where('reset_token', $hashedToken)
+            ->where('reset_expires_at', '>', now())
+            ->first();
         if (!$user) {
             return redirect('/forgot-password')->with('error', 'This password reset link is invalid or has expired.');
         }

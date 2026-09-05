@@ -131,6 +131,10 @@ Route::prefix('/portal')->middleware('auth.alumni')->name('portal.')->group(func
     Route::post('/contact-requests/{id}/reject', [ProfileController::class, 'rejectContactRequest'])->name('contact_requests.reject');
     Route::post('/contact-requests/{id}/delete', [ProfileController::class, 'deleteContactRequest'])->name('contact_requests.delete');
 
+    // Email change OTP (AJAX)
+    Route::post('/profile/email-change/send-otp', [ProfileController::class, 'sendEmailChangeOtp'])->name('profile.email_change.send_otp');
+    Route::post('/profile/email-change/verify-otp', [ProfileController::class, 'verifyEmailChangeOtp'])->name('profile.email_change.verify_otp');
+
     // Membership
     Route::get('/membership', [PortalMembership::class, 'index'])->name('membership');
     Route::post('/membership/apply', [PortalMembership::class, 'apply'])->name('membership.apply');

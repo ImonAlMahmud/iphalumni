@@ -12,6 +12,16 @@ class UploadService
     private array $allowedDocMimes   = ['application/pdf', 'image/jpeg', 'image/png'];
 
     /**
+     * Extensions that must never be saved, regardless of reported MIME type.
+     * Guards against double-extension attacks (e.g., evil.php.jpg).
+     */
+    private array $blockedExtensions = [
+        'php', 'php3', 'php4', 'php5', 'php7', 'phtml', 'phar',
+        'exe', 'sh', 'bat', 'cmd', 'pl', 'py', 'rb', 'cgi',
+        'htaccess', 'htpasswd', 'js', 'html', 'htm', 'xml',
+    ];
+
+    /**
      * Upload avatar — stored in public/storage/avatars/
      */
     public function uploadAvatar(UploadedFile $file, int $userId): string|false
@@ -67,29 +77,49 @@ class UploadService
         if ($file['error'] !== UPLOAD_ERR_OK) return false;
         if ($file['size'] > $maxSize) return false;
 
+        // Read real MIME from file bytes — not from HTTP header
         $finfo    = new \finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->file($file['tmp_name']);
         if (!in_array($mimeType, $allowedMimes, true)) return false;
 
+        // Block dangerous extensions
+        $originalName = strtolower($file['name'] ?? '');
+        if ($this->hasDangerousExtension($originalName)) return false;
+
         $ext      = $this->mimeToExt($mimeType);
-        $filename = $namePrefix . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+        $filename = $namePrefix . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
         $destDir  = public_path('uploads/' . $subDir);
 
         if (!is_dir($destDir)) mkdir($destDir, 0755, true);
         if (!move_uploaded_file($file['tmp_name'], $destDir . DIRECTORY_SEPARATOR . $filename)) return false;
+
+        // Remove executable permission
+        @chmod($destDir . DIRECTORY_SEPARATOR . $filename, 0644);
 
         return $filename;
     }
 
     private function upload(UploadedFile $file, string $subDir, array $allowedMimes, int $maxSize, string $namePrefix): string|false
     {
+        // 1. Size check
         if ($file->getSize() > $maxSize) return false;
 
-        $mimeType = $file->getMimeType();
-        if (!in_array($mimeType, $allowedMimes, true)) return false;
+        // 2. Block dangerous original extension before anything else
+        $originalName = strtolower($file->getClientOriginalName());
+        if ($this->hasDangerousExtension($originalName)) return false;
 
-        $ext      = $this->mimeToExt($mimeType);
-        $filename = $namePrefix . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+        // 3. Read real MIME from actual file bytes using finfo (not HTTP header or client claim)
+        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
+        $realMime = $finfo->file($file->getRealPath());
+        if (!in_array($realMime, $allowedMimes, true)) return false;
+
+        // 4. Cross-check: reported MIME must match real MIME
+        $reportedMime = $file->getMimeType();
+        if ($reportedMime !== $realMime) return false;
+
+        // 5. Generate a safe randomized filename — no original name used
+        $ext      = $this->mimeToExt($realMime);
+        $filename = $namePrefix . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
 
         // Store in public disk (storage/app/public/...)
         $file->storeAs($subDir, $filename, 'public');
@@ -101,7 +131,26 @@ class UploadService
         }
         @copy(storage_path("app/public/{$subDir}/{$filename}"), "{$pubTarget}/{$filename}");
 
+        // Remove executable permission from the saved file
+        @chmod("{$pubTarget}/{$filename}", 0644);
+
         return $filename;
+    }
+
+    /**
+     * Checks if filename contains any dangerous extension (handles double-extension attacks).
+     */
+    private function hasDangerousExtension(string $filename): bool
+    {
+        // Split on ALL dots to catch double extensions like shell.php.jpg
+        $parts = explode('.', $filename);
+        // Check every segment after the first (all extensions)
+        for ($i = 1; $i < count($parts); $i++) {
+            if (in_array(strtolower($parts[$i]), $this->blockedExtensions, true)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private function mimeToExt(string $mime): string

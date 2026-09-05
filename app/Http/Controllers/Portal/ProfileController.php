@@ -47,8 +47,10 @@ class ProfileController extends BaseController
         $locationType = $request->input('location_type', 'bangladesh');
         $countryName  = trim((string)$request->input('country', ''));
 
-        $newEmail = strtolower(trim((string)$request->input('email', '')));
-        if (!empty($newEmail) && $newEmail !== strtolower((string)$user->email)) {
+        $newEmail     = strtolower(trim((string)$request->input('email', '')));
+        $isEmailChange = !empty($newEmail) && $newEmail !== strtolower((string)$user->email);
+
+        if ($isEmailChange) {
             if (!filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
                 return redirect('/portal/profile')->with('error', 'অনুগ্রহ করে একটি সঠিক ইমেইল ঠিকানা প্রদান করুন।');
             }
@@ -56,6 +58,24 @@ class ProfileController extends BaseController
             if ($existing) {
                 return redirect('/portal/profile')->with('error', 'এই ইমেইল ঠিকানাটি ইতোমধ্যে অন্য একজন সদস্যের অ্যাকাউন্টে ব্যবহৃত হচ্ছে। অনুগ্রহ করে ভিন্ন ইমেইল ব্যবহার করুন।');
             }
+
+            // Require OTP session verification before applying email change
+            $sessionKey  = 'email_change_verified_' . $user->id;
+            $sessionData = $request->session()->get($sessionKey);
+
+            $otpVerified = $sessionData
+                && isset($sessionData['email'], $sessionData['expires_at'])
+                && $sessionData['email'] === $newEmail
+                && now()->timestamp < $sessionData['expires_at'];
+
+            if (!$otpVerified) {
+                return redirect('/portal/profile')
+                    ->with('error', 'ইমেইল পরিবর্তন করতে হলে প্রথমে নতুন ইমেইলে পাঠানো OTP কোডটি দিয়ে যাচাই করুন।')
+                    ->withInput();
+            }
+
+            // OTP verified — clear the session flag
+            $request->session()->forget($sessionKey);
         }
 
         $dobInput   = trim((string)$request->input('dob', ''));
@@ -107,7 +127,7 @@ class ProfileController extends BaseController
             if ($request->filled('name')) {
                 $userUpdates['name'] = trim((string)$request->input('name'));
             }
-            if (!empty($newEmail) && $newEmail !== strtolower((string)$user->email)) {
+            if ($isEmailChange) {
                 $userUpdates['email'] = $newEmail;
             }
             if (!empty($userUpdates)) {
@@ -184,11 +204,95 @@ class ProfileController extends BaseController
                 }
             }
 
-            return redirect('/portal/profile')->with('success', 'প্রোফাইল সফলভাবে আপডেট করা হয়েছে।');
+            return redirect('/portal/profile')->with('success', 'প্রোফাইল সফলভাবে আপডেট করা হয়েছে।');
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('Profile update failed: ' . $e->getMessage(), ['exception' => $e]);
-            return redirect('/portal/profile')->with('error', 'প্রোফাইল সংরক্ষণ করার সময় একটি সমস্যা হয়েছে: ' . $e->getMessage());
+            return redirect('/portal/profile')->with('error', 'প্রোফাইল সংরক্ষণ করার সময় একটি সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।');
         }
+    }
+
+    /**
+     * Step 1: Send OTP to the new email before allowing the email change.
+     * Called via AJAX from the profile page.
+     */
+    public function sendEmailChangeOtp(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $user     = Auth::user();
+        $newEmail = strtolower(trim((string)$request->input('email', '')));
+
+        if (empty($newEmail) || !filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
+            return response()->json(['success' => false, 'message' => 'সঠিক ইমেইল ঠিকানা দিন।']);
+        }
+        if ($newEmail === strtolower((string)$user->email)) {
+            return response()->json(['success' => false, 'message' => 'এটি আপনার বর্তমান ইমেইল।']);
+        }
+        if (DB::table('users')->where('email', $newEmail)->where('id', '!=', $user->id)->exists()) {
+            return response()->json(['success' => false, 'message' => 'এই ইমেইলটি অন্য অ্যাকাউন্টে ব্যবহৃত হচ্ছে।']);
+        }
+
+        // Generate 6-digit OTP
+        $otp = (string)random_int(100000, 999999);
+
+        // Store pending OTP in session with 10-minute expiry
+        $request->session()->put('email_change_otp_' . $user->id, [
+            'email'      => $newEmail,
+            'otp'        => $otp,
+            'expires_at' => now()->addMinutes(10)->timestamp,
+        ]);
+
+        $result = MailService::send($newEmail, 'Email Change Verification — IPH Alumni', [
+            'title'   => 'ইমেইল পরিবর্তনের OTP',
+            'badge'   => 'EMAIL CHANGE OTP',
+            'content' => "<p>আপনার IPH Alumni পোর্টাল অ্যাকাউন্টের ইমেইল পরিবর্তনের অনুরোধ করা হয়েছে।</p>
+                <div style='text-align:center;margin:24px 0;'>
+                    <span style='display:inline-block;padding:12px 32px;background:#800020;color:#fff;font-size:26px;font-weight:bold;letter-spacing:6px;border-radius:12px;'>{$otp}</span>
+                </div>
+                <p style='font-size:13px;color:#64748b;'>এই কোডটির মেয়াদ ১০ মিনিট। আপনি যদি এই পরিবর্তনের অনুরোধ না করে থাকেন, নিরাপত্তার জন্য পাসওয়ার্ড পরিবর্তন করুন।</p>",
+        ]);
+
+        return response()->json([
+            'success' => (bool)($result['success'] ?? false),
+            'message' => ($result['success'] ?? false)
+                ? 'নতুন ইমেইলে OTP পাঠানো হয়েছে।'
+                : 'OTP পাঠাতে সমস্যা হয়েছে। SMTP সেটিংস যাচাই করুন।',
+        ]);
+    }
+
+    /**
+     * Step 2: Validate OTP and mark email change as verified in session.
+     * Called via AJAX from the profile page.
+     */
+    public function verifyEmailChangeOtp(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $user     = Auth::user();
+        $newEmail = strtolower(trim((string)$request->input('email', '')));
+        $code     = trim((string)$request->input('otp', ''));
+
+        $sessionKey  = 'email_change_otp_' . $user->id;
+        $sessionData = $request->session()->get($sessionKey);
+
+        if (
+            !$sessionData ||
+            !isset($sessionData['email'], $sessionData['otp'], $sessionData['expires_at']) ||
+            $sessionData['email'] !== $newEmail ||
+            now()->timestamp > $sessionData['expires_at']
+        ) {
+            return response()->json(['success' => false, 'message' => 'OTP মেয়াদ শেষ হয়েছে বা তথ্য মেলেনি। আবার চেষ্টা করুন।']);
+        }
+
+        // Timing-safe comparison to prevent timing attacks
+        if (!hash_equals($sessionData['otp'], $code)) {
+            return response()->json(['success' => false, 'message' => 'OTP কোডটি সঠিক নয়।']);
+        }
+
+        // Clear OTP, write verified flag with 15-min window to submit the form
+        $request->session()->forget($sessionKey);
+        $request->session()->put('email_change_verified_' . $user->id, [
+            'email'      => $newEmail,
+            'expires_at' => now()->addMinutes(15)->timestamp,
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'ইমেইল যাচাই সফল হয়েছে! এখন প্রোফাইল আপডেট করুন।']);
     }
 
     public function uploadAvatar(Request $request)
