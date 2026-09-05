@@ -194,8 +194,8 @@ class AuthController extends BaseController
 
             return redirect('/login')->with('success', $msg);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('Registration error: ' . $e->getMessage());
-            return back()->with('error', 'রেজিস্ট্রেশন জমা দিতে সমস্যা হয়েছে: ' . $e->getMessage())->withInput();
+            \Illuminate\Support\Facades\Log::error('Registration error', ['exception' => $e]);
+            return back()->with('error', 'Registration failed. Please try again or contact support.')->withInput();
         }
     }
 

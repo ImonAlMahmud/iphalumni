@@ -371,7 +371,8 @@ class AlumniController extends BaseController
             $filename = 'IPH_Alumni_Member_Cards_SVG_' . date('Ymd_His') . '.zip';
             return response()->download($zipPath, $filename)->deleteFileAfterSend(true);
         } catch (\Throwable $e) {
-            return redirect('/admin/alumni')->with('error', 'SVG কার্ড এক্সপোর্টে সমস্যা হয়েছে: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('SVG card export failed', ['exception' => $e]);
+            return redirect('/admin/alumni')->with('error', 'SVG কার্ড এক্সপোর্টে সমস্যা হয়েছে। অনুগ্রহ করে সিস্টেম লগ দেখুন।');
         }
     }
 
