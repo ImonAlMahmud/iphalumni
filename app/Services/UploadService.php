@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class UploadService
@@ -109,8 +110,15 @@ class UploadService
         if ($this->hasDangerousExtension($originalName)) return false;
 
         // 3. Read real MIME from actual file bytes using finfo (not HTTP header or client claim)
-        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-        $realMime = $finfo->file($file->getRealPath());
+        $realPath = $file->getRealPath();
+        if ($realPath === false || !is_readable($realPath)) return false;
+        try {
+            $finfo = new \finfo(FILEINFO_MIME_TYPE);
+            $realMime = $finfo->file($realPath);
+        } catch (\Throwable $e) {
+            Log::warning('UploadService finfo failed', ['err'=>$e->getMessage()]);
+            return false;
+        }
         if (!in_array($realMime, $allowedMimes, true)) return false;
 
         // 4. Cross-check: reported MIME must match real MIME
