@@ -51,6 +51,10 @@
 
           <div class="text-[13.5px] text-white/60 mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
             <span>✉ <?= e($alumni['email']) ?></span>
+            <?php if (!empty($alumni['secondary_email'])): ?>
+            <span class="text-white/40 font-mono text-[12px]">|</span>
+            <span title="Secondary Email">✉ <?= e($alumni['secondary_email']) ?> <span class="text-[11px] text-amber-300/80 font-mono">(Secondary)</span></span>
+            <?php endif; ?>
             <?php if (!empty($alumni['phone'])): ?>
             <span>📞 <?= e($alumni['phone']) ?></span>
             <?php endif; ?>

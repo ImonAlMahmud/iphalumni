@@ -29,7 +29,21 @@ class AuthController extends BaseController
             return back()->with('error', 'Email and password are required.');
         }
 
-        if (Auth::attempt(['email' => $email, 'password' => $password])) {
+        $loginAttempt = Auth::attempt(['email' => $email, 'password' => $password]);
+        if (! $loginAttempt) {
+            $matchedUser = \App\Models\User::where('secondary_email', $email)
+                ->orWhereHas('alumniProfile', function ($q) use ($email) {
+                    $q->where('secondary_email', $email);
+                })
+                ->first();
+
+            if ($matchedUser && \Illuminate\Support\Facades\Hash::check($password, $matchedUser->password)) {
+                Auth::login($matchedUser, $request->boolean('remember'));
+                $loginAttempt = true;
+            }
+        }
+
+        if ($loginAttempt) {
             $request->session()->regenerate();
             $user = Auth::user();
 
@@ -217,7 +231,15 @@ class AuthController extends BaseController
             return back()->with('error', 'Please enter a valid email address.');
         }
 
-        $user = DB::table('users')->where('email', $email)->first();
+        $user = DB::table('users')->where('email', $email)
+            ->orWhere('secondary_email', $email)
+            ->first();
+        if (!$user) {
+            $profileUserId = DB::table('alumni_profiles')->where('secondary_email', $email)->value('user_id');
+            if ($profileUserId) {
+                $user = DB::table('users')->where('id', $profileUserId)->first();
+            }
+        }
         if ($user) {
             // Generate plain token for the URL, store only the SHA-256 hash in DB
             $plainToken = bin2hex(random_bytes(32));

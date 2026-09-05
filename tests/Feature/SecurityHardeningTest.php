@@ -121,4 +121,26 @@ class SecurityHardeningTest extends TestCase
 
         $this->assertEquals(url('/portal'), $response->getTargetUrl());
     }
+
+    /**
+     * Test that secondary email can be saved and is accessible in models.
+     */
+    public function test_secondary_email_is_persisted_and_fillable(): void
+    {
+        $user = new \App\Models\User([
+            'name' => 'Secondary Email User',
+            'email' => 'primary@example.com',
+            'secondary_email' => 'secondary@example.com',
+            'password' => 'secret123',
+            'role' => 'alumni',
+            'status' => 'active',
+        ]);
+
+        $this->assertEquals('secondary@example.com', $user->secondary_email);
+
+        $profile = new \App\Models\AlumniProfile([
+            'secondary_email' => 'alumni_secondary@example.com',
+        ]);
+        $this->assertEquals('alumni_secondary@example.com', $profile->secondary_email);
+    }
 }

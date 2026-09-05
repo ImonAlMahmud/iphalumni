@@ -84,9 +84,24 @@ class ProfileController extends BaseController
         $bloodGroup = trim((string)$request->input('blood_group', '')) ?: null;
         $batchYear  = trim((string)$request->input('batch_year', '')) ?: null;
 
+            // Secondary email validation
+            $secondaryEmail = strtolower(trim((string)$request->input('secondary_email', '')));
+            if (!empty($secondaryEmail)) {
+                if (!filter_var($secondaryEmail, FILTER_VALIDATE_EMAIL)) {
+                    return redirect('/portal/profile')->with('error', 'অনুগ্রহ করে একটি সঠিক সেকেন্ডারি (বিকল্প) ইমেইল ঠিকানা প্রদান করুন।')->withInput();
+                }
+                $currentPrimary = $isEmailChange ? $newEmail : strtolower((string)$user->email);
+                if ($secondaryEmail === $currentPrimary) {
+                    return redirect('/portal/profile')->with('error', 'সেকেন্ডারি ইমেইল এবং প্রাইমারি ইমেইল একই হতে পারবে না। অনুগ্রহ করে ভিন্ন ইমেইল ব্যবহার করুন।')->withInput();
+                }
+            } else {
+                $secondaryEmail = null;
+            }
+
         try {
             DB::table('alumni_profiles')->where('id', (int)$profile['id'])->update([
                 'phone'            => trim((string)$request->input('phone', '')),
+                'secondary_email'  => $secondaryEmail,
                 'nid_number'       => trim((string)$request->input('nid_number', '')),
                 'dob'              => $dob,
                 'gender'           => $gender,
@@ -123,17 +138,17 @@ class ProfileController extends BaseController
             ]);
 
             // Update name and email in users table
-            $userUpdates = [];
+            $userUpdates = [
+                'secondary_email' => $secondaryEmail,
+            ];
             if ($request->filled('name')) {
                 $userUpdates['name'] = trim((string)$request->input('name'));
             }
             if ($isEmailChange) {
                 $userUpdates['email'] = $newEmail;
             }
-            if (!empty($userUpdates)) {
-                $userUpdates['updated_at'] = now();
-                DB::table('users')->where('id', $user->id)->update($userUpdates);
-            }
+            $userUpdates['updated_at'] = now();
+            DB::table('users')->where('id', $user->id)->update($userUpdates);
 
             // Save / Update Education (Study Info)
             $university = trim((string)$request->input('university', ''));

@@ -138,8 +138,14 @@ $isLoggedIn = auth() !== null;
         <?php if ($isLoggedIn): ?>
           <div class="space-y-4 text-[14px]">
             <div class="p-3.5 rounded-2xl bg-gray-50/80 border border-gray-100">
-              <span class="text-gray-400 text-[11px] font-mono uppercase block mb-1"><?= __('ইমেইল ঠিকানা', 'EMAIL ADDRESS') ?></span>
+              <span class="text-gray-400 text-[11px] font-mono uppercase block mb-1"><?= __('ইমেইল ঠিকানা (Primary)', 'EMAIL ADDRESS (Primary)') ?></span>
               <a href="mailto:<?= e($alumni['email']) ?>" class="text-blue-600 font-medium hover:underline break-all"><?= e($alumni['email']) ?></a>
+              <?php if (!empty($alumni['secondary_email'])): ?>
+              <div class="mt-2 pt-2 border-t border-gray-100">
+                <span class="text-gray-400 text-[10.5px] font-mono uppercase block mb-0.5"><?= __('বিকল্প ইমেইল', 'SECONDARY EMAIL') ?></span>
+                <a href="mailto:<?= e($alumni['secondary_email']) ?>" class="text-slate-600 font-medium hover:text-[#800020] hover:underline break-all text-[13px]"><?= e($alumni['secondary_email']) ?></a>
+              </div>
+              <?php endif; ?>
             </div>
             <?php if (!empty($alumni['phone'])): ?>
             <div class="p-3.5 rounded-2xl bg-gray-50/80 border border-gray-100">

@@ -29,26 +29,33 @@ $actType = $profile['activity_type'] ?? 'work';
       <form method="POST" action="<?= url('/portal/profile') ?>" class="space-y-6">
         <?= csrf_field() ?>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label class="form-label" for="name">Full Name *</label>
+            <label class="form-label" for="name">Full Name (পূর্ণ নাম) *</label>
             <input id="name" type="text" name="name" value="<?= e($user['name'] ?? '') ?>" required class="form-input">
           </div>
           <div>
-            <label class="form-label" for="email">Email Address (ইমেইল ঠিকানা) *</label>
+            <label class="form-label" for="email">Primary Email (প্রধান ইমেইল) *</label>
             <input id="email" type="email" name="email" value="<?= e($user['email'] ?? '') ?>" required class="form-input" placeholder="e.g. member@iphalumni.org">
           </div>
           <div>
-            <label class="form-label" for="phone">Phone Number</label>
+            <label class="form-label" for="secondary_email">
+              Secondary Email (বিকল্প ইমেইল)
+              <span class="text-xs text-slate-400 font-normal ml-1">(Optional)</span>
+            </label>
+            <input id="secondary_email" type="email" name="secondary_email" value="<?= e($profile['secondary_email'] ?? ($user['secondary_email'] ?? '')) ?>" class="form-input" placeholder="e.g. personal@gmail.com">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div>
+            <label class="form-label" for="phone">Phone Number (মোবাইল নম্বর)</label>
             <input id="phone" type="text" name="phone" value="<?= e($profile['phone'] ?? '') ?>" placeholder="+880 1xxx..." class="form-input">
           </div>
           <div>
             <label class="form-label" for="nid_number">NID Number (জাতীয় পরিচয়পত্র নম্বর)</label>
             <input id="nid_number" type="text" name="nid_number" value="<?= e($profile['nid_number'] ?? '') ?>" placeholder="e.g. 1990123456789" class="form-input">
           </div>
-        </div>
-
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
             <label class="form-label" for="dob">Date of Birth</label>
             <input id="dob" type="date" name="dob" value="<?= $profile['dob'] ? date('Y-m-d', strtotime($profile['dob'])) : '' ?>" class="form-input">
@@ -62,6 +69,9 @@ $actType = $profile['activity_type'] ?? 'work';
               <option value="other" <?= ($profile['gender'] ?? '') === 'other' ? 'selected' : '' ?>>Other</option>
             </select>
           </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="form-label" for="blood_group">Blood Group</label>
             <select id="blood_group" name="blood_group" class="form-input">
@@ -69,7 +79,7 @@ $actType = $profile['activity_type'] ?? 'work';
               <?php foreach (['A+','A-','B+','B-','AB+','AB-','O+','O-'] as $bg): ?>
               <option value="<?= $bg ?>" <?= ($profile['blood_group'] ?? '') === $bg ? 'selected' : '' ?>><?= $bg ?></option>
               <?php endforeach; ?>
-              </select>
+            </select>
           </div>
           <div>
             <label class="form-label" for="batch_year">Batch (ব্যাচ)</label>

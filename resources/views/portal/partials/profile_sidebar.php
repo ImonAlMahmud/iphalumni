@@ -47,6 +47,11 @@ $avatarFile = !empty($profile['avatar']) ? $profile['avatar'] : (!empty($user['a
 
     <h4 class="font-serif text-[17px] font-semibold text-gray-800 leading-tight"><?= e($user['name'] ?? '') ?></h4>
     <p class="text-[12px] text-gray-400 mt-1 truncate"><?= e($user['email'] ?? '') ?></p>
+    <?php if (!empty($profile['secondary_email'])): ?>
+    <p class="text-[11px] text-slate-500 mt-0.5 truncate" title="Secondary Email: <?= e($profile['secondary_email']) ?>">
+      <i class="fa-regular fa-envelope text-[10px] mr-1 text-[#800020]"></i><?= e($profile['secondary_email']) ?>
+    </p>
+    <?php endif; ?>
     
     <span class="inline-flex items-center gap-1.5 mt-3 px-3 py-1 rounded-full text-[10.5px] font-mono font-semibold uppercase tracking-wider"
           style="background:<?= $statusBg ?>;color:<?= $statusColor ?>;">

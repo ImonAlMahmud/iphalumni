@@ -14,7 +14,7 @@ class AlumniProfile extends Model
     protected $table = 'alumni_profiles';
 
     protected $fillable = [
-        'user_id', 'batch_year', 'phone', 'bio', 'avatar', 'signature',
+        'user_id', 'batch_year', 'phone', 'secondary_email', 'bio', 'avatar', 'signature',
         'gender', 'dob', 'blood_group', 'nid_number', 'student_id',
         'current_location', 'permanent_location', 'permanent_district', 'permanent_upazila',
         'thana_upazila', 'province_city', 'country',
