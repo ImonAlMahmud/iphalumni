@@ -646,6 +646,8 @@ This project is open-sourced software licensed under the [MIT license](https://o
 
 **IPH Alumni Association Portal** — Developed for ইনস্টিটিউট অব পাবলিক হেলথ (IPH), ঢাকা।
 
+**Developer:** Mahmudur Rahman Imon
+
 ---
 
 <div align="center">
