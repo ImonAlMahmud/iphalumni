@@ -47,6 +47,14 @@ class DeployController extends Controller
             ], 403);
         }
 
+        // Action: ping
+        if ($request->query('action') === 'ping' || $request->input('action') === 'ping') {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Deploy endpoint is online and responding!',
+            ], 200);
+        }
+
         // 2. Verify Target Branch from Payload (if present)
         $ref = $request->input('ref'); // e.g. "refs/heads/main"
         if (!empty($ref)) {
