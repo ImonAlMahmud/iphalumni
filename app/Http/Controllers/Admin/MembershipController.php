@@ -50,6 +50,100 @@ class MembershipController extends BaseController
         );
     }
 
+    public function logs(Request $request)
+    {
+        $search   = trim((string)$request->input('q', ''));
+        $status   = trim((string)$request->input('status', ''));
+        $typeId   = (int)$request->input('type', 0);
+        $method   = trim((string)$request->input('method', ''));
+        $pStatus  = trim((string)$request->input('payment_status', ''));
+        $page     = max(1, (int)$request->input('page', 1));
+        $perPage  = 20;
+
+        $query = DB::table('memberships as m')
+            ->join('alumni_profiles as ap', 'ap.id', '=', 'm.alumni_profile_id')
+            ->join('users as u', 'u.id', '=', 'ap.user_id')
+            ->join('membership_types as mt', 'mt.id', '=', 'm.membership_type_id')
+            ->leftJoin('membership_payments as mp', 'mp.membership_id', '=', 'm.id')
+            ->whereNull('m.deleted_at');
+
+        if ($status !== '' && $status !== 'all') {
+            $query->where('m.status', $status);
+        }
+
+        if ($typeId > 0) {
+            $query->where('m.membership_type_id', $typeId);
+        }
+
+        if ($method !== '' && $method !== 'all') {
+            $query->where('mp.method', $method);
+        }
+
+        if ($pStatus !== '' && $pStatus !== 'all') {
+            $query->where('mp.status', $pStatus);
+        }
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('u.name', 'like', "%{$search}%")
+                  ->orWhere('u.email', 'like', "%{$search}%")
+                  ->orWhere('ap.phone', 'like', "%{$search}%")
+                  ->orWhere('m.membership_number', 'like', "%{$search}%")
+                  ->orWhere('mp.transaction_id', 'like', "%{$search}%");
+            });
+        }
+
+        $totalRecords = (clone $query)->count();
+
+        $memberships = $query->select(
+            'm.*',
+            'u.id as user_id',
+            'u.name',
+            'u.email',
+            'u.avatar as user_avatar',
+            'ap.avatar as profile_avatar',
+            'ap.phone',
+            'ap.batch_year',
+            'ap.student_id',
+            'ap.proof_document as profile_proof',
+            'mt.name as type_name',
+            'mt.fee as type_fee',
+            'mp.id as payment_id',
+            'mp.amount as payment_amount',
+            'mp.currency as payment_currency',
+            'mp.method as payment_method',
+            'mp.transaction_id',
+            'mp.payment_slip',
+            'mp.status as payment_status',
+            'mp.paid_at as payment_date'
+        )
+        ->orderBy('m.created_at', 'desc')
+        ->offset(($page - 1) * $perPage)
+        ->limit($perPage)
+        ->get()
+        ->map(fn($r) => (array)$r)
+        ->toArray();
+
+        // Summary Stats
+        $stats = [
+            'total'          => DB::table('memberships')->whereNull('deleted_at')->count(),
+            'active'         => DB::table('memberships')->where('status', 'active')->whereNull('deleted_at')->count(),
+            'pending'        => DB::table('memberships')->where('status', 'pending')->whereNull('deleted_at')->count(),
+            'total_payments' => (float)DB::table('membership_payments')->where('status', 'paid')->sum('amount'),
+        ];
+
+        $typesList = DB::table('membership_types')->orderBy('sort_order', 'asc')->get()->map(fn($r) => (array)$r)->toArray();
+
+        $totalPages = max(1, (int)ceil($totalRecords / $perPage));
+
+        return $this->legacyView(
+            'admin/membership/logs',
+            compact('memberships', 'stats', 'typesList', 'search', 'status', 'typeId', 'method', 'pStatus', 'page', 'totalPages', 'totalRecords'),
+            'admin',
+            'Membership & Payment Log'
+        );
+    }
+
     public function grantHonorary(Request $request)
     {
         $alumniProfileId = (int)$request->input('alumni_profile_id');

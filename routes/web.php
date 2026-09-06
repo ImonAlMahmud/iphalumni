@@ -213,6 +213,7 @@ Route::prefix('/admin')->middleware('auth.admin')->name('admin.')->group(functio
 
     // Membership
     Route::get('/membership', [AdminMembership::class, 'index'])->name('membership');
+    Route::get('/membership/logs', [AdminMembership::class, 'logs'])->name('membership.logs');
     Route::post('/membership/grant-honorary', [AdminMembership::class, 'grantHonorary'])->name('membership.grant_honorary');
     Route::post('/membership/tier/{id}/update', [AdminMembership::class, 'updateTier'])->name('membership.tier.update');
     Route::post('/membership/{id}/approve', [AdminMembership::class, 'approve'])->name('membership.approve');

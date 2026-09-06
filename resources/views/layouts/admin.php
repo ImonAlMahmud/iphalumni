@@ -1,6 +1,6 @@
 <?php
 $appName     = env('APP_NAME', 'IPH Alumni Association');
-$user        = auth();
+$user        = is_array($u = auth()) ? $u : ($u && method_exists($u, 'toArray') ? $u->toArray() : (\Illuminate\Support\Facades\Auth::user() ? \Illuminate\Support\Facades\Auth::user()->toArray() : []));
 $title       = isset($title) ? e($title) . ' — Admin · ' . $appName : 'Admin · ' . $appName;
 $currentUri  = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 
@@ -30,6 +30,12 @@ function isAdminNavActive(string $navPath, string $uri): bool {
         }
     }
 
+    if ($navPath === '/admin/membership') {
+        if (str_contains($cleanUri, '/admin/membership/logs')) {
+            return false;
+        }
+    }
+
     if (str_contains($cleanUri, $navPath . '/')) {
         return true;
     }
@@ -45,6 +51,7 @@ $navGroups = [
         ['/admin/alumni/mapping', 'User Data Mapping', 'fa-solid fa-diagram-project'],
         ['/admin/students', 'Student Database', 'fa-solid fa-database'],
         ['/admin/membership', 'Memberships', 'fa-solid fa-id-card-clip'],
+        ['/admin/membership/logs', 'Membership & Payment Log', 'fa-solid fa-receipt'],
     ],
     'CONTENT' => [
         ['/admin/stories', 'Blogs & Articles', 'fa-solid fa-book-open-reader'],

@@ -4,6 +4,20 @@
  * Variables: $pending, $stats, $memberships
  */
 ?>
+<!-- Page Header -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+  <div>
+    <span class="font-mono text-[11px] font-bold text-[#E58E97] uppercase tracking-wider block mb-1">
+      <i class="fa-solid fa-id-card-clip mr-1"></i> MEMBERSHIP ADMINISTRATION
+    </span>
+    <h1 class="font-serif text-[28px] font-bold text-white"><?= __('মেম্বারশিপ ও ফি ম্যানেজমেন্ট', 'Membership & Fee Management') ?></h1>
+  </div>
+  <a href="<?= url('/admin/membership/logs') ?>" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#800020] to-[#A22638] hover:brightness-110 text-white text-[13px] font-bold shadow-lg shadow-[#800020]/25 transition-all flex items-center gap-2">
+    <i class="fa-solid fa-receipt"></i>
+    <span><?= __('মেম্বারশিপ ও পেমেন্ট লগ দেখুন', 'Membership & Payment Log') ?> →</span>
+  </a>
+</div>
+
 <!-- Stats Strip -->
 <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
   <?php
@@ -181,64 +195,24 @@
   <?php endif; ?>
 </div>
 
-<!-- All Memberships List -->
-<div class="rounded-2xl overflow-hidden" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
-  <div class="px-5 py-4 border-b border-white/8">
-    <h3 class="text-[14px] font-semibold text-white">Membership Log</h3>
+<!-- Membership Log Dedicated Page Callout Card -->
+<div class="rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-white/[0.06] via-black/40 to-white/[0.02] border border-white/10 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 font-['Kalpurush']">
+  <div class="space-y-2 max-w-2xl">
+    <div class="flex items-center gap-2 text-[#E58E97] font-mono text-[11px] font-bold uppercase tracking-wider">
+      <i class="fa-solid fa-receipt"></i> AUDIT & FINANCIAL LOGS
+    </div>
+    <h3 class="font-serif text-[21px] font-bold text-white tracking-tight">
+      <?= __('সদস্যপদ ও পেমেন্ট হিস্ট্রি লগ (Membership & Payment Log)', 'Membership & Payment Log') ?>
+    </h3>
+    <p class="text-[13.5px] text-white/60 leading-relaxed">
+      <?= __('সকল সদস্যের সদস্যপদ অ্যাক্টিভেশন, মেয়াদকাল, পেমেন্ট মেথড (bKash/Nagad/UddoktaPay), ট্রানজেকশন আইডি (TrxID) এবং পেমেন্ট স্লিপের সম্পূর্ণ অডিট রেকর্ড দেখতে আলাদা ডেডিকেটেড পেজ ব্যবহার করুন।', 'View complete audit history of member subscriptions, validity, payment methods, transaction IDs, and receipts on a dedicated page.') ?>
+    </p>
   </div>
-  <table class="w-full text-[13px]">
-    <thead>
-      <tr class="border-b border-white/5">
-        <th class="text-left px-5 py-3.5 text-white/35 font-mono text-[11px]">Member</th>
-        <th class="text-left px-5 py-3.5 text-white/35 font-mono text-[11px]">Tier</th>
-        <th class="text-left px-5 py-3.5 text-white/35 font-mono text-[11px]">Member ID</th>
-        <th class="text-left px-5 py-3.5 text-white/35 font-mono text-[11px]">Status</th>
-        <th class="text-left px-5 py-3.5 text-white/35 font-mono text-[11px]">Validity</th>
-        <th class="text-left px-5 py-3.5 text-white/35 font-mono text-[11px]">Actions</th>
-      </tr>
-    </thead>
-    <tbody class="divide-y divide-white/5">
-      <?php foreach ($memberships as $m):
-        $stColors = [
-          'active'    => ['rgba(78,156,129,0.2)', '#4E9C81'],
-          'pending'   => ['rgba(162,38,56,0.15)', '#A22638'],
-          'expired'   => ['rgba(255,255,255,0.05)', 'rgba(255,255,255,0.4)'],
-          'rejected'  => ['rgba(239,68,68,0.15)', '#f87171'],
-          'cancelled' => ['rgba(239,68,68,0.15)', '#f87171'],
-        ];
-        [$bg, $clr] = $stColors[$m['status']] ?? ['rgba(255,255,255,0.05)', 'rgba(255,255,255,0.4)'];
-      ?>
-      <tr>
-        <td class="px-5 py-3.5">
-          <div class="font-medium text-white"><?= e($m['name']) ?></div>
-          <div class="text-[11.5px] text-white/50"><?= e($m['email']) ?></div>
-        </td>
-        <td class="px-5 py-3.5 text-white/70"><?= e($m['type_name']) ?></td>
-        <td class="px-5 py-3.5 text-white/70 font-mono"><?= e($m['membership_number']) ?></td>
-        <td class="px-5 py-3.5">
-          <span class="px-2.5 py-0.5 rounded-full text-[10.5px] font-mono" style="background:<?= $bg ?>;color:<?= $clr ?>;">
-            <?= strtoupper($m['status']) ?>
-          </span>
-        </td>
-        <td class="px-5 py-3.5 text-white/50">
-          <?= $m['start_date'] ? date('d M Y', strtotime($m['start_date'])) : '—' ?>
-          to
-          <?= $m['end_date'] ? date('d M Y', strtotime($m['end_date'])) : 'Lifetime' ?>
-        </td>
-        <td class="px-5 py-3.5 space-x-3 flex items-center">
-          <?php if (!empty($m['proof_document'])): ?>
-          <a href="<?= asset('storage/documents/' . e($m['proof_document'])) ?>" target="_blank" class="text-blue-400 hover:underline">
-            View Proof
-          </a>
-          <?php endif; ?>
-          
-          <form method="POST" action="<?= url('/admin/membership/' . $m['id'] . '/delete') ?>" class="inline" onsubmit="return confirm('Are you sure you want to revoke/remove this membership?')">
-            <?= csrf_field() ?>
-            <button type="submit" class="text-red-400 hover:underline">Remove</button>
-          </form>
-        </td>
-      </tr>
-      <?php endforeach; ?>
-    </tbody>
-  </table>
+
+  <div class="flex items-center gap-3 shrink-0 w-full md:w-auto">
+    <a href="<?= url('/admin/membership/logs') ?>" class="w-full md:w-auto px-6 py-3 rounded-2xl bg-gradient-to-r from-[#800020] via-[#A22638] to-[#800020] hover:brightness-110 text-white font-bold text-[13.5px] shadow-xl shadow-[#800020]/30 transition-all flex items-center justify-center gap-2">
+      <i class="fa-solid fa-receipt"></i>
+      <span><?= __('সম্পূর্ণ মেম্বারশিপ ও পেমেন্ট লগ দেখুন', 'View Full Membership & Payment Log') ?> →</span>
+    </a>
+  </div>
 </div>
