@@ -303,7 +303,7 @@ class AlumniController extends BaseController
             if ($emp) {
                 DB::table('alumni_employment')->where('id', $emp->id)->update([
                     'organization' => $organization,
-                    'designation'  => $designation,
+                    'job_title'    => $designation ?: ($emp->job_title ?? null),
                     'department'   => $department,
                     'updated_at'   => now(),
                 ]);
@@ -311,7 +311,7 @@ class AlumniController extends BaseController
                 DB::table('alumni_employment')->insert([
                     'alumni_profile_id' => $id,
                     'organization'      => $organization,
-                    'designation'       => $designation,
+                    'job_title'         => $designation,
                     'department'        => $department,
                     'is_current'        => 1,
                     'created_at'        => now(),

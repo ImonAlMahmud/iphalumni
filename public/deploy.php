@@ -59,8 +59,19 @@ if (isset($_GET['action']) && $_GET['action'] === 'ping') {
     exit;
 }
 
-// Determine project root directory
 $root = file_exists(__DIR__ . '/../artisan') ? realpath(__DIR__ . '/..') : realpath(__DIR__);
+
+if (isset($_GET['action']) && $_GET['action'] === 'log') {
+    $logFile = $root . '/storage/logs/laravel.log';
+    $content = file_exists($logFile) ? @file_get_contents($logFile) : 'Log file not found';
+    $lines = explode("\n", (string)$content);
+    $tail = array_slice($lines, -150);
+    echo json_encode([
+        'status' => 'success',
+        'log'    => implode("\n", $tail)
+    ]);
+    exit;
+}
 $isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
 $cdPrefix = $isWindows ? "cd /d \"{$root}\" && " : "cd \"{$root}\" && ";
 

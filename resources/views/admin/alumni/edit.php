@@ -214,7 +214,7 @@
 
         <div>
           <label class="block text-[11px] font-mono text-white/60 mb-1">পদবী (Job Title / Designation)</label>
-          <input type="text" name="designation" value="<?= e($currentEmp['designation'] ?? '') ?>" placeholder="যেমন: Medical Officer / Consultant" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-purple-400">
+          <input type="text" name="designation" value="<?= e($currentEmp['job_title'] ?? ($currentEmp['designation'] ?? '')) ?>" placeholder="যেমন: Medical Officer / Consultant" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-purple-400">
         </div>
 
         <div>
