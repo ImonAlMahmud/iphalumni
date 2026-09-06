@@ -98,6 +98,7 @@
       };
       $amount = (float)($m['payment_amount'] ?? ($m['type_fee'] ?? 0));
       $pStatus = strtolower($m['payment_status'] ?? ($st === 'active' ? 'paid' : 'pending'));
+      $memNo = (!empty($m['membership_number']) && str_starts_with($m['membership_number'], 'IPHAA-')) ? $m['membership_number'] : ('IPHAA-' . str_pad((string)($m['alumni_profile_id'] ?? $m['id']), 5, '0', STR_PAD_LEFT));
     ?>
     <tr>
       <td><?= $idx + 1 ?></td>
@@ -108,7 +109,7 @@
         <?php if (!empty($m['batch_year'])): ?><br><span style="color: #444; font-size: 9px; font-weight: bold;">Batch: <?= e($m['batch_year']) ?></span><?php endif; ?>
       </td>
       <td>
-        <strong style="font-family: monospace; color: #800020; font-size: 11px;"><?= e($m['membership_number']) ?></strong><br>
+        <strong style="font-family: monospace; color: #800020; font-size: 11px;"><?= e($memNo) ?></strong><br>
         <span style="font-size: 10px; color: #333; font-weight: bold;"><?= e($m['type_name']) ?></span><br>
         <span style="color: #777; font-size: 9.5px;">Fee: ৳ <?= number_format((float)($m['type_fee'] ?? 0)) ?></span>
       </td>

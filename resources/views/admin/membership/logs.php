@@ -192,6 +192,7 @@
               // Determine proof file
               $proofFile = !empty($m['payment_slip']) ? $m['payment_slip'] : (!empty($m['proof_document']) ? $m['proof_document'] : (!empty($m['profile_proof']) ? $m['profile_proof'] : null));
               $proofUrl  = $proofFile ? asset('storage/documents/' . $proofFile) : null;
+              $memNo     = (!empty($m['membership_number']) && str_starts_with($m['membership_number'], 'IPHAA-')) ? $m['membership_number'] : ('IPHAA-' . str_pad((string)($m['alumni_profile_id'] ?? $m['id']), 5, '0', STR_PAD_LEFT));
             ?>
             <tr class="hover:bg-white/[0.02] transition-colors">
               
@@ -225,9 +226,9 @@
               <!-- 2. Membership ID & Tier -->
               <td class="p-4 align-top">
                 <div class="font-mono text-[13px] font-bold text-[#E58E97] tracking-wide flex items-center gap-1.5">
-                  <span><?= e($m['membership_number']) ?></span>
+                  <span><?= e($memNo) ?></span>
                   <button type="button" 
-                          onclick="navigator.clipboard.writeText('<?= e($m['membership_number']) ?>'); alert('Member ID Copied: <?= e($m['membership_number']) ?>')" 
+                          onclick="navigator.clipboard.writeText('<?= e($memNo) ?>'); alert('Member ID Copied: <?= e($memNo) ?>')" 
                           title="Copy Member ID" 
                           class="text-white/30 hover:text-white text-[11px]">
                     <i class="fa-regular fa-copy"></i>
@@ -369,7 +370,7 @@
                 <?php if ($proofUrl): ?>
                 <div class="mt-2">
                   <a href="<?= $proofUrl ?>" target="_blank" 
-                     @click.prevent="proofUrl = '<?= $proofUrl ?>'; proofTitle = 'Receipt: <?= e($m['name']) ?> (<?= e($m['membership_number']) ?>)'; proofModalOpen = true"
+                     @click.prevent="proofUrl = '<?= $proofUrl ?>'; proofTitle = 'Receipt: <?= e($m['name']) ?> (<?= e($memNo) ?>)'; proofModalOpen = true"
                      class="inline-flex items-center gap-1 text-[11px] font-mono text-sky-400 hover:text-sky-300 hover:underline">
                     <i class="fa-solid fa-file-invoice text-[10px]"></i> View Receipt / Slip
                   </a>

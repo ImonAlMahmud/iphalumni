@@ -35,7 +35,8 @@ if (!empty($lastEdu['degree'])) {
 }
 
 $rawId = !empty($profile['id']) ? $profile['id'] : $user['id'];
-$memberNo = !empty($profile['membership_number']) ? $profile['membership_number'] : (!empty($membership['membership_number']) ? $membership['membership_number'] : ('IPHAA-' . str_pad((string)$rawId, 5, '0', STR_PAD_LEFT)));
+$rawMemberNo = !empty($profile['membership_number']) ? $profile['membership_number'] : (!empty($membership['membership_number']) ? $membership['membership_number'] : '');
+$memberNo = (!empty($rawMemberNo) && str_starts_with($rawMemberNo, 'IPHAA-')) ? $rawMemberNo : ('IPHAA-' . str_pad((string)$rawId, 5, '0', STR_PAD_LEFT));
 $degree      = !empty($latestDegree) ? $latestDegree : (!empty($profile['degree']) ? $profile['degree'] : ($refData['department'] ?? 'Public Health Graduate'));
 $batch       = !empty($refData['batch']) ? $refData['batch'] : (!empty($refData['session']) ? $refData['session'] : (!empty($profile['batch_year']) ? $profile['batch_year'] : 'N/A'));
 $phone       = !empty($profile['phone']) ? $profile['phone'] : ($refData['mobile'] ?? 'N/A');

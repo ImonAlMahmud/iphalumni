@@ -38,6 +38,18 @@ class AppServiceProvider extends ServiceProvider
                     $table->string('secondary_email')->nullable()->after('email');
                 });
             }
+
+            // Ensure all existing memberships follow IPHAA-0000X format
+            if (\Illuminate\Support\Facades\Schema::hasTable('memberships')) {
+                \Illuminate\Support\Facades\DB::table('memberships')
+                    ->where(function ($q) {
+                        $q->whereNull('membership_number')
+                          ->orWhere('membership_number', 'not like', 'IPHAA-%');
+                    })
+                    ->update([
+                        'membership_number' => \Illuminate\Support\Facades\DB::raw("CONCAT('IPHAA-', LPAD(COALESCE(alumni_profile_id, id), 5, '0'))")
+                    ]);
+            }
         } catch (\Throwable $e) {
             // Fail silently if DB connection is not established during initial setup
         }

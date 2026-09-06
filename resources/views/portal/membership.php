@@ -25,8 +25,13 @@
             ?>">
               <?= strtoupper($membership['status']) ?>
             </span>
+            <?php 
+              $dispMemNo = (!empty($membership['membership_number']) && str_starts_with($membership['membership_number'], 'IPHAA-')) 
+                ? $membership['membership_number'] 
+                : ('IPHAA-' . str_pad((string)($membership['alumni_profile_id'] ?? $profile['id'] ?? 1), 5, '0', STR_PAD_LEFT));
+            ?>
             <h4 class="font-serif text-[18px] font-semibold text-gray-800 mt-2">
-              <?= e($membership['type_name'] ?? 'Alumni Membership') ?> — <?= e($membership['membership_number']) ?>
+              <?= e($membership['type_name'] ?? 'Alumni Membership') ?> — <?= e($dispMemNo) ?>
             </h4>
             <p class="text-[13px] text-gray-500 mt-1">
               Validity: <?= date('d M Y', strtotime($membership['start_date'])) ?> 

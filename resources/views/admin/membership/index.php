@@ -164,7 +164,12 @@
           </div>
           <?php endif; ?>
         </td>
-        <td class="px-5 py-3.5 text-white/70 font-mono"><?= e($p['membership_number']) ?></td>
+        <?php 
+          $dispMemNo = (!empty($p['membership_number']) && str_starts_with($p['membership_number'], 'IPHAA-')) 
+            ? $p['membership_number'] 
+            : ('IPHAA-' . str_pad((string)($p['alumni_profile_id'] ?? $p['id']), 5, '0', STR_PAD_LEFT));
+        ?>
+        <td class="px-5 py-3.5 text-white/70 font-mono"><?= e($dispMemNo) ?></td>
         <td class="px-5 py-3.5 text-white/50"><?= date('d M Y', strtotime($p['created_at'])) ?></td>
         <td class="px-5 py-3.5 space-x-3 flex items-center">
           <?php if (!empty($p['proof_document'])): ?>

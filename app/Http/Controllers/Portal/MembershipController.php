@@ -103,20 +103,23 @@ class MembershipController extends BaseController
 
         if ($existing) {
             $memId = (int) $existing->id;
-            DB::table('memberships')->where('id', $memId)->update([
+            $updateData = [
                 'membership_type_id' => $typeId,
                 'status' => 'pending',
                 'start_date' => $startDate,
                 'end_date' => $endDate,
                 'deleted_at' => null,
                 'updated_at' => now(),
-            ]);
+            ];
+            if (empty($existing->membership_number) || !str_starts_with($existing->membership_number, 'IPHAA-')) {
+                $updateData['membership_number'] = 'IPHAA-' . str_pad((string) $profile['id'], 5, '0', STR_PAD_LEFT);
+            }
+            DB::table('memberships')->where('id', $memId)->update($updateData);
         } else {
-            $baseMemberNum = 'IPH-'.($profile['batch_year'] ?? date('Y')).'-'.str_pad((string) $profile['id'], 4, '0', STR_PAD_LEFT);
-            $memberNum = $baseMemberNum;
+            $memberNum = 'IPHAA-' . str_pad((string) $profile['id'], 5, '0', STR_PAD_LEFT);
             $suffix = 1;
             while (DB::table('memberships')->where('membership_number', $memberNum)->exists()) {
-                $memberNum = $baseMemberNum.'-'.$suffix++;
+                $memberNum = 'IPHAA-' . str_pad((string) $profile['id'], 5, '0', STR_PAD_LEFT) . '-' . $suffix++;
             }
             $qrCode = bin2hex(random_bytes(16));
 

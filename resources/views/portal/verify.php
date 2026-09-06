@@ -34,7 +34,12 @@
           </span>
         <?php endif; ?>
         <h3 class="font-serif text-[20px] font-bold text-gray-800 mt-3"><?= e($result['member_name']) ?></h3>
-        <p class="text-[12.5px] text-gray-400 mt-1 font-mono">ID: <?= e($result['membership_number']) ?></p>
+        <?php 
+          $dispMemNo = (!empty($result['membership_number']) && str_starts_with($result['membership_number'], 'IPHAA-')) 
+            ? $result['membership_number'] 
+            : ('IPHAA-' . str_pad((string)($result['alumni_profile_id'] ?? $result['id'] ?? 1), 5, '0', STR_PAD_LEFT));
+        ?>
+        <p class="text-[12.5px] text-gray-400 mt-1 font-mono">ID: <?= e($dispMemNo) ?></p>
       </div>
 
       <hr class="border-gray-100">

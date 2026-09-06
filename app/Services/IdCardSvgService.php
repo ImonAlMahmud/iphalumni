@@ -62,7 +62,8 @@ class IdCardSvgService
 
         $rawId       = $profile['id'] ?? $profile['user_id'];
         $membership  = DB::table('memberships')->where('alumni_profile_id', $profile['id'])->whereNull('deleted_at')->orderByDesc('created_at')->first();
-        $memberNo    = !empty($membership->membership_number) ? (string)$membership->membership_number : ('IPHAA-' . str_pad((string)$rawId, 5, '0', STR_PAD_LEFT));
+        $rawMemberNo = !empty($membership->membership_number) ? (string)$membership->membership_number : '';
+        $memberNo    = (!empty($rawMemberNo) && str_starts_with($rawMemberNo, 'IPHAA-')) ? $rawMemberNo : ('IPHAA-' . str_pad((string)$rawId, 5, '0', STR_PAD_LEFT));
         $degree      = !empty($latestDegree) ? $latestDegree : (!empty($profile['degree']) ? $profile['degree'] : ($refData['department'] ?? 'Public Health Graduate'));
         $batch       = !empty($refData['batch']) ? $refData['batch'] : (!empty($refData['session']) ? $refData['session'] : (!empty($profile['batch_year']) ? $profile['batch_year'] : 'N/A'));
         $phone       = !empty($profile['phone']) ? $profile['phone'] : ($refData['mobile'] ?? 'N/A');

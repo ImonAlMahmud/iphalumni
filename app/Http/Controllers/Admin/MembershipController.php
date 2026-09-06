@@ -234,6 +234,9 @@ class MembershipController extends BaseController
             $sl = 1;
             foreach ($rows as $row) {
                 $amount = (float)($row['payment_amount'] ?? ($row['type_fee'] ?? 0));
+                $memNum = (!empty($row['membership_number']) && str_starts_with($row['membership_number'], 'IPHAA-'))
+                    ? $row['membership_number']
+                    : ('IPHAA-' . str_pad((string)($row['alumni_profile_id'] ?? $row['id']), 5, '0', STR_PAD_LEFT));
                 fputcsv($out, [
                     $sl++,
                     $row['name'] ?? '',
@@ -242,7 +245,7 @@ class MembershipController extends BaseController
                     $row['phone'] ?? '',
                     $row['batch_year'] ?? '',
                     $row['student_id'] ?? '',
-                    $row['membership_number'] ?? '',
+                    $memNum,
                     $row['type_name'] ?? '',
                     (float)($row['type_fee'] ?? 0),
                     strtoupper((string)($row['status'] ?? '')),
@@ -374,7 +377,7 @@ class MembershipController extends BaseController
             $typeId = $honoraryType->id;
         }
 
-        $memNo = 'IPH-HON-' . str_pad((string)$alumniProfileId, 5, '0', STR_PAD_LEFT);
+        $memNo = 'IPHAA-' . str_pad((string)$alumniProfileId, 5, '0', STR_PAD_LEFT);
 
         // Check if existing membership
         $existing = DB::table('memberships')->where('alumni_profile_id', $alumniProfileId)->first();

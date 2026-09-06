@@ -19,7 +19,8 @@ $committeePost = $isCommittee ? ($committeeMember->designation ?? 'Committee Mem
 $committeeType = $isCommittee ? (!empty($committeeMember->committee_name) ? $committeeMember->committee_name : (ucfirst($committeeMember->committee_type ?? 'Executive') . ' Committee')) : null;
 
 $membershipName = !empty($membershipType->name) ? $membershipType->name : 'Active Member';
-$memberNo       = !empty($membership['membership_number']) ? $membership['membership_number'] : ('IPHAA-' . str_pad((string)($profile['id'] ?? 1), 5, '0', STR_PAD_LEFT));
+$rawMemberNo    = !empty($membership['membership_number']) ? $membership['membership_number'] : '';
+$memberNo       = (!empty($rawMemberNo) && str_starts_with($rawMemberNo, 'IPHAA-')) ? $rawMemberNo : ('IPHAA-' . str_pad((string)($profile['id'] ?? 1), 5, '0', STR_PAD_LEFT));
 
 $batch = !empty($refData['batch']) ? $refData['batch'] : (!empty($profile['batch_year']) ? $profile['batch_year'] : '—');
 $roll  = !empty($refData['roll']) ? $refData['roll'] : (!empty($profile['student_id']) ? $profile['student_id'] : '');
