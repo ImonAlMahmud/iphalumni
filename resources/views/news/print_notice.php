@@ -7,7 +7,7 @@
   @import url('https://fonts.maateen.me/kalpurush/font.css');
   @page {
     size: A4 portrait;
-    margin: 8mm 12mm 8mm 12mm;
+    margin: 8mm 0.8in 8mm 0.8in;
   }
   * {
     box-sizing: border-box;
@@ -23,10 +23,10 @@
   }
 
   .letterhead {
-    max-width: 820px;
+    max-width: 840px;
     margin: 15px auto;
     background: #fff;
-    padding: 24px 30px;
+    padding: 24px 0.8in;
     min-height: 275mm;
     box-sizing: border-box;
     display: flex;
@@ -147,7 +147,7 @@
   }
   .seal-section.seal-align-right {
     justify-content: flex-end;
-    padding-right: 25px;
+    padding-right: 15px;
   }
   .seal-section.seal-align-center {
     justify-content: center;
@@ -185,25 +185,25 @@
   /* 1 Signatory -> Right Aligned */
   .signatories-row.sig-align-right {
     justify-content: flex-end;
-    padding-right: 15px;
+    padding-right: 10px;
   }
 
   /* 2 Signatories -> 1 Left, 1 Right */
   .signatories-row.sig-align-split {
     justify-content: space-between;
-    padding: 0 15px;
+    padding: 0 5px;
   }
 
   /* 3 or 4 Signatories -> Center Aligned, Inline */
   .signatories-row.sig-align-center {
     justify-content: center;
-    gap: 20px;
-    padding: 0 5px;
+    gap: 16px;
+    padding: 0 2px;
   }
 
   .signatory-item {
-    min-width: 125px;
-    max-width: 195px;
+    min-width: 110px;
+    max-width: 180px;
     text-align: center;
     flex-shrink: 1;
     page-break-inside: avoid;
@@ -219,7 +219,7 @@
   }
   .sig-img-wrap img {
     max-height: 48px;
-    max-width: 145px;
+    max-width: 140px;
     object-fit: contain;
   }
 
@@ -229,18 +229,18 @@
   }
   .sig-name {
     font-weight: bold;
-    font-size: 14px;
+    font-size: 13.5px;
     color: #101820;
     line-height: 1.25;
   }
   .sig-title {
-    font-size: 12px;
+    font-size: 11.5px;
     color: #444;
     line-height: 1.25;
     margin-top: 1px;
   }
   .sig-org {
-    font-size: 10.5px;
+    font-size: 10px;
     color: #777;
     margin-top: 1px;
   }
@@ -323,7 +323,7 @@
 </head>
 <body onload="if(window.location.search.includes('autoprint=1')) window.print();">
 
-<div class="no-print" style="margin: 15px auto; max-width: 820px; text-align: right;">
+<div class="no-print" style="margin: 15px auto; max-width: 840px; text-align: right;">
   <button onclick="window.print()" style="background: #800020; color: white; border: none; padding: 10px 22px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px;">
     🖨️ Print Official Notice / Save PDF
   </button>
@@ -337,7 +337,7 @@
         <img src="<?= asset('images/LOGO.png') ?>" alt="IPH Logo" class="header-logo">
         <div class="header-titles">
           <h1>আইপিএইচ অ্যালামনাই অ্যাসোসিয়েশন</h1>
-          <h2>INSTITUTE OF PUBLIC HEALTH ALUMAIN ASSOCIATION</h2>
+          <h2>INSTITUTE OF PUBLIC HEALTH ALUMNI ASSOCIATION</h2>
           <p>Estd: 2015 | Mohakhali, Dhaka-1212, Bangladesh</p>
         </div>
       </div>
