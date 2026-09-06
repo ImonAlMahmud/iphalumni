@@ -71,6 +71,42 @@ class AppServiceProvider extends ServiceProvider
                     })
                     ->update(['graduation_year' => '2021']);
             }
+
+            // Ensure high-performance indexes exist across production tables
+            \Illuminate\Support\Facades\Cache::rememberForever('iph_db_indexes_optimized_v1', function () {
+                $indexes = [
+                    ['students_reference', 'idx_sr_batch_roll', ['batch', 'roll']],
+                    ['students_reference', 'idx_sr_session_dept', ['session', 'department']],
+                    ['students_reference', 'idx_sr_roll', ['roll']],
+                    ['alumni_profiles', 'idx_ap_status_deleted', ['status', 'deleted_at']],
+                    ['alumni_profiles', 'idx_ap_batch_status', ['batch_year', 'status']],
+                    ['alumni_profiles', 'idx_ap_phone', ['phone']],
+                    ['alumni_profiles', 'idx_ap_created_at', ['created_at']],
+                    ['membership_payments', 'idx_mp_status_txn', ['status', 'transaction_id']],
+                    ['membership_payments', 'idx_mp_created_at', ['created_at']],
+                    ['membership_payments', 'idx_mp_method', ['method']],
+                    ['memberships', 'idx_mem_profile_status', ['alumni_profile_id', 'status']],
+                    ['events', 'idx_events_status_date', ['status', 'event_date']],
+                    ['news', 'idx_news_status_published', ['status', 'published_at']],
+                    ['jobs', 'idx_jobs_status_vis', ['status', 'visibility']],
+                    ['api_tokens', 'idx_api_tokens_token_expires', ['token', 'expires_at']],
+                ];
+
+                foreach ($indexes as [$tbl, $idxName, $columns]) {
+                    try {
+                        if (\Illuminate\Support\Facades\Schema::hasTable($tbl)) {
+                            $chk = \Illuminate\Support\Facades\DB::select("SHOW INDEX FROM `{$tbl}` WHERE Key_name = ?", [$idxName]);
+                            if (empty($chk)) {
+                                $colsList = implode('`, `', $columns);
+                                \Illuminate\Support\Facades\DB::statement("ALTER TABLE `{$tbl}` ADD INDEX `{$idxName}` (`{$colsList}`)");
+                            }
+                        }
+                    } catch (\Throwable $e) {
+                        // Ignore individual index failures
+                    }
+                }
+                return true;
+            });
         } catch (\Throwable $e) {
             // Fail silently if DB connection is not established during initial setup
         }
