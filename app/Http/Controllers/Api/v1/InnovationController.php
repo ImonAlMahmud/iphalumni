@@ -24,8 +24,9 @@ class InnovationController extends BaseApiController
             });
         }
 
-        $code = trim((string)$request->input('code', ''));
-        $eventId = $request->input('event_id');
+        $input = $this->getPayload($request);
+        $code = trim((string)($input['code'] ?? ''));
+        $eventId = $input['event_id'] ?? null;
 
         if ($code === '') {
             return $this->errorResponse('QR code payload or pass string is required.', 422, null, 'EMPTY_CODE');

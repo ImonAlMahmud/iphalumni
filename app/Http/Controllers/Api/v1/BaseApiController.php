@@ -29,6 +29,23 @@ class BaseApiController extends Controller
     }
 
     /**
+     * Get request payload safely from json body or form params.
+     */
+    protected function getPayload(\Illuminate\Http\Request $request): array
+    {
+        $all = $request->all();
+        if (!empty($all)) {
+            return $all;
+        }
+        $raw = json_decode((string)$request->getContent(), true);
+        if (is_array($raw)) {
+            $request->merge($raw);
+            return $raw;
+        }
+        return [];
+    }
+
+    /**
      * Send an error JSON response.
      */
     protected function errorResponse(string $message = 'Error', int $code = 400, mixed $errors = null, ?string $errorCode = null): JsonResponse

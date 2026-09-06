@@ -19,7 +19,9 @@ class AuthController extends BaseApiController
      */
     public function login(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
+        $input = $this->getPayload($request);
+
+        $validator = Validator::make($input, [
             'email'       => 'required|email',
             'password'    => 'required|string',
             'device_name' => 'nullable|string|max:100',
@@ -29,7 +31,7 @@ class AuthController extends BaseApiController
             return $this->errorResponse('Validation failed', 422, $validator->errors(), 'VALIDATION_FAILED');
         }
 
-        $user = User::where('email', $request->input('email'))->first();
+        $user = User::where('email', $input['email'] ?? '')->first();
 
         if (!$user || !Hash::check($request->input('password'), $user->password)) {
             return $this->errorResponse('Invalid email or password credentials.', 401, null, 'INVALID_CREDENTIALS');
@@ -92,7 +94,9 @@ class AuthController extends BaseApiController
      */
     public function register(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
+        $input = $this->getPayload($request);
+
+        $validator = Validator::make($input, [
             'name'        => 'required|string|max:190',
             'email'       => 'required|email|max:190|unique:users,email',
             'password'    => 'required|string|min:6',
@@ -109,23 +113,23 @@ class AuthController extends BaseApiController
         DB::beginTransaction();
         try {
             $user = User::create([
-                'name'     => $request->input('name'),
-                'email'    => $request->input('email'),
-                'password' => Hash::make($request->input('password')),
+                'name'     => $input['name'],
+                'email'    => $input['email'],
+                'password' => Hash::make($input['password']),
                 'role'     => 'alumni',
                 'status'   => 'active',
             ]);
 
             $profile = AlumniProfile::create([
                 'user_id'     => $user->id,
-                'batch_year'  => $request->input('batch_year'),
-                'phone'       => $request->input('phone'),
-                'blood_group' => $request->input('blood_group'),
+                'batch_year'  => $input['batch_year'] ?? null,
+                'phone'       => $input['phone'] ?? null,
+                'blood_group' => $input['blood_group'] ?? null,
                 'status'      => 'approved',
                 'is_public'   => 1,
             ]);
 
-            $tokenData = ApiToken::createToken($user, 'mobile_app', $request->input('device_name', 'Mobile App'), 120);
+            $tokenData = ApiToken::createToken($user, 'mobile_app', $input['device_name'] ?? 'Mobile App', 120);
 
             DB::commit();
 
