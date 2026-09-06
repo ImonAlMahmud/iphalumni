@@ -112,7 +112,12 @@ class AlumniController extends BaseController
         $education  = $this->model->getEducation($id);
         $employment = $this->model->getEmployment($id);
 
-        $primaryEdu = !empty($education) ? (current(array_filter($education, fn($e) => !empty($e['is_primary']))) ?: $education[0]) : null;
+        $primaryEdu = null;
+        if (!empty($education)) {
+            $withYear = array_values(array_filter($education, fn($e) => !empty($e['graduation_year'])));
+            $primaryEdu = current(array_filter($education, fn($e) => !empty($e['is_primary']))) 
+                ?: (!empty($withYear) ? $withYear[0] : $education[0]);
+        }
         $currentEmp = !empty($employment) ? (current(array_filter($employment, fn($e) => !empty($e['is_current']))) ?: $employment[0]) : null;
 
         $allUniversities = DB::table('universities')->select('country', 'name')->orderBy('country', 'asc')->orderBy('name', 'asc')->get()->map(fn($r) => (array)$r)->toArray();
@@ -258,12 +263,20 @@ class AlumniController extends BaseController
 
         if (!empty($degree) || !empty($institution) || !empty($fieldOfStudy)) {
             $edu = DB::table('alumni_education')->where('alumni_profile_id', $id)->where('is_primary', 1)->first();
+            if (!$edu) {
+                $edu = DB::table('alumni_education')
+                    ->where('alumni_profile_id', $id)
+                    ->where('degree', $degree)
+                    ->first() ?: DB::table('alumni_education')->where('alumni_profile_id', $id)->orderBy('id', 'asc')->first();
+            }
+
             if ($edu) {
                 DB::table('alumni_education')->where('id', $edu->id)->update([
                     'degree'          => $degree,
                     'institution'     => $institution,
                     'field_of_study'  => $fieldOfStudy,
-                    'graduation_year' => $gradYear ?: null,
+                    'graduation_year' => $gradYear ?: ($edu->graduation_year ?? null),
+                    'is_primary'      => 1,
                     'updated_at'      => now(),
                 ]);
             } else {

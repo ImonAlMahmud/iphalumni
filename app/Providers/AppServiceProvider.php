@@ -50,6 +50,20 @@ class AppServiceProvider extends ServiceProvider
                         'membership_number' => \Illuminate\Support\Facades\DB::raw("CONCAT('IPHAA-', LPAD(COALESCE(alumni_profile_id, id), 5, '0'))")
                     ]);
             }
+
+            // Clean up any duplicate alumni_education records
+            if (\Illuminate\Support\Facades\Schema::hasTable('alumni_education')) {
+                \Illuminate\Support\Facades\DB::statement("
+                    DELETE e1 FROM alumni_education e1
+                    INNER JOIN alumni_education e2 
+                    WHERE e1.alumni_profile_id = e2.alumni_profile_id 
+                      AND LOWER(TRIM(e1.degree)) = LOWER(TRIM(e2.degree))
+                      AND (
+                          ((e1.graduation_year IS NULL OR e1.graduation_year = '') AND (e2.graduation_year IS NOT NULL AND e2.graduation_year != ''))
+                          OR (e1.id > e2.id AND COALESCE(e1.graduation_year, '') = COALESCE(e2.graduation_year, ''))
+                      )
+                ");
+            }
         } catch (\Throwable $e) {
             // Fail silently if DB connection is not established during initial setup
         }

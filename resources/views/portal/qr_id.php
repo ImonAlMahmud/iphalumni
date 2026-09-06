@@ -131,17 +131,34 @@ $validity  = !empty($membership['end_date']) ? date('d M Y', strtotime($membersh
           </div>
         </div>
 
-        <!-- Electronic Contactless Chip Icon -->
-        <div class="flex flex-col items-center justify-center opacity-80" title="Secure Smart Pass">
-          <div class="w-8 h-6 rounded-md bg-gradient-to-br from-amber-200 via-amber-400 to-amber-600 p-[1.5px] shadow-sm">
-            <div class="w-full h-full rounded-[4px] bg-black/40 grid grid-cols-2 gap-0.5 p-0.5">
-              <div class="border-b border-r border-amber-300/40"></div>
-              <div class="border-b border-amber-300/40"></div>
-              <div class="border-r border-amber-300/40"></div>
-              <div></div>
-            </div>
-          </div>
-          <i class="fa-solid fa-wifi text-[9px] text-amber-300 rotate-90 mt-0.5"></i>
+        <!-- Electronic Smart Chip & Contactless Indicator -->
+        <div class="flex items-center gap-2" title="Official Smart Membership Pass">
+          <!-- Standard Contactless RFID Wave Symbol -->
+          <svg class="w-4 h-4 text-amber-300/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <path d="M8.5 16.5a5 5 0 0 1 0-9"/>
+            <path d="M12 19a8.5 8.5 0 0 0 0-14"/>
+            <path d="M15.5 21.5a12 12 0 0 0 0-19"/>
+          </svg>
+
+          <!-- Authentic Gold EMV Smart Microchip SVG -->
+          <svg class="w-10 h-7 drop-shadow" viewBox="0 0 44 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0.5" y="0.5" width="43" height="31" rx="5" fill="url(#chip-gold-portal)" stroke="#D4AF37" stroke-width="0.8"/>
+            <rect x="13.5" y="1" width="17" height="30" rx="2.5" fill="none" stroke="#8A5A00" stroke-width="0.8" stroke-opacity="0.6"/>
+            <line x1="0.5" y1="10.5" x2="13.5" y2="10.5" stroke="#8A5A00" stroke-width="0.8" stroke-opacity="0.6"/>
+            <line x1="30.5" y1="10.5" x2="43.5" y2="10.5" stroke="#8A5A00" stroke-width="0.8" stroke-opacity="0.6"/>
+            <line x1="0.5" y1="21.5" x2="13.5" y2="21.5" stroke="#8A5A00" stroke-width="0.8" stroke-opacity="0.6"/>
+            <line x1="30.5" y1="21.5" x2="43.5" y2="21.5" stroke="#8A5A00" stroke-width="0.8" stroke-opacity="0.6"/>
+            <line x1="13.5" y1="16" x2="30.5" y2="16" stroke="#8A5A00" stroke-width="0.8" stroke-opacity="0.6"/>
+            <circle cx="22" cy="16" r="2.2" fill="#E5B842" stroke="#8A5A00" stroke-width="0.7" stroke-opacity="0.6"/>
+            <defs>
+              <linearGradient id="chip-gold-portal" x1="0" y1="0" x2="44" y2="32" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#FFE082"/>
+                <stop offset="40%" stop-color="#FFB300"/>
+                <stop offset="70%" stop-color="#FFA000"/>
+                <stop offset="100%" stop-color="#B87D10"/>
+              </linearGradient>
+            </defs>
+          </svg>
         </div>
       </div>
 

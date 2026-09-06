@@ -172,10 +172,24 @@ class AlumniProfile extends Model
 
     public function getEducation(int $profileId): array
     {
-        return array_map(fn($r) => (array)$r, DB::table('alumni_education')
+        $rows = DB::table('alumni_education')
             ->where('alumni_profile_id', $profileId)
+            ->orderBy('is_primary', 'DESC')
             ->orderBy('graduation_year', 'DESC')
-            ->get()->toArray());
+            ->orderBy('id', 'ASC')
+            ->get();
+
+        $seen = [];
+        $unique = [];
+        foreach ($rows as $r) {
+            $key = strtolower(trim((string)$r->degree)) . '|' . strtolower(trim((string)$r->institution));
+            if (!isset($seen[$key])) {
+                $seen[$key] = true;
+                $unique[] = (array)$r;
+            }
+        }
+
+        return $unique;
     }
 
     public function getEmployment(int $profileId): array
