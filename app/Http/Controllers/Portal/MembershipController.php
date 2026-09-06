@@ -168,7 +168,41 @@ class MembershipController extends BaseController
             return redirect('/portal/membership')->with('error', 'You do not have an active membership.');
         }
 
-        return $this->legacyView('portal/qr_id', compact('user', 'profile', 'membership'), 'portal', 'My QR ID Card');
+        // Fetch membership type
+        $membershipType = DB::table('membership_types')->where('id', $membership['membership_type_id'])->first();
+
+        // Fetch committee position if any
+        $committeeMember = DB::table('committee_members as cm')
+            ->leftJoin('committees as c', 'c.id', '=', 'cm.committee_id')
+            ->where('cm.user_id', $user->id)
+            ->where('cm.is_active', 1)
+            ->whereNull('cm.deleted_at')
+            ->select('cm.*', 'c.name as committee_name')
+            ->orderBy('cm.sort_order', 'asc')
+            ->orderBy('cm.id', 'asc')
+            ->first();
+
+        // Fetch student reference if mapped
+        $refData = null;
+        if (!empty($profile['student_reference_id'])) {
+            $ref = DB::table('students_reference')->where('id', $profile['student_reference_id'])->first();
+            if ($ref) {
+                $refData = (array)$ref;
+            }
+        }
+
+        // Fetch latest academic degree
+        $lastEdu = DB::table('alumni_education')
+            ->where('alumni_profile_id', $profile['id'])
+            ->orderByRaw('CAST(graduation_year AS UNSIGNED) DESC, id DESC')
+            ->first();
+
+        return $this->legacyView(
+            'portal/qr_id',
+            compact('user', 'profile', 'membership', 'membershipType', 'committeeMember', 'refData', 'lastEdu'),
+            'portal',
+            'My QR ID Card'
+        );
     }
 
     public function verify(Request $request, $code)
@@ -177,7 +211,23 @@ class MembershipController extends BaseController
             ->join('membership_types as mt', 'mt.id', '=', 'm.membership_type_id')
             ->join('alumni_profiles as ap', 'ap.id', '=', 'm.alumni_profile_id')
             ->join('users as u', 'u.id', '=', 'ap.user_id')
-            ->select('m.*', 'mt.name as type_name', 'u.name as member_name', 'ap.batch_year')
+            ->leftJoin('committee_members as cm', function ($join) {
+                $join->on('cm.user_id', '=', 'u.id')
+                    ->where('cm.is_active', '=', 1)
+                    ->whereNull('cm.deleted_at');
+            })
+            ->leftJoin('committees as c', 'c.id', '=', 'cm.committee_id')
+            ->select(
+                'm.*',
+                'mt.name as type_name',
+                'u.name as member_name',
+                'u.avatar as user_avatar',
+                'ap.batch_year',
+                'ap.blood_group',
+                'cm.designation as committee_position',
+                'cm.committee_type',
+                'c.name as committee_name'
+            )
             ->where('m.qr_code', (string) $code)
             ->first();
 

@@ -23,10 +23,17 @@
       </div>
 
       <div>
-        <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-mono font-semibold uppercase">
-          Active Member
-        </span>
-        <h3 class="font-serif text-[19px] font-bold text-gray-800 mt-3"><?= e($result['member_name']) ?></h3>
+        <?php if (!empty($result['committee_position'])): ?>
+          <div class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-50 border border-amber-300 text-amber-800 text-[12px] font-bold font-mono uppercase shadow-sm">
+            <i class="fa-solid fa-crown text-amber-500"></i>
+            <?= e($result['committee_position']) ?> · <?= e($result['committee_name'] ?? 'Executive Committee') ?>
+          </div>
+        <?php else: ?>
+          <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-mono font-semibold uppercase">
+            <?= e($result['type_name'] ?? 'Active Member') ?>
+          </span>
+        <?php endif; ?>
+        <h3 class="font-serif text-[20px] font-bold text-gray-800 mt-3"><?= e($result['member_name']) ?></h3>
         <p class="text-[12.5px] text-gray-400 mt-1 font-mono">ID: <?= e($result['membership_number']) ?></p>
       </div>
 
