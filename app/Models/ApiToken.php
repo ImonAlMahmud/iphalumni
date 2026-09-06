@@ -30,11 +30,29 @@ class ApiToken extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public static function ensureTableExists(): void
+    {
+        if (!\Illuminate\Support\Facades\Schema::hasTable('api_tokens')) {
+            \Illuminate\Support\Facades\Schema::create('api_tokens', function ($table) {
+                $table->increments('id');
+                $table->unsignedInteger('user_id')->index();
+                $table->string('token', 100)->unique();
+                $table->string('name')->default('mobile_app');
+                $table->string('device_name')->nullable();
+                $table->timestamp('last_used_at')->nullable();
+                $table->timestamp('expires_at')->nullable();
+                $table->timestamps();
+            });
+        }
+    }
+
     /**
      * Create a new API token for a user.
      */
     public static function createToken(User $user, string $name = 'mobile_app', ?string $deviceName = null, ?int $expiryDays = 90): array
     {
+        self::ensureTableExists();
+
         // 64 random characters hex token
         $rawToken = bin2hex(random_bytes(32));
 
@@ -59,6 +77,8 @@ class ApiToken extends Model
      */
     public static function findValidToken(string $rawToken): ?self
     {
+        self::ensureTableExists();
+
         $hashed = hash('sha256', $rawToken);
         $record = self::where('token', $hashed)->first();
 

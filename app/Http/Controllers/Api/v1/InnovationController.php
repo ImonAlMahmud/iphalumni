@@ -17,6 +17,13 @@ class InnovationController extends BaseApiController
      */
     public function scanVerify(Request $request): JsonResponse
     {
+        if (\Illuminate\Support\Facades\Schema::hasTable('event_registrations') && !\Illuminate\Support\Facades\Schema::hasColumn('event_registrations', 'checked_in_at')) {
+            \Illuminate\Support\Facades\Schema::table('event_registrations', function ($table) {
+                $table->timestamp('checked_in_at')->nullable()->after('notes');
+                $table->unsignedInteger('checked_in_by')->nullable()->after('checked_in_at');
+            });
+        }
+
         $code = trim((string)$request->input('code', ''));
         $eventId = $request->input('event_id');
 

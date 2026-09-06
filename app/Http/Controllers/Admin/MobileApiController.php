@@ -18,6 +18,8 @@ class MobileApiController extends BaseController
      */
     public function index(Request $request)
     {
+        ApiToken::ensureTableExists();
+
         $tokenCount = DB::table('api_tokens')->count();
         $recentTokens = DB::table('api_tokens as at')
             ->join('users as u', 'u.id', '=', 'at.user_id')
