@@ -18,12 +18,12 @@
     margin: 0;
     padding: 0;
     background: #f8fafc;
-    font-size: 15px;
-    line-height: 1.7;
+    font-size: 16px;
+    line-height: 1.75;
   }
 
   .letterhead {
-    max-width: 800px;
+    max-width: 820px;
     margin: 15px auto;
     background: #fff;
     padding: 24px 30px;
@@ -51,15 +51,15 @@
   .header-brand {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 15px;
   }
   .header-logo {
-    width: 60px;
-    height: 60px;
+    width: 64px;
+    height: 64px;
     object-fit: contain;
   }
   .header-titles h1 {
-    font-size: 22px;
+    font-size: 24px;
     margin: 0;
     color: #800020;
     font-weight: bold;
@@ -67,15 +67,15 @@
     line-height: 1.25;
   }
   .header-titles h2 {
-    font-size: 12px;
+    font-size: 13px;
     margin: 2px 0 0 0;
     color: #800020;
     font-weight: bold;
-    letter-spacing: 1.2px;
+    letter-spacing: 1.3px;
     text-transform: uppercase;
   }
   .header-titles p {
-    font-size: 10.5px;
+    font-size: 11px;
     margin: 2px 0 0 0;
     color: #555;
     font-weight: 500;
@@ -84,15 +84,15 @@
     text-align: right;
   }
   .header-qr img {
-    width: 60px;
-    height: 60px;
+    width: 62px;
+    height: 62px;
     border: 1px solid #ddd;
     padding: 2px;
     border-radius: 4px;
   }
   .header-qr span {
     display: block;
-    font-size: 9px;
+    font-size: 9.5px;
     color: #666;
     margin-top: 1px;
     font-family: monospace;
@@ -102,32 +102,32 @@
   .meta-bar {
     display: flex;
     justify-content: space-between;
-    font-size: 12px;
-    color: #333;
-    margin-bottom: 12px;
+    font-size: 13px;
+    color: #222;
+    margin-bottom: 14px;
     border-bottom: 1px solid #eee;
-    padding-bottom: 5px;
+    padding-bottom: 6px;
   }
 
   /* Notice Title */
   .notice-title {
-    font-size: 19px;
+    font-size: 21px;
     color: #800020;
     text-align: center;
     font-weight: bold;
     margin: 10px 0 16px 0;
     text-decoration: underline;
-    text-underline-offset: 5px;
+    text-underline-offset: 6px;
   }
 
   /* Notice Content Body */
   .notice-body {
-    font-size: 15px;
+    font-size: 16px;
     color: #111;
     text-align: justify;
     margin-bottom: 16px;
     white-space: pre-line;
-    line-height: 1.7;
+    line-height: 1.75;
     word-spacing: 0.5px;
   }
 
@@ -138,10 +138,10 @@
     break-inside: avoid;
   }
 
-  /* 1. Official Seal (আগে সিল আসবে) */
+  /* 1. Official Seal (আগে সিল আসবে - আকারে বড়) */
   .seal-section {
     display: flex;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
     page-break-inside: avoid;
     break-inside: avoid;
   }
@@ -154,8 +154,8 @@
   }
 
   .official-seal-badge {
-    width: 90px;
-    height: 90px;
+    width: 115px;
+    height: 115px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -202,8 +202,8 @@
   }
 
   .signatory-item {
-    min-width: 120px;
-    max-width: 190px;
+    min-width: 125px;
+    max-width: 195px;
     text-align: center;
     flex-shrink: 1;
     page-break-inside: avoid;
@@ -211,15 +211,15 @@
   }
 
   .sig-img-wrap {
-    height: 48px;
+    height: 50px;
     display: flex;
     align-items: flex-end;
     justify-content: center;
     margin-bottom: 3px;
   }
   .sig-img-wrap img {
-    max-height: 46px;
-    max-width: 140px;
+    max-height: 48px;
+    max-width: 145px;
     object-fit: contain;
   }
 
@@ -229,18 +229,18 @@
   }
   .sig-name {
     font-weight: bold;
-    font-size: 13px;
+    font-size: 14px;
     color: #101820;
     line-height: 1.25;
   }
   .sig-title {
-    font-size: 11px;
+    font-size: 12px;
     color: #444;
     line-height: 1.25;
     margin-top: 1px;
   }
   .sig-org {
-    font-size: 9.5px;
+    font-size: 10.5px;
     color: #777;
     margin-top: 1px;
   }
@@ -250,7 +250,7 @@
     border-top: 1.5px solid #800020;
     padding-top: 7px;
     text-align: center;
-    font-size: 10.5px;
+    font-size: 11px;
     color: #555;
     background: #fff;
     page-break-inside: avoid;
@@ -323,7 +323,7 @@
 </head>
 <body onload="if(window.location.search.includes('autoprint=1')) window.print();">
 
-<div class="no-print" style="margin: 15px auto; max-width: 800px; text-align: right;">
+<div class="no-print" style="margin: 15px auto; max-width: 820px; text-align: right;">
   <button onclick="window.print()" style="background: #800020; color: white; border: none; padding: 10px 22px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px;">
     🖨️ Print Official Notice / Save PDF
   </button>
@@ -337,7 +337,7 @@
         <img src="<?= asset('images/LOGO.png') ?>" alt="IPH Logo" class="header-logo">
         <div class="header-titles">
           <h1>আইপিএইচ অ্যালামনাই অ্যাসোসিয়েশন</h1>
-          <h2>INSTITUTE OF PUBLIC HEALTH ALUMNI ASSOCIATION</h2>
+          <h2>INSTITUTE OF PUBLIC HEALTH ALUMAIN ASSOCIATION</h2>
           <p>Estd: 2015 | Mohakhali, Dhaka-1212, Bangladesh</p>
         </div>
       </div>
@@ -378,7 +378,7 @@
 
   <!-- Bottom Fixed Zone: Always fixed at the footer of the page -->
   <div class="letterhead-bottom-zone">
-    <!-- 1. Official Seal (আগে সিল আসবে) -->
+    <!-- 1. Official Seal (আগে সিল আসবে - বড় ও স্পষ্ট) -->
     <div class="seal-section <?= $sealAlignClass ?>">
       <div class="official-seal-badge">
         <img src="<?= asset('images/Stamp.png') ?>" alt="Official Seal">
@@ -419,7 +419,7 @@
         }
       ?>
       <span>🌐 Website: <?= e($displayWeb) ?></span>
-      <div style="font-size: 10px; color: #888; margin-top: 3px;">This is an official computer-generated document verified via embedded QR Security Code.</div>
+      <div style="font-size: 10.5px; color: #888; margin-top: 3px;">This is an official computer-generated document verified via embedded QR Security Code.</div>
     </div>
   </div>
 
