@@ -141,11 +141,16 @@
   /* 1. Official Seal (আগে সিল আসবে) */
   .seal-section {
     display: flex;
-    justify-content: flex-end;
-    padding-right: 25px;
     margin-bottom: 6px;
     page-break-inside: avoid;
     break-inside: avoid;
+  }
+  .seal-section.seal-align-right {
+    justify-content: flex-end;
+    padding-right: 25px;
+  }
+  .seal-section.seal-align-center {
+    justify-content: center;
   }
 
   .official-seal-badge {
@@ -169,20 +174,38 @@
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    justify-content: flex-end;
     align-items: flex-end;
-    gap: 35px;
     width: 100%;
     margin-bottom: 12px;
     page-break-inside: avoid;
     break-inside: avoid;
+    box-sizing: border-box;
+  }
+
+  /* 1 Signatory -> Right Aligned */
+  .signatories-row.sig-align-right {
+    justify-content: flex-end;
+    padding-right: 15px;
+  }
+
+  /* 2 Signatories -> 1 Left, 1 Right */
+  .signatories-row.sig-align-split {
+    justify-content: space-between;
+    padding: 0 15px;
+  }
+
+  /* 3 or 4 Signatories -> Center Aligned, Inline */
+  .signatories-row.sig-align-center {
+    justify-content: center;
+    gap: 20px;
+    padding: 0 5px;
   }
 
   .signatory-item {
-    min-width: 140px;
+    min-width: 120px;
     max-width: 190px;
     text-align: center;
-    flex-shrink: 0;
+    flex-shrink: 1;
     page-break-inside: avoid;
     break-inside: avoid;
   }
@@ -211,13 +234,13 @@
     line-height: 1.25;
   }
   .sig-title {
-    font-size: 11.5px;
+    font-size: 11px;
     color: #444;
     line-height: 1.25;
     margin-top: 1px;
   }
   .sig-org {
-    font-size: 10px;
+    font-size: 9.5px;
     color: #777;
     margin-top: 1px;
   }
@@ -269,9 +292,27 @@
       page-break-inside: avoid !important;
       break-inside: avoid !important;
     }
+    .seal-section.seal-align-right {
+      justify-content: flex-end !important;
+    }
+    .seal-section.seal-align-center {
+      justify-content: center !important;
+    }
     .signatories-row {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
       page-break-inside: avoid !important;
       break-inside: avoid !important;
+    }
+    .signatories-row.sig-align-right {
+      justify-content: flex-end !important;
+    }
+    .signatories-row.sig-align-split {
+      justify-content: space-between !important;
+    }
+    .signatories-row.sig-align-center {
+      justify-content: center !important;
     }
     .pad-footer {
       page-break-inside: avoid !important;
@@ -321,10 +362,24 @@
     </div>
   </div>
 
+  <?php
+    $sigCount = !empty($signatories) ? count($signatories) : 0;
+    if ($sigCount <= 1) {
+        $sigAlignClass  = 'sig-align-right';
+        $sealAlignClass = 'seal-align-right';
+    } elseif ($sigCount === 2) {
+        $sigAlignClass  = 'sig-align-split';
+        $sealAlignClass = 'seal-align-center';
+    } else {
+        $sigAlignClass  = 'sig-align-center';
+        $sealAlignClass = 'seal-align-center';
+    }
+  ?>
+
   <!-- Bottom Fixed Zone: Always fixed at the footer of the page -->
   <div class="letterhead-bottom-zone">
     <!-- 1. Official Seal (আগে সিল আসবে) -->
-    <div class="seal-section">
+    <div class="seal-section <?= $sealAlignClass ?>">
       <div class="official-seal-badge">
         <img src="<?= asset('images/Stamp.png') ?>" alt="Official Seal">
       </div>
@@ -332,7 +387,7 @@
 
     <!-- 2. Signatures (তারপর সিগনেচার - পাশাপাশি একই লাইনে) -->
     <?php if (!empty($signatories)): ?>
-    <div class="signatories-row">
+    <div class="signatories-row <?= $sigAlignClass ?>">
       <?php foreach ($signatories as $sig): ?>
       <div class="signatory-item">
         <div class="sig-img-wrap">
