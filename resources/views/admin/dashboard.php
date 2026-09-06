@@ -9,19 +9,22 @@
 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
   <?php
   $cards = [
-    ['Total Alumni',   $totalAlumni,   '#A22638'],
-    ['Pending Review', $pendingAlumni, '#ef4444'],
-    ['Active Members', $activeMembers, '#4E9C81'],
-    ['Events',         $totalEvents,   '#6366f1'],
-    ['Membership Rev', '৳' . number_format($totalRevenue), '#A22638'],
-    ['Donations',      '৳' . number_format($totalDonations), '#8b5cf6'],
+    ['Total Alumni',   $totalAlumni,   '#A22638', url('/admin/alumni'), 'fa-solid fa-users'],
+    ['Pending Review', $pendingAlumni, '#ef4444', url('/admin/alumni?status=pending'), 'fa-solid fa-user-clock'],
+    ['Active Members', $activeMembers, '#4E9C81', url('/admin/membership'), 'fa-solid fa-id-card'],
+    ['Events',         $totalEvents,   '#6366f1', url('/admin/events'), 'fa-solid fa-calendar-days'],
+    ['Membership Rev', '৳' . number_format($totalRevenue), '#A22638', url('/admin/membership/logs'), 'fa-solid fa-coins'],
+    ['Donations',      '৳' . number_format($totalDonations), '#8b5cf6', url('/admin/reports/donations'), 'fa-solid fa-hand-holding-heart'],
   ];
-  foreach ($cards as [$label, $val, $color]):
+  foreach ($cards as [$label, $val, $color, $href, $icon]):
   ?>
-  <div class="p-5 rounded-2xl" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);">
-    <div class="font-serif text-[26px] font-semibold" style="color:<?= $color ?>"><?= $val ?></div>
-    <div class="text-[12px] mt-1" style="color:rgba(255,255,255,0.45);"><?= $label ?></div>
-  </div>
+  <a href="<?= $href ?>" class="p-5 rounded-2xl block transition-all hover:scale-[1.02] group relative overflow-hidden" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);">
+    <div class="flex items-center justify-between mb-2">
+      <div class="font-serif text-[26px] font-semibold tracking-tight" style="color:<?= $color ?>"><?= $val ?></div>
+      <i class="<?= $icon ?> text-[14px] opacity-40 group-hover:opacity-100 transition-opacity" style="color:<?= $color ?>"></i>
+    </div>
+    <div class="text-[12px] group-hover:text-white transition-colors" style="color:rgba(255,255,255,0.45);"><?= $label ?></div>
+  </a>
   <?php endforeach; ?>
 </div>
 

@@ -412,21 +412,7 @@ class MembershipController extends BaseController
     {
         $id = (int)$id;
 
-        $slip = DB::table('membership_payments')->where('membership_id', $id)->value('payment_slip');
-        if (!empty($slip)) {
-            if (Storage::disk('public')->exists("documents/{$slip}")) {
-                Storage::disk('public')->delete("documents/{$slip}");
-            }
-            DB::table('membership_payments')->where('membership_id', $id)->update([
-                'payment_slip' => null,
-                'status'       => 'paid',
-                'paid_at'      => now(),
-            ]);
-        }
-
-        DB::table('memberships')->where('id', $id)->update(['status' => 'active', 'approved_at' => now(), 'updated_at' => now()]);
-
-        // Auto-record to Association Total Funds
+        // Fetch membership details
         $mDetail = DB::table('memberships as m')
             ->join('membership_types as mt', 'mt.id', '=', 'm.membership_type_id')
             ->join('alumni_profiles as ap', 'ap.id', '=', 'm.alumni_profile_id')
@@ -435,6 +421,39 @@ class MembershipController extends BaseController
             ->where('m.id', $id)
             ->first();
 
+        // 1. Mark membership active
+        DB::table('memberships')->where('id', $id)->update([
+            'status'      => 'active',
+            'approved_at' => now(),
+            'updated_at'  => now()
+        ]);
+
+        // 2. Handle membership_payments record
+        $existingPayment = DB::table('membership_payments')->where('membership_id', $id)->first();
+        if ($existingPayment) {
+            if (!empty($existingPayment->payment_slip) && Storage::disk('public')->exists("documents/{$existingPayment->payment_slip}")) {
+                Storage::disk('public')->delete("documents/{$existingPayment->payment_slip}");
+            }
+            DB::table('membership_payments')->where('id', $existingPayment->id)->update([
+                'payment_slip' => null,
+                'status'       => 'paid',
+                'paid_at'      => $existingPayment->paid_at ?: now(),
+                'amount'       => ($existingPayment->amount > 0) ? $existingPayment->amount : ($mDetail->fee ?? 0),
+            ]);
+        } else if ($mDetail && (float)$mDetail->fee > 0) {
+            DB::table('membership_payments')->insert([
+                'membership_id'  => $id,
+                'amount'         => (float)$mDetail->fee,
+                'currency'       => 'BDT',
+                'method'         => 'ADMIN_APPROVED',
+                'transaction_id' => 'TRX-ADM-' . $id,
+                'status'         => 'paid',
+                'paid_at'        => now(),
+                'created_at'     => now(),
+            ]);
+        }
+
+        // 3. Auto-record to Association Total Funds
         if ($mDetail && (float)$mDetail->fee > 0) {
             $ref = 'MEM-' . $id;
             $checkExists = DB::table('association_funds')->where('reference_no', $ref)->exists();
@@ -452,7 +471,7 @@ class MembershipController extends BaseController
             }
         }
 
-        return redirect('/admin/membership')->with('success', 'Membership approved and payment receipt file cleaned up.');
+        return redirect('/admin/membership')->with('success', 'মেম্বারশিপ সক্রিয় করা হয়েছে এবং পেমেন্ট সফলভাবে রেকর্ড করা হয়েছে।');
     }
 
     public function reject(Request $request, $id)
