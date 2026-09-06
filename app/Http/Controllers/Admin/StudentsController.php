@@ -65,6 +65,18 @@ class StudentsController extends BaseController
         $sessions = DB::table('students_reference')->distinct()->orderBy('session', 'asc')->pluck('session')->toArray();
         $depts = DB::table('students_reference')->distinct()->orderBy('department', 'asc')->pluck('department')->toArray();
 
+        $totalAll = DB::table('students_reference')->count();
+        $missingCount = DB::table('students_reference')->where(function ($q) {
+            $q->whereNull('roll')->orWhere('roll', '')
+              ->orWhereNull('name_english')->orWhere('name_english', '')
+              ->orWhereNull('name_bangla')->orWhere('name_bangla', '')
+              ->orWhereNull('mobile')->orWhere('mobile', '')
+              ->orWhereNull('guardian_mobile')->orWhere('guardian_mobile', '')
+              ->orWhereNull('batch')->orWhere('batch', '')
+              ->orWhereNull('session')->orWhere('session', '')
+              ->orWhereNull('department')->orWhere('department', '');
+        })->count();
+
         $pagination = [
             'total'        => $total,
             'per_page'     => $perPage,
@@ -74,7 +86,7 @@ class StudentsController extends BaseController
 
         return $this->legacyView(
             'admin/students/index',
-            compact('students', 'batches', 'sessions', 'depts', 'pagination', 'batch', 'session', 'dept', 'search', 'missingInfo'),
+            compact('students', 'batches', 'sessions', 'depts', 'pagination', 'batch', 'session', 'dept', 'search', 'missingInfo', 'totalAll', 'missingCount'),
             'admin',
             'Student Reference Database'
         );
