@@ -49,7 +49,7 @@
         <i class="fa-solid fa-user-shield text-[#E58E97]"></i> ১. অ্যাকাউন্ট ও স্ট্যাটাস তথ্য (Account & Status)
       </h3>
 
-      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 rounded-2xl bg-white/[0.03] border border-white/10">
         <!-- Current Avatar Preview & Upload -->
         <div class="flex items-center gap-4">
           <div class="w-20 h-20 rounded-2xl overflow-hidden bg-gradient-to-br from-[#800020] to-[#2F8863] flex items-center justify-center font-bold text-[24px] text-white shrink-0 shadow-lg border-2 border-white/20">
@@ -59,10 +59,40 @@
               <?= initials($alumni['name'] ?? 'M') ?>
             <?php endif; ?>
           </div>
-          <div>
-            <label class="block text-[12px] font-mono text-white/70 mb-1">নতুন ছবি পরিবর্তন করুন (Change Avatar)</label>
-            <input type="file" name="avatar" accept="image/*" class="text-[12px] text-white/60 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[11.5px] file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20">
+          <div class="flex-1 min-w-0">
+            <label class="block text-[12px] font-semibold text-white/80 mb-1">
+              <i class="fa-solid fa-camera text-[#E58E97] mr-1"></i> প্রোফাইল ছবি (Avatar)
+            </label>
+            <input type="file" name="avatar" accept="image/*" class="text-[12px] text-white/60 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[11.5px] file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20 w-full cursor-pointer">
             <p class="text-[11px] text-white/40 mt-1">JPG, PNG বা WebP ফরম্যাট (সর্বোচ্চ 2MB)</p>
+          </div>
+        </div>
+
+        <!-- Member Digital Signature Preview & Upload -->
+        <div class="flex items-center gap-4 md:border-l md:border-white/10 md:pl-6 pt-4 md:pt-0 border-t md:border-t-0 border-white/10">
+          <div class="w-28 h-20 rounded-2xl overflow-hidden bg-white/95 flex items-center justify-center shrink-0 shadow-md border-2 border-white/20 p-1.5">
+            <?php if (!empty($alumni['signature_image'])): ?>
+              <img src="<?= asset('storage/signatures/' . e($alumni['signature_image'])) ?>" alt="Signature" class="max-h-full max-w-full object-contain filter contrast-125">
+            <?php else: ?>
+              <div class="text-center text-slate-400 text-[10.5px] leading-tight">
+                <i class="fa-solid fa-signature text-[18px] mb-0.5 block text-slate-300"></i> No Sign
+              </div>
+            <?php endif; ?>
+          </div>
+          <div class="flex-1 min-w-0">
+            <label class="block text-[12px] font-semibold text-emerald-300 mb-1">
+              <i class="fa-solid fa-file-signature mr-1"></i> ডিজিটাল স্বাক্ষর (Digital Signature)
+            </label>
+            <input type="file" name="signature" accept="image/png,image/jpeg,image/webp" class="text-[12px] text-white/60 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[11.5px] file:font-semibold file:bg-emerald-600/30 file:text-emerald-200 hover:file:bg-emerald-600/50 w-full cursor-pointer">
+            <div class="flex items-center justify-between mt-1">
+              <p class="text-[11px] text-white/40">স্বচ্ছ ব্যাকগ্রাউন্ড (PNG) সর্বোচ্চ 2MB</p>
+              <?php if (!empty($alumni['signature_image'])): ?>
+                <label class="inline-flex items-center gap-1.5 text-[11px] text-rose-400 hover:text-rose-300 cursor-pointer ml-2">
+                  <input type="checkbox" name="remove_signature" value="1" class="rounded border-white/20 bg-black/40 text-rose-500 focus:ring-0">
+                  স্বাক্ষর মুছে ফেলুন
+                </label>
+              <?php endif; ?>
+            </div>
           </div>
         </div>
       </div>

@@ -66,7 +66,7 @@ class AlumniController extends BaseController
         $id = (int)$id;
         $alumni = DB::table('alumni_profiles as ap')
             ->join('users as u', 'u.id', '=', 'ap.user_id')
-            ->select('ap.*', 'u.name', 'u.email', 'u.role', 'u.created_at as registered_at')
+            ->select('ap.*', 'u.name', 'u.email', 'u.role', 'u.signature_image', 'u.created_at as registered_at')
             ->where('ap.id', $id)
             ->first();
 
@@ -100,7 +100,7 @@ class AlumniController extends BaseController
         $id = (int)$id;
         $alumni = DB::table('alumni_profiles as ap')
             ->join('users as u', 'u.id', '=', 'ap.user_id')
-            ->select('ap.*', 'u.name', 'u.email', 'u.role', 'u.status as user_status', 'u.created_at as registered_at')
+            ->select('ap.*', 'u.name', 'u.email', 'u.role', 'u.signature_image', 'u.status as user_status', 'u.created_at as registered_at')
             ->where('ap.id', $id)
             ->first();
 
@@ -204,6 +204,21 @@ class AlumniController extends BaseController
             'avatar'          => $avatarFilename,
             'updated_at'      => now(),
         ];
+
+        // Handle signature upload or removal if provided
+        if ($request->hasFile('signature')) {
+            $sigFile = $request->file('signature');
+            if ($sigFile && $sigFile->isValid()) {
+                $uploader = new \App\Services\UploadService();
+                $uploadedSig = $uploader->uploadSignature($sigFile, $userId);
+                if ($uploadedSig) {
+                    $userUpdates['signature_image'] = $uploadedSig;
+                }
+            }
+        } elseif ($request->input('remove_signature') == '1') {
+            $userUpdates['signature_image'] = null;
+        }
+
         if ($request->filled('role')) {
             $role = $request->input('role');
             if (in_array($role, ['alumni', 'admin', 'super_admin', 'editor'])) {
@@ -256,17 +271,17 @@ class AlumniController extends BaseController
         ]);
 
         // Primary Education update or create
-        $degree      = trim((string)$request->input('degree', ''));
-        $institution = trim((string)$request->input('institution', ''));
+        $degree       = trim((string)$request->input('degree', ''));
+        $institution  = trim((string)$request->input('institution', ''));
         $fieldOfStudy = trim((string)$request->input('field_of_study', ''));
-        $gradYear    = trim((string)$request->input('graduation_year', ''));
+        $gradYear     = trim((string)$request->input('graduation_year', ''));
 
-        if (!empty($degree) || !empty($institution) || !empty($fieldOfStudy)) {
-            $edu = DB::table('alumni_education')->where('alumni_profile_id', $id)->where('is_primary', 1)->first();
-            if (!$edu) {
-                $edu = DB::table('alumni_education')
-                    ->where('alumni_profile_id', $id)
-                    ->where('degree', $degree)
+        if (!empty($degree) || !empty($institution)) {
+            $eduId = (int)$request->input('education_id', 0);
+            if ($eduId > 0) {
+                $edu = DB::table('alumni_education')->where('id', $eduId)->where('alumni_profile_id', $id)->first();
+            } else {
+                $edu = DB::table('alumni_education')->where('alumni_profile_id', $id)->where('is_primary', 1)
                     ->first() ?: DB::table('alumni_education')->where('alumni_profile_id', $id)->orderBy('id', 'asc')->first();
             }
 
@@ -325,6 +340,55 @@ class AlumniController extends BaseController
         AuditLogger::log('ALUMNI_UPDATE', "Admin updated profile ID #{$id} ({$name})");
 
         return redirect('/admin/alumni/' . $id)->with('success', 'মেম্বারের প্রোফাইল তথ্য সফলভাবে আপডেট করা হয়েছে।');
+    }
+
+    public function uploadSignature(Request $request, $id)
+    {
+        $id = (int)$id;
+        $alumni = DB::table('alumni_profiles')->where('id', $id)->first();
+        if (!$alumni) {
+            abort(404, 'Alumni profile not found');
+        }
+
+        $file = $request->file('signature');
+        if (!$file || !$file->isValid()) {
+            return redirect('/admin/alumni/' . $id)->with('error', 'কোনো ফাইল নির্বাচন করা হয়নি বা ফাইলটি সঠিক নয়।');
+        }
+
+        $uploader = new \App\Services\UploadService();
+        $filename = $uploader->uploadSignature($file, (int)$alumni->user_id);
+        if (!$filename) {
+            return redirect('/admin/alumni/' . $id)->with('error', 'স্বাক্ষর আপলোড ব্যর্থ হয়েছে। JPG, PNG বা WebP ফরম্যাট ব্যবহার করুন (সর্বোচ্চ ২MB)।');
+        }
+
+        DB::table('users')->where('id', $alumni->user_id)->update([
+            'signature_image' => $filename,
+            'updated_at'      => now(),
+        ]);
+
+        $adminUser = Auth::user();
+        $this->logHistory($id, 'signature_updated', "Digital signature uploaded by admin ({$adminUser->name})", (int)$adminUser->id);
+
+        return redirect('/admin/alumni/' . $id)->with('success', 'সদস্যের ডিজিটাল স্বাক্ষর (Signature) সফলভাবে আপলোড করা হয়েছে।');
+    }
+
+    public function deleteSignature(Request $request, $id)
+    {
+        $id = (int)$id;
+        $alumni = DB::table('alumni_profiles')->where('id', $id)->first();
+        if (!$alumni) {
+            abort(404, 'Alumni profile not found');
+        }
+
+        DB::table('users')->where('id', $alumni->user_id)->update([
+            'signature_image' => null,
+            'updated_at'      => now(),
+        ]);
+
+        $adminUser = Auth::user();
+        $this->logHistory($id, 'signature_removed', "Digital signature removed by admin ({$adminUser->name})", (int)$adminUser->id);
+
+        return redirect('/admin/alumni/' . $id)->with('success', 'সদস্যের ডিজিটাল স্বাক্ষর মুছে ফেলা হয়েছে।');
     }
 
     public function viewIdCard(Request $request, $id)

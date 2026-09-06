@@ -275,6 +275,62 @@
       <?php endif; ?>
     </div>
 
+    <!-- Digital Signature (ডিজিটাল স্বাক্ষর) Card -->
+    <div class="p-6 rounded-3xl space-y-4" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
+      <div class="flex items-center justify-between pb-3 border-b border-white/5">
+        <h3 class="text-[15px] font-semibold text-white font-serif flex items-center gap-2">
+          ✍️ Digital Signature (স্বাক্ষর)
+        </h3>
+        <?php if (!empty($alumni['signature_image'])): ?>
+          <span class="px-2 py-0.5 rounded text-[10.5px] font-mono font-semibold bg-emerald-500/20 text-emerald-300">✓ Uploaded</span>
+        <?php else: ?>
+          <span class="px-2 py-0.5 rounded text-[10.5px] font-mono font-semibold bg-amber-500/20 text-amber-300">⚠️ Missing</span>
+        <?php endif; ?>
+      </div>
+
+      <?php if (!empty($alumni['signature_image'])): ?>
+        <div class="p-4 rounded-2xl bg-white/95 border border-white/10 flex items-center justify-center min-h-[90px] shadow-inner">
+          <img src="<?= asset('storage/signatures/' . e($alumni['signature_image'])) ?>" alt="Signature" class="max-h-20 object-contain filter contrast-125">
+        </div>
+
+        <div class="flex items-center justify-between text-[11.5px] pt-1">
+          <span class="text-white/60 font-mono text-[11px] truncate max-w-[180px]" title="<?= e($alumni['signature_image']) ?>">
+            <?= e($alumni['signature_image']) ?>
+          </span>
+          <form method="POST" action="<?= url('/admin/alumni/' . $alumni['id'] . '/delete-signature') ?>" onsubmit="return confirm('আপনি কি নিশ্চিত যে এই স্বাক্ষর মুছে ফেলতে চান?');" class="inline">
+            <?= csrf_field() ?>
+            <button type="submit" class="text-rose-400 hover:text-rose-300 underline font-medium">মুছে ফেলুন</button>
+          </form>
+        </div>
+
+        <form method="POST" action="<?= url('/admin/alumni/' . $alumni['id'] . '/signature') ?>" enctype="multipart/form-data" class="space-y-3 pt-3 border-t border-white/5">
+          <?= csrf_field() ?>
+          <label class="block text-[12px] text-white/70 font-medium">স্বাক্ষর পরিবর্তন / প্রতিস্থাপন করুন:</label>
+          <input type="file" name="signature" accept="image/png,image/jpeg,image/webp" required
+                 class="block w-full text-[12px] text-white/70 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[11.5px] file:font-semibold file:bg-emerald-600/30 file:text-emerald-200 hover:file:bg-emerald-600/50 cursor-pointer">
+          <button type="submit" class="w-full py-2 bg-emerald-600/90 hover:bg-emerald-600 text-white rounded-xl text-[12.5px] font-semibold transition-colors flex items-center justify-center gap-1.5 shadow-md">
+            📤 স্বাক্ষর প্রতিস্থাপন করুন
+          </button>
+        </form>
+      <?php else: ?>
+        <div class="p-4 rounded-2xl bg-white/[0.02] border border-dashed border-white/15 text-center py-5">
+          <div class="text-2xl mb-1 text-white/30">✍️</div>
+          <p class="text-[12.5px] text-white/40">কোনো ডিজিটাল স্বাক্ষর আপলোড করা নেই।</p>
+        </div>
+
+        <form method="POST" action="<?= url('/admin/alumni/' . $alumni['id'] . '/signature') ?>" enctype="multipart/form-data" class="space-y-3 pt-1">
+          <?= csrf_field() ?>
+          <label class="block text-[12px] text-white/70 font-medium">সদস্যের স্বাক্ষর আপলোড করুন:</label>
+          <input type="file" name="signature" accept="image/png,image/jpeg,image/webp" required
+                 class="block w-full text-[12px] text-white/70 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[11.5px] file:font-semibold file:bg-emerald-600/30 file:text-emerald-200 hover:file:bg-emerald-600/50 cursor-pointer">
+          <p class="text-[11px] text-white/40">স্বচ্ছ ব্যাকগ্রাউন্ড (PNG) সুপারিশকৃত, সর্বোচ্চ ২MB।</p>
+          <button type="submit" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[12.5px] font-semibold transition-colors flex items-center justify-center gap-1.5 shadow-md">
+            📤 স্বাক্ষর আপলোড করুন
+          </button>
+        </form>
+      <?php endif; ?>
+    </div>
+
     <!-- Audit & History Trail -->
     <?php if (!empty($approvalHistory)): ?>
     <div class="p-6 rounded-3xl space-y-3" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">

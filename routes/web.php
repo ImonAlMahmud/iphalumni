@@ -208,6 +208,8 @@ Route::prefix('/admin')->middleware('auth.admin')->name('admin.')->group(functio
     Route::get('/alumni/{id}', [AdminAlumni::class, 'show'])->name('alumni.show');
     Route::get('/alumni/{id}/edit', [AdminAlumni::class, 'edit'])->name('alumni.edit');
     Route::post('/alumni/{id}/edit', [AdminAlumni::class, 'update'])->name('alumni.update');
+    Route::post('/alumni/{id}/signature', [AdminAlumni::class, 'uploadSignature'])->name('alumni.signature');
+    Route::post('/alumni/{id}/delete-signature', [AdminAlumni::class, 'deleteSignature'])->name('alumni.delete_signature');
     Route::get('/alumni/{id}/id-card', [AdminAlumni::class, 'viewIdCard'])->name('alumni.id_card');
     Route::get('/alumni/{id}/membership-card', [AdminAlumni::class, 'viewMembershipCard'])->name('alumni.membership_card');
     Route::post('/alumni/{id}/approve', [AdminAlumni::class, 'approve'])->name('alumni.approve');
