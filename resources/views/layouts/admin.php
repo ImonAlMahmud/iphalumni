@@ -5,42 +5,44 @@ $title       = isset($title) ? e($title) . ' — Admin · ' . $appName : 'Admin 
 $currentUri  = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 
 // Helper function to accurately detect active admin menu
-function isAdminNavActive(string $navPath, string $uri): bool {
-    // Standardize paths by removing trailing slashes
-    $navPath = rtrim($navPath, '/');
-    $cleanUri = rtrim($uri, '/');
-    
-    // Normalize /public if present
-    if (str_contains($cleanUri, '/public')) {
-        $cleanUri = str_replace('/public', '', $cleanUri);
-    }
-
-    if ($cleanUri === $navPath) {
-        return true;
-    }
-
-    if (str_ends_with($cleanUri, $navPath)) {
-        return true;
-    }
-
-    // Prevents parent route /admin/alumni from matching child sub-routes that have their own sidebar item
-    if ($navPath === '/admin/alumni') {
-        if (str_contains($cleanUri, '/admin/alumni/contact-requests') || str_contains($cleanUri, '/admin/alumni/mapping')) {
-            return false;
+if (!function_exists('isAdminNavActive')) {
+    function isAdminNavActive(string $navPath, string $uri): bool {
+        // Standardize paths by removing trailing slashes
+        $navPath = rtrim($navPath, '/');
+        $cleanUri = rtrim($uri, '/');
+        
+        // Normalize /public if present
+        if (str_contains($cleanUri, '/public')) {
+            $cleanUri = str_replace('/public', '', $cleanUri);
         }
-    }
 
-    if ($navPath === '/admin/membership') {
-        if (str_contains($cleanUri, '/admin/membership/logs')) {
-            return false;
+        if ($cleanUri === $navPath) {
+            return true;
         }
-    }
 
-    if (str_contains($cleanUri, $navPath . '/')) {
-        return true;
-    }
+        if ($cleanUri === $navPath) {
+            return true;
+        }
 
-    return false;
+        // Prevents parent route /admin/alumni from matching child sub-routes that have their own sidebar item
+        if ($navPath === '/admin/alumni') {
+            if (str_contains($cleanUri, '/admin/alumni/contact-requests') || str_contains($cleanUri, '/admin/alumni/mapping')) {
+                return false;
+            }
+        }
+
+        if ($navPath === '/admin/membership') {
+            if (str_contains($cleanUri, '/admin/membership/logs')) {
+                return false;
+            }
+        }
+
+        if (str_contains($cleanUri, $navPath . '/')) {
+            return true;
+        }
+
+        return false;
+    }
 }
 
 $navGroups = [

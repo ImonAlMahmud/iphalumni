@@ -96,14 +96,18 @@
           <?= date('d M Y', strtotime($a['registered_at'])) ?>
         </td>
         <td class="px-5 py-3.5">
-          <div class="flex items-center gap-2">
-            <a href="<?= url('/admin/alumni/' . $a['id']) ?>" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-colors"
-               style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);">
-              View →
+          <div class="flex items-center gap-1.5">
+            <a href="<?= url('/admin/alumni/' . $a['id']) ?>" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[12px] font-medium transition-colors bg-white/5 hover:bg-white/10 text-white/80 border border-white/10" title="View Full Profile">
+              View
             </a>
-            <a href="<?= url('/admin/alumni/' . $a['id'] . '/card-svg/zip') ?>" class="p-1.5 rounded-lg text-amber-400 hover:text-amber-300 hover:bg-white/5 transition-colors border border-transparent hover:border-amber-500/30"
-               title="Download Member ID Card (SVG ZIP)">
-              <i class="fa-solid fa-id-card text-[12.5px]"></i>
+            <a href="<?= url('/admin/alumni/' . $a['id'] . '/edit') ?>" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[12px] font-medium transition-colors bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30" title="Edit Member Profile">
+              <i class="fa-solid fa-user-pen text-[10px]"></i> Edit
+            </a>
+            <a href="<?= url('/admin/alumni/' . $a['id'] . '/id-card') ?>" target="_blank" class="p-1 rounded-lg text-sky-400 hover:text-sky-300 hover:bg-white/5 transition-colors" title="View Member ID Card">
+              <i class="fa-solid fa-id-card text-[12px]"></i>
+            </a>
+            <a href="<?= url('/admin/alumni/' . $a['id'] . '/membership-card') ?>" target="_blank" class="p-1 rounded-lg text-emerald-400 hover:text-emerald-300 hover:bg-white/5 transition-colors" title="View Membership Pass">
+              <i class="fa-solid fa-qrcode text-[12px]"></i>
             </a>
           </div>
         </td>

@@ -144,6 +144,198 @@ class MembershipController extends BaseController
         );
     }
 
+    public function exportCsv(Request $request)
+    {
+        $search   = trim((string)$request->input('q', ''));
+        $status   = trim((string)$request->input('status', ''));
+        $typeId   = (int)$request->input('type', 0);
+        $method   = trim((string)$request->input('method', ''));
+        $pStatus  = trim((string)$request->input('payment_status', ''));
+
+        $query = DB::table('memberships as m')
+            ->join('alumni_profiles as ap', 'ap.id', '=', 'm.alumni_profile_id')
+            ->join('users as u', 'u.id', '=', 'ap.user_id')
+            ->join('membership_types as mt', 'mt.id', '=', 'm.membership_type_id')
+            ->leftJoin('membership_payments as mp', 'mp.membership_id', '=', 'm.id')
+            ->whereNull('m.deleted_at');
+
+        if ($status !== '' && $status !== 'all') {
+            $query->where('m.status', $status);
+        }
+        if ($typeId > 0) {
+            $query->where('m.membership_type_id', $typeId);
+        }
+        if ($method !== '' && $method !== 'all') {
+            $query->where('mp.method', $method);
+        }
+        if ($pStatus !== '' && $pStatus !== 'all') {
+            $query->where('mp.status', $pStatus);
+        }
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('u.name', 'like', "%{$search}%")
+                  ->orWhere('u.email', 'like', "%{$search}%")
+                  ->orWhere('ap.phone', 'like', "%{$search}%")
+                  ->orWhere('m.membership_number', 'like', "%{$search}%")
+                  ->orWhere('mp.transaction_id', 'like', "%{$search}%");
+            });
+        }
+
+        $rows = $query->select(
+            'm.*',
+            'u.name',
+            'u.email',
+            'ap.secondary_email',
+            'ap.phone',
+            'ap.batch_year',
+            'ap.student_id',
+            'mt.name as type_name',
+            'mt.fee as type_fee',
+            'mp.amount as payment_amount',
+            'mp.currency as payment_currency',
+            'mp.method as payment_method',
+            'mp.transaction_id',
+            'mp.status as payment_status',
+            'mp.paid_at as payment_date'
+        )
+        ->orderBy('m.created_at', 'desc')
+        ->get()
+        ->map(fn($r) => (array)$r)
+        ->toArray();
+
+        $filename = 'membership_payments_log_' . date('Ymd_His') . '.csv';
+
+        return response()->streamDownload(function () use ($rows) {
+            $out = fopen('php://output', 'w');
+            fputs($out, "\xEF\xBB\xBF");
+            fputcsv($out, [
+                'SL',
+                'Member Name',
+                'Email',
+                'Secondary Email',
+                'Phone',
+                'Batch Year',
+                'DU Reg / Student ID',
+                'Membership Number',
+                'Membership Tier',
+                'Plan Fee (BDT)',
+                'Membership Status',
+                'Start Date',
+                'End Date',
+                'Approved At',
+                'Payment Amount',
+                'Currency',
+                'Payment Method',
+                'Transaction ID (TrxID)',
+                'Payment Status',
+                'Payment Date',
+            ]);
+
+            $sl = 1;
+            foreach ($rows as $row) {
+                $amount = (float)($row['payment_amount'] ?? ($row['type_fee'] ?? 0));
+                fputcsv($out, [
+                    $sl++,
+                    $row['name'] ?? '',
+                    $row['email'] ?? '',
+                    $row['secondary_email'] ?? '',
+                    $row['phone'] ?? '',
+                    $row['batch_year'] ?? '',
+                    $row['student_id'] ?? '',
+                    $row['membership_number'] ?? '',
+                    $row['type_name'] ?? '',
+                    (float)($row['type_fee'] ?? 0),
+                    strtoupper((string)($row['status'] ?? '')),
+                    $row['start_date'] ? date('d M Y', strtotime((string)$row['start_date'])) : '',
+                    $row['end_date'] ? date('d M Y', strtotime((string)$row['end_date'])) : 'Lifetime',
+                    $row['approved_at'] ? date('d M Y H:i', strtotime((string)$row['approved_at'])) : '',
+                    $amount,
+                    $row['payment_currency'] ?? 'BDT',
+                    strtoupper((string)($row['payment_method'] ?? 'FREE/ADMIN')),
+                    $row['transaction_id'] ?? '',
+                    strtoupper((string)($row['payment_status'] ?? ($row['status'] === 'active' ? 'PAID' : 'PENDING'))),
+                    $row['payment_date'] ? date('d M Y H:i', strtotime((string)$row['payment_date'])) : '',
+                ]);
+            }
+            fclose($out);
+        }, $filename, ['Content-Type' => 'text/csv; charset=utf-8']);
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $search   = trim((string)$request->input('q', ''));
+        $status   = trim((string)$request->input('status', ''));
+        $typeId   = (int)$request->input('type', 0);
+        $method   = trim((string)$request->input('method', ''));
+        $pStatus  = trim((string)$request->input('payment_status', ''));
+
+        $query = DB::table('memberships as m')
+            ->join('alumni_profiles as ap', 'ap.id', '=', 'm.alumni_profile_id')
+            ->join('users as u', 'u.id', '=', 'ap.user_id')
+            ->join('membership_types as mt', 'mt.id', '=', 'm.membership_type_id')
+            ->leftJoin('membership_payments as mp', 'mp.membership_id', '=', 'm.id')
+            ->whereNull('m.deleted_at');
+
+        if ($status !== '' && $status !== 'all') {
+            $query->where('m.status', $status);
+        }
+        if ($typeId > 0) {
+            $query->where('m.membership_type_id', $typeId);
+        }
+        if ($method !== '' && $method !== 'all') {
+            $query->where('mp.method', $method);
+        }
+        if ($pStatus !== '' && $pStatus !== 'all') {
+            $query->where('mp.status', $pStatus);
+        }
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('u.name', 'like', "%{$search}%")
+                  ->orWhere('u.email', 'like', "%{$search}%")
+                  ->orWhere('ap.phone', 'like', "%{$search}%")
+                  ->orWhere('m.membership_number', 'like', "%{$search}%")
+                  ->orWhere('mp.transaction_id', 'like', "%{$search}%");
+            });
+        }
+
+        $memberships = $query->select(
+            'm.*',
+            'u.name',
+            'u.email',
+            'ap.phone',
+            'ap.batch_year',
+            'mt.name as type_name',
+            'mt.fee as type_fee',
+            'mp.amount as payment_amount',
+            'mp.currency as payment_currency',
+            'mp.method as payment_method',
+            'mp.transaction_id',
+            'mp.status as payment_status',
+            'mp.paid_at as payment_date'
+        )
+        ->orderBy('m.created_at', 'desc')
+        ->get()
+        ->map(fn($r) => (array)$r)
+        ->toArray();
+
+        $stats = [
+            'total'          => count($memberships),
+            'active'         => count(array_filter($memberships, fn($m) => ($m['status'] ?? '') === 'active')),
+            'total_payments' => array_sum(array_map(fn($m) => (float)($m['payment_amount'] ?? 0), $memberships)),
+        ];
+
+        $reportTitle = 'IPH Alumni Association — Membership & Payment Audit History Report';
+
+        extract(compact('memberships', 'stats', 'reportTitle', 'search', 'status', 'method'));
+        $viewFile = resource_path('views/admin/membership/print_log.php');
+        if (file_exists($viewFile)) {
+            ob_start();
+            require $viewFile;
+            return response(ob_get_clean());
+        }
+        abort(404);
+    }
+
     public function grantHonorary(Request $request)
     {
         $alumniProfileId = (int)$request->input('alumni_profile_id');

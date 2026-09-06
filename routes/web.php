@@ -206,6 +206,10 @@ Route::prefix('/admin')->middleware('auth.admin')->name('admin.')->group(functio
     Route::post('/alumni/map-student', [AdminAlumni::class, 'mapStudent'])->name('alumni.map_student');
     Route::get('/alumni/contact-requests', [AdminAlumni::class, 'contactRequests'])->name('alumni.contact_requests');
     Route::get('/alumni/{id}', [AdminAlumni::class, 'show'])->name('alumni.show');
+    Route::get('/alumni/{id}/edit', [AdminAlumni::class, 'edit'])->name('alumni.edit');
+    Route::post('/alumni/{id}/edit', [AdminAlumni::class, 'update'])->name('alumni.update');
+    Route::get('/alumni/{id}/id-card', [AdminAlumni::class, 'viewIdCard'])->name('alumni.id_card');
+    Route::get('/alumni/{id}/membership-card', [AdminAlumni::class, 'viewMembershipCard'])->name('alumni.membership_card');
     Route::post('/alumni/{id}/approve', [AdminAlumni::class, 'approve'])->name('alumni.approve');
     Route::post('/alumni/{id}/reject', [AdminAlumni::class, 'reject'])->name('alumni.reject');
     Route::post('/alumni/{id}/status', [AdminAlumni::class, 'updateStatus'])->name('alumni.status');
@@ -214,6 +218,8 @@ Route::prefix('/admin')->middleware('auth.admin')->name('admin.')->group(functio
     // Membership
     Route::get('/membership', [AdminMembership::class, 'index'])->name('membership');
     Route::get('/membership/logs', [AdminMembership::class, 'logs'])->name('membership.logs');
+    Route::get('/membership/logs/export/csv', [AdminMembership::class, 'exportCsv'])->name('membership.logs.export_csv');
+    Route::get('/membership/logs/export/pdf', [AdminMembership::class, 'exportPdf'])->name('membership.logs.export_pdf');
     Route::post('/membership/grant-honorary', [AdminMembership::class, 'grantHonorary'])->name('membership.grant_honorary');
     Route::post('/membership/tier/{id}/update', [AdminMembership::class, 'updateTier'])->name('membership.tier.update');
     Route::post('/membership/{id}/approve', [AdminMembership::class, 'approve'])->name('membership.approve');

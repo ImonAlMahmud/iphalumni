@@ -27,12 +27,18 @@
       </p>
     </div>
 
-    <div class="flex items-center gap-2.5">
-      <a href="<?= url('/admin/membership') ?>" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-[13px] font-medium transition-all flex items-center gap-1.5">
+    <div class="flex items-center gap-2 flex-wrap">
+      <a href="<?= url('/admin/membership') ?>" class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-[12.5px] font-medium transition-all flex items-center gap-1.5">
         <i class="fa-solid fa-sliders text-[11px]"></i> Plans & Pricing
       </a>
-      <button type="button" onclick="window.print()" class="px-4 py-2 rounded-xl bg-[#800020] hover:bg-[#990026] text-white text-[13px] font-semibold transition-all shadow-md flex items-center gap-1.5">
-        <i class="fa-solid fa-print text-[11px]"></i> Print Log
+      <a href="<?= url('/admin/membership/logs/export/csv?' . http_build_query($_GET)) ?>" class="px-3.5 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-[12.5px] font-semibold transition-all shadow-sm flex items-center gap-1.5" title="Export filtered records to CSV / Excel">
+        <i class="fa-solid fa-file-csv text-[13px]"></i> Export CSV
+      </a>
+      <a href="<?= url('/admin/membership/logs/export/pdf?' . http_build_query($_GET)) ?>" target="_blank" class="px-3.5 py-2 rounded-xl bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-[12.5px] font-semibold transition-all shadow-sm flex items-center gap-1.5" title="Printable report / Save as PDF">
+        <i class="fa-solid fa-file-pdf text-[13px]"></i> Export PDF
+      </a>
+      <button type="button" onclick="window.print()" class="px-3.5 py-2 rounded-xl bg-[#800020] hover:bg-[#990026] text-white text-[12.5px] font-semibold transition-all shadow-md flex items-center gap-1.5">
+        <i class="fa-solid fa-print text-[11px]"></i> Print
       </button>
     </div>
   </div>
@@ -402,9 +408,18 @@
                   </form>
                 <?php endif; ?>
 
-                <div>
-                  <a href="<?= url('/admin/alumni/' . $m['alumni_profile_id']) ?>" class="text-[11.5px] text-white/40 hover:text-white inline-flex items-center gap-1">
-                    Profile <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+                <div class="pt-2 mt-1 border-t border-white/5 flex flex-col items-end gap-1.5 font-mono text-[11px]">
+                  <a href="<?= url('/admin/alumni/' . $m['alumni_profile_id'] . '/edit') ?>" class="text-amber-400 hover:text-amber-300 inline-flex items-center gap-1 font-semibold">
+                    <i class="fa-solid fa-user-pen text-[10px]"></i> Edit Profile
+                  </a>
+                  <a href="<?= url('/admin/alumni/' . $m['alumni_profile_id'] . '/id-card') ?>" target="_blank" class="text-sky-400 hover:text-sky-300 inline-flex items-center gap-1">
+                    <i class="fa-solid fa-id-card text-[10px]"></i> Member Card
+                  </a>
+                  <a href="<?= url('/admin/alumni/' . $m['alumni_profile_id'] . '/membership-card') ?>" target="_blank" class="text-emerald-400 hover:text-emerald-300 inline-flex items-center gap-1">
+                    <i class="fa-solid fa-qrcode text-[10px]"></i> Membership Card
+                  </a>
+                  <a href="<?= url('/admin/alumni/' . $m['alumni_profile_id']) ?>" class="text-white/40 hover:text-white inline-flex items-center gap-1">
+                    Full Profile <i class="fa-solid fa-arrow-up-right-from-square text-[8.5px]"></i>
                   </a>
                 </div>
 

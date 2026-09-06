@@ -95,6 +95,313 @@ class AlumniController extends BaseController
         );
     }
 
+    public function edit(Request $request, $id)
+    {
+        $id = (int)$id;
+        $alumni = DB::table('alumni_profiles as ap')
+            ->join('users as u', 'u.id', '=', 'ap.user_id')
+            ->select('ap.*', 'u.name', 'u.email', 'u.role', 'u.status as user_status', 'u.created_at as registered_at')
+            ->where('ap.id', $id)
+            ->first();
+
+        if (!$alumni) {
+            abort(404, 'Alumni profile not found');
+        }
+        $alumni = (array)$alumni;
+
+        $education  = $this->model->getEducation($id);
+        $employment = $this->model->getEmployment($id);
+
+        $primaryEdu = !empty($education) ? (current(array_filter($education, fn($e) => !empty($e['is_primary']))) ?: $education[0]) : null;
+        $currentEmp = !empty($employment) ? (current(array_filter($employment, fn($e) => !empty($e['is_current']))) ?: $employment[0]) : null;
+
+        $allUniversities = DB::table('universities')->select('country', 'name')->orderBy('country', 'asc')->orderBy('name', 'asc')->get()->map(fn($r) => (array)$r)->toArray();
+
+        return $this->legacyView(
+            'admin/alumni/edit',
+            compact('alumni', 'education', 'employment', 'primaryEdu', 'currentEmp', 'allUniversities'),
+            'admin',
+            'Edit Alumni Profile: ' . ($alumni['name'] ?? '')
+        );
+    }
+
+    public function update(Request $request, $id)
+    {
+        $id = (int)$id;
+        $alumni = DB::table('alumni_profiles as ap')
+            ->join('users as u', 'u.id', '=', 'ap.user_id')
+            ->select('ap.*', 'u.id as user_id', 'u.email as current_email')
+            ->where('ap.id', $id)
+            ->first();
+
+        if (!$alumni) {
+            abort(404, 'Alumni profile not found');
+        }
+
+        $userId = (int)$alumni->user_id;
+
+        $name  = trim((string)$request->input('name', ''));
+        $email = strtolower(trim((string)$request->input('email', '')));
+
+        if (empty($name)) {
+            return redirect('/admin/alumni/' . $id . '/edit')->with('error', 'সদস্যের নাম প্রদান করা বাধ্যতামূলক।')->withInput();
+        }
+
+        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return redirect('/admin/alumni/' . $id . '/edit')->with('error', 'একটি বৈধ ইমেইল ঠিকানা প্রদান করুন।')->withInput();
+        }
+
+        // Check email uniqueness excluding current user
+        $existing = DB::table('users')->where('email', $email)->where('id', '!=', $userId)->first();
+        if ($existing) {
+            return redirect('/admin/alumni/' . $id . '/edit')->with('error', 'এই ইমেইল ঠিকানাটি ইতিমধ্যে অন্য অ্যাকাউন্টে ব্যবহৃত হচ্ছে।')->withInput();
+        }
+
+        $secondaryEmail = strtolower(trim((string)$request->input('secondary_email', '')));
+        if (!empty($secondaryEmail)) {
+            if (!filter_var($secondaryEmail, FILTER_VALIDATE_EMAIL)) {
+                return redirect('/admin/alumni/' . $id . '/edit')->with('error', 'একটি বৈধ সেকেন্ডারি ইমেইল ঠিকানা প্রদান করুন।')->withInput();
+            }
+            if ($secondaryEmail === $email) {
+                return redirect('/admin/alumni/' . $id . '/edit')->with('error', 'প্রাইমারি ও সেকেন্ডারি ইমেইল একই হতে পারবে না।')->withInput();
+            }
+        } else {
+            $secondaryEmail = null;
+        }
+
+        $dobInput = trim((string)$request->input('dob', ''));
+        $dob      = (!empty($dobInput) && strtotime($dobInput)) ? date('Y-m-d', strtotime($dobInput)) : null;
+
+        $status = trim((string)$request->input('status', $alumni->status));
+        $allowedStatuses = ['pending', 'under_review', 'verified', 'approved', 'rejected'];
+        if (!in_array($status, $allowedStatuses)) {
+            $status = $alumni->status;
+        }
+
+        // Handle avatar upload if provided
+        $avatarFilename = $alumni->avatar;
+        if ($request->hasFile('avatar')) {
+            $file = $request->file('avatar');
+            if ($file && $file->isValid()) {
+                $uploader = new \App\Services\UploadService();
+                $uploaded = $uploader->uploadAvatar($file, $userId);
+                if ($uploaded) {
+                    $avatarFilename = $uploaded;
+                }
+            }
+        }
+
+        // Update User
+        $userUpdates = [
+            'name'            => $name,
+            'email'           => $email,
+            'secondary_email' => $secondaryEmail,
+            'avatar'          => $avatarFilename,
+            'updated_at'      => now(),
+        ];
+        if ($request->filled('role')) {
+            $role = $request->input('role');
+            if (in_array($role, ['alumni', 'admin', 'super_admin', 'editor'])) {
+                $userUpdates['role'] = $role;
+            }
+        }
+        if ($status === 'approved' || $status === 'verified') {
+            $userUpdates['status'] = 'active';
+        }
+        DB::table('users')->where('id', $userId)->update($userUpdates);
+
+        // Update Alumni Profile
+        DB::table('alumni_profiles')->where('id', $id)->update([
+            'batch_year'              => trim((string)$request->input('batch_year', '')) ?: null,
+            'student_id'              => trim((string)$request->input('student_id', '')) ?: null,
+            'phone'                   => trim((string)$request->input('phone', '')),
+            'secondary_email'         => $secondaryEmail,
+            'nid_number'              => trim((string)$request->input('nid_number', '')),
+            'dob'                     => $dob,
+            'gender'                  => trim((string)$request->input('gender', '')) ?: null,
+            'blood_group'             => trim((string)$request->input('blood_group', '')) ?: null,
+            'status'                  => $status,
+            'avatar'                  => $avatarFilename,
+            'bio'                     => trim((string)$request->input('bio', '')),
+            'location_type'           => $request->input('location_type', 'bangladesh'),
+            'current_location'        => trim((string)$request->input('current_location', '')),
+            'thana_upazila'           => trim((string)$request->input('thana_upazila', '')),
+            'country'                 => trim((string)$request->input('country', '')),
+            'province_city'           => trim((string)$request->input('province_city', '')),
+            'permanent_location'      => trim((string)$request->input('permanent_location', '')),
+            'permanent_district'      => trim((string)$request->input('permanent_district', '')),
+            'permanent_upazila'       => trim((string)$request->input('permanent_upazila', '')),
+            'emergency_contact_name'  => trim((string)$request->input('emergency_contact_name', '')),
+            'emergency_contact_phone' => trim((string)$request->input('emergency_contact_phone', '')),
+            'activity_type'           => $request->input('activity_type', 'work'),
+            'session_years'           => trim((string)$request->input('session_years', '')),
+            'specialization'          => trim((string)$request->input('specialization', '')),
+            'skills'                  => trim((string)$request->input('skills', '')),
+            'experience_years'        => trim((string)$request->input('experience_years', '')),
+            'willing_to_mentor'       => (int)$request->input('willing_to_mentor', 0),
+            'job_referral'            => (int)$request->input('job_referral', 0),
+            'website'                 => trim((string)$request->input('website', '')),
+            'linkedin_url'            => trim((string)$request->input('linkedin_url', '')),
+            'facebook_url'            => trim((string)$request->input('facebook_url', '')),
+            'google_scholar_url'      => trim((string)$request->input('google_scholar_url', '')),
+            'researchgate_url'        => trim((string)$request->input('researchgate_url', '')),
+            'publications'            => trim((string)$request->input('publications', '')),
+            'awards_recognition'      => trim((string)$request->input('awards_recognition', '')),
+            'updated_at'              => now(),
+        ]);
+
+        // Primary Education update or create
+        $degree      = trim((string)$request->input('degree', ''));
+        $institution = trim((string)$request->input('institution', ''));
+        $fieldOfStudy = trim((string)$request->input('field_of_study', ''));
+        $gradYear    = trim((string)$request->input('graduation_year', ''));
+
+        if (!empty($degree) || !empty($institution) || !empty($fieldOfStudy)) {
+            $edu = DB::table('alumni_education')->where('alumni_profile_id', $id)->where('is_primary', 1)->first();
+            if ($edu) {
+                DB::table('alumni_education')->where('id', $edu->id)->update([
+                    'degree'          => $degree,
+                    'institution'     => $institution,
+                    'field_of_study'  => $fieldOfStudy,
+                    'graduation_year' => $gradYear ?: null,
+                    'updated_at'      => now(),
+                ]);
+            } else {
+                DB::table('alumni_education')->insert([
+                    'alumni_profile_id' => $id,
+                    'degree'            => $degree,
+                    'institution'       => $institution,
+                    'field_of_study'    => $fieldOfStudy,
+                    'graduation_year'   => $gradYear ?: null,
+                    'is_primary'        => 1,
+                    'created_at'        => now(),
+                    'updated_at'        => now(),
+                ]);
+            }
+        }
+
+        // Current Employment update or create
+        $organization = trim((string)$request->input('organization', ''));
+        $designation  = trim((string)$request->input('designation', ''));
+        $department   = trim((string)$request->input('department', ''));
+
+        if (!empty($organization) || !empty($designation)) {
+            $emp = DB::table('alumni_employment')->where('alumni_profile_id', $id)->where('is_current', 1)->first();
+            if ($emp) {
+                DB::table('alumni_employment')->where('id', $emp->id)->update([
+                    'organization' => $organization,
+                    'designation'  => $designation,
+                    'department'   => $department,
+                    'updated_at'   => now(),
+                ]);
+            } else {
+                DB::table('alumni_employment')->insert([
+                    'alumni_profile_id' => $id,
+                    'organization'      => $organization,
+                    'designation'       => $designation,
+                    'department'        => $department,
+                    'is_current'        => 1,
+                    'created_at'        => now(),
+                    'updated_at'        => now(),
+                ]);
+            }
+        }
+
+        $adminUser = Auth::user();
+        $this->logHistory($id, 'updated', "Profile updated by admin ({$adminUser->name})", (int)$adminUser->id);
+        AuditLogger::log('ALUMNI_UPDATE', "Admin updated profile ID #{$id} ({$name})");
+
+        return redirect('/admin/alumni/' . $id)->with('success', 'মেম্বারের প্রোফাইল তথ্য সফলভাবে আপডেট করা হয়েছে।');
+    }
+
+    public function viewIdCard(Request $request, $id)
+    {
+        $id = (int)$id;
+        $profile = DB::table('alumni_profiles as ap')
+            ->join('users as u', 'u.id', '=', 'ap.user_id')
+            ->select('ap.*', 'u.name', 'u.email', 'u.avatar as user_avatar')
+            ->where('ap.id', $id)
+            ->first();
+
+        if (!$profile) {
+            abort(404, 'Alumni profile not found');
+        }
+        $profile = (array)$profile;
+
+        $membership = (new \App\Models\Membership())->getByAlumni($id);
+
+        $refData = null;
+        if (!empty($profile['student_reference_id'])) {
+            $ref = DB::table('students_reference')->where('id', $profile['student_reference_id'])->first();
+            if ($ref) {
+                $refData = (array)$ref;
+            }
+        }
+
+        $lastEdu = DB::table('alumni_education')
+            ->where('alumni_profile_id', $id)
+            ->orderByRaw('CAST(graduation_year AS UNSIGNED) DESC, id DESC')
+            ->first();
+
+        return $this->legacyView(
+            'admin/alumni/id_card',
+            compact('profile', 'membership', 'refData', 'lastEdu'),
+            'admin',
+            'Member Alumni ID Card: ' . ($profile['name'] ?? '')
+        );
+    }
+
+    public function viewMembershipCard(Request $request, $id)
+    {
+        $id = (int)$id;
+        $profile = DB::table('alumni_profiles as ap')
+            ->join('users as u', 'u.id', '=', 'ap.user_id')
+            ->select('ap.*', 'u.name', 'u.email', 'u.avatar as user_avatar')
+            ->where('ap.id', $id)
+            ->first();
+
+        if (!$profile) {
+            abort(404, 'Alumni profile not found');
+        }
+        $profile = (array)$profile;
+
+        $membership = (new \App\Models\Membership())->getByAlumni($id);
+        $membershipType = null;
+        if ($membership && !empty($membership['membership_type_id'])) {
+            $membershipType = DB::table('membership_types')->where('id', $membership['membership_type_id'])->first();
+        }
+
+        $committeeMember = DB::table('committee_members as cm')
+            ->leftJoin('committees as c', 'c.id', '=', 'cm.committee_id')
+            ->where('cm.user_id', $profile['user_id'])
+            ->where('cm.is_active', 1)
+            ->whereNull('cm.deleted_at')
+            ->select('cm.*', 'c.name as committee_name')
+            ->orderBy('cm.sort_order', 'asc')
+            ->orderBy('cm.id', 'asc')
+            ->first();
+
+        $refData = null;
+        if (!empty($profile['student_reference_id'])) {
+            $ref = DB::table('students_reference')->where('id', $profile['student_reference_id'])->first();
+            if ($ref) {
+                $refData = (array)$ref;
+            }
+        }
+
+        $lastEdu = DB::table('alumni_education')
+            ->where('alumni_profile_id', $id)
+            ->orderByRaw('CAST(graduation_year AS UNSIGNED) DESC, id DESC')
+            ->first();
+
+        return $this->legacyView(
+            'admin/alumni/membership_card',
+            compact('profile', 'membership', 'membershipType', 'committeeMember', 'refData', 'lastEdu'),
+            'admin',
+            'Membership Card: ' . ($profile['name'] ?? '')
+        );
+    }
+
     public function approve(Request $request, $id)
     {
         $id   = (int)$id;
