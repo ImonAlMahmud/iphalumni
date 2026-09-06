@@ -298,6 +298,11 @@ Route::prefix('/admin')->middleware('auth.admin')->name('admin.')->group(functio
     // Email templates
     Route::get('/email-templates', [EmailTemplatesController::class, 'index'])->name('email_templates');
     Route::post('/email-templates/send-test', [EmailTemplatesController::class, 'sendTest'])->name('email_templates.send_test');
+
+    // Mobile App & REST API Hub
+    Route::get('/mobile-api', [\App\Http\Controllers\Admin\MobileApiController::class, 'index'])->name('mobile_api');
+    Route::post('/mobile-api/generate-token', [\App\Http\Controllers\Admin\MobileApiController::class, 'generateToken'])->name('mobile_api.generate_token');
+    Route::post('/mobile-api/revoke-token', [\App\Http\Controllers\Admin\MobileApiController::class, 'revokeToken'])->name('mobile_api.revoke_token');
 });
 
 // ── Automated Webhook Deployment Route ───────────────────────────────────────
