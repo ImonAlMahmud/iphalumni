@@ -175,6 +175,165 @@
     </div>
   </div>
 
+  <?php if (session('success')): ?>
+  <div class="mb-6 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 flex items-center justify-between shadow-lg">
+    <div class="flex items-center gap-3">
+      <i class="fa-solid fa-circle-check text-lg"></i>
+      <span class="text-sm font-semibold"><?= e(session('success')) ?></span>
+    </div>
+    <span class="text-xs font-mono opacity-60">Auto-saved</span>
+  </div>
+  <?php endif; ?>
+
+  <!-- Mobile App Store Links & Public Website CTA Settings -->
+  <div class="p-6 rounded-2xl bg-gradient-to-br from-[#1e232d] to-[#12161f] border border-[#E58E97]/30 shadow-2xl mb-8 relative overflow-hidden">
+    <div class="absolute -right-16 -top-16 w-56 h-56 bg-[#800020]/20 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-5 border-b border-white/10">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#E58E97]"></span>
+          <h2 class="text-[17px] font-bold text-white flex items-center gap-2">
+            <i class="fa-brands fa-google-play text-emerald-400"></i>
+            <?= __('মোবাইল অ্যাপ ডাউনলোড লিংক ও পাবলিক সাইট CTA সেটিংস', 'Mobile App Download Links & Public Site CTA Settings') ?>
+          </h2>
+        </div>
+        <p class="text-[12.5px] text-white/60 mt-1">
+          <?= __('এখানে গুগল প্লে-স্টোর বা অ্যাপ স্টোরের লিংক প্রদান করুন। লিংক প্রদান করা থাকলে পাবলিক ওয়েবসাইটের হোমপেজ ও ফুটারে ডাউনলোড ব্যাজ ও ইন্টারেক্টিভ CTA সেকশন প্রদর্শিত হবে।', 'Provide your Google Play Store or App Store links here. When saved, interactive download buttons and banners will automatically appear on the public website.') ?>
+        </p>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="px-3 py-1 rounded-full text-[11px] font-mono <?= !empty($appLinks['google_play_url']) ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30' ?>">
+          <i class="fa-solid <?= !empty($appLinks['google_play_url']) ? 'fa-circle-check' : 'fa-triangle-exclamation' ?> mr-1"></i>
+          <?= !empty($appLinks['google_play_url']) ? 'Play Store Active' : 'Play Store Not Set' ?>
+        </span>
+      </div>
+    </div>
+
+    <!-- Form for Updating Links -->
+    <form action="<?= url('/admin/mobile-api/update-links') ?>" method="POST" class="mt-6">
+      <?= csrf_field() ?>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <!-- Google Play Store URL -->
+        <div class="space-y-1.5">
+          <label class="block text-[13px] font-medium text-white/90 flex items-center justify-between">
+            <span class="flex items-center gap-2">
+              <i class="fa-brands fa-google-play text-emerald-400"></i>
+              <span><?= __('গুগল প্লে-স্টোর লিংক (Google Play Store URL)', 'Google Play Store URL') ?></span>
+              <span class="text-rose-400 font-bold">*</span>
+            </span>
+            <?php if (!empty($appLinks['google_play_url'])): ?>
+            <a href="<?= e($appLinks['google_play_url']) ?>" target="_blank" rel="noopener noreferrer" class="text-[11px] text-emerald-400 hover:underline flex items-center gap-1 font-mono">
+              <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> টেস্ট করুন
+            </a>
+            <?php endif; ?>
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/40">
+              <i class="fa-brands fa-android text-[15px]"></i>
+            </div>
+            <input type="url" 
+                   name="app_google_play_url" 
+                   value="<?= e($appLinks['google_play_url'] ?? '') ?>" 
+                   placeholder="https://play.google.com/store/apps/details?id=com.iphalumni.app"
+                   class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/40 border border-white/15 text-white text-[13.5px] focus:border-[#E58E97] focus:ring-1 focus:ring-[#E58E97] outline-none transition-all placeholder:text-white/30 font-mono">
+          </div>
+          <p class="text-[11px] text-white/40">
+            উদাহরণ: <code class="text-white/60">https://play.google.com/store/apps/details?id=com.iphalumni.app</code>
+          </p>
+        </div>
+
+        <!-- Apple App Store URL -->
+        <div class="space-y-1.5">
+          <label class="block text-[13px] font-medium text-white/90 flex items-center justify-between">
+            <span class="flex items-center gap-2">
+              <i class="fa-brands fa-apple text-slate-300"></i>
+              <span><?= __('অ্যাপল অ্যাপ স্টোর লিংক (Apple App Store URL)', 'Apple App Store URL') ?></span>
+              <span class="text-[11px] text-white/40 font-normal">(ঐচ্ছিক / Optional)</span>
+            </span>
+            <?php if (!empty($appLinks['apple_store_url'])): ?>
+            <a href="<?= e($appLinks['apple_store_url']) ?>" target="_blank" rel="noopener noreferrer" class="text-[11px] text-sky-400 hover:underline flex items-center gap-1 font-mono">
+              <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> টেস্ট করুন
+            </a>
+            <?php endif; ?>
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/40">
+              <i class="fa-brands fa-apple text-[16px]"></i>
+            </div>
+            <input type="url" 
+                   name="app_apple_store_url" 
+                   value="<?= e($appLinks['apple_store_url'] ?? '') ?>" 
+                   placeholder="https://apps.apple.com/app/iph-alumni/id123456789"
+                   class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/40 border border-white/15 text-white text-[13.5px] focus:border-[#E58E97] focus:ring-1 focus:ring-[#E58E97] outline-none transition-all placeholder:text-white/30 font-mono">
+          </div>
+          <p class="text-[11px] text-white/40">আইওএস বা আইফোন ব্যবহারকারীদের জন্য অ্যাপ স্টোর লিংক।</p>
+        </div>
+
+        <!-- Direct APK File URL -->
+        <div class="space-y-1.5">
+          <label class="block text-[13px] font-medium text-white/90 flex items-center gap-2">
+            <i class="fa-solid fa-file-arrow-down text-amber-400"></i>
+            <span><?= __('সরাসরি APK ফাইল ডাউনলোড লিংক (Direct APK URL)', 'Direct APK Download URL') ?></span>
+            <span class="text-[11px] text-white/40 font-normal">(ঐচ্ছিক / Optional)</span>
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/40">
+              <i class="fa-solid fa-link text-[14px]"></i>
+            </div>
+            <input type="url" 
+                   name="app_apk_url" 
+                   value="<?= e($appLinks['apk_url'] ?? '') ?>" 
+                   placeholder="https://iphalumni.org/downloads/app-release.apk"
+                   class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/40 border border-white/15 text-white text-[13.5px] focus:border-[#E58E97] focus:ring-1 focus:ring-[#E58E97] outline-none transition-all placeholder:text-white/30 font-mono">
+          </div>
+          <p class="text-[11px] text-white/40">যাদের প্লে-স্টোর অ্যাকাউন্ট নেই তারা সরাসরি APK ডাউনলোড করতে পারবেন।</p>
+        </div>
+
+        <!-- App Version -->
+        <div class="space-y-1.5">
+          <label class="block text-[13px] font-medium text-white/90 flex items-center gap-2">
+            <i class="fa-solid fa-code-branch text-purple-400"></i>
+            <span><?= __('বর্তমান অ্যাপ সংস্করণ (Current App Version)', 'Current App Version') ?></span>
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/40">
+              <i class="fa-solid fa-tag text-[14px]"></i>
+            </div>
+            <input type="text" 
+                   name="app_version_name" 
+                   value="<?= e($appLinks['version_name'] ?? '1.0.0') ?>" 
+                   placeholder="1.0.0"
+                   class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/40 border border-white/15 text-white text-[13.5px] focus:border-[#E58E97] focus:ring-1 focus:ring-[#E58E97] outline-none transition-all font-mono">
+          </div>
+          <p class="text-[11px] text-white/40">এপিআই কনফিগারে ক্লায়েন্ট ডিভাইসকে পাঠানো হবে।</p>
+        </div>
+      </div>
+
+      <!-- Visibility Toggle & Submit Action -->
+      <div class="mt-6 pt-5 border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <label class="flex items-center gap-3 cursor-pointer select-none">
+          <input type="checkbox" 
+                 name="app_cta_enabled" 
+                 value="1" 
+                 <?= (!empty($appLinks['cta_enabled'])) ? 'checked' : '' ?>
+                 class="w-4 h-4 rounded text-[#800020] bg-black/40 border-white/30 focus:ring-[#E58E97] focus:ring-offset-0">
+          <div>
+            <span class="text-[13.5px] font-semibold text-white">
+              <?= __('পাবলিক ওয়েবসাইটে অ্যাপ ডাউনলোড CTA ও ডাউনলোড বোতাম দেখান', 'Enable App Download CTA & Badges on Public Website') ?>
+            </span>
+            <p class="text-[11px] text-white/50">হোমপেজ এবং ফুটার সহ পাবলিক পেজে অ্যাপ স্টোর ডাউনলোড ব্যাজ ও অ্যানিমেটেড ব্যানার প্রদর্শন করা হবে।</p>
+          </div>
+        </label>
+
+        <button type="submit" 
+                class="px-6 py-2.5 rounded-xl text-[13.5px] font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-lg shadow-emerald-900/30 flex items-center gap-2 transition-all transform active:scale-95 shrink-0">
+          <i class="fa-solid fa-floppy-disk"></i>
+          <span><?= __('সংরক্ষণ করুন (Save Links)', 'Save Links') ?></span>
+        </button>
+      </div>
+    </form>
+  </div>
+
   <!-- Interactive Test Console Section -->
   <div id="api-console-section" class="p-5 rounded-2xl bg-black/60 border border-[#E58E97]/30 shadow-2xl mb-8 relative overflow-hidden backdrop-blur-md">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 pb-4 border-b border-white/10">

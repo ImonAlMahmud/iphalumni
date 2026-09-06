@@ -195,10 +195,14 @@ Route::prefix('/admin')->middleware('auth.admin')->name('admin.')->group(functio
 
     // Students Reference Database Directory
     Route::get('/students', [AdminStudents::class, 'index'])->name('students');
+    Route::get('/students/sample-template', [AdminStudents::class, 'sampleTemplate'])->name('students.sample_template');
     Route::get('/students/export/csv', [AdminStudents::class, 'exportCsv'])->name('students.export_csv');
     Route::get('/students/export/print', [AdminStudents::class, 'exportPrint'])->name('students.export_print');
+    Route::post('/students/store', [AdminStudents::class, 'store'])->name('students.store');
+    Route::post('/students/import', [AdminStudents::class, 'import'])->name('students.import');
     Route::post('/students/{id}/update', [AdminStudents::class, 'update'])->name('students.update');
     Route::post('/students/{id}/delete', [AdminStudents::class, 'delete'])->name('students.delete');
+    Route::post('/students/batch/delete', [AdminStudents::class, 'deleteBatch'])->name('students.batch.delete');
 
     // Alumni Management
     Route::get('/alumni', [AdminAlumni::class, 'index'])->name('alumni');
@@ -303,6 +307,7 @@ Route::prefix('/admin')->middleware('auth.admin')->name('admin.')->group(functio
     Route::get('/mobile-api', [\App\Http\Controllers\Admin\MobileApiController::class, 'index'])->name('mobile_api');
     Route::post('/mobile-api/generate-token', [\App\Http\Controllers\Admin\MobileApiController::class, 'generateToken'])->name('mobile_api.generate_token');
     Route::post('/mobile-api/revoke-token', [\App\Http\Controllers\Admin\MobileApiController::class, 'revokeToken'])->name('mobile_api.revoke_token');
+    Route::post('/mobile-api/update-links', [\App\Http\Controllers\Admin\MobileApiController::class, 'updateLinks'])->name('mobile_api.update_links');
 });
 
 // ── Automated Webhook Deployment Route ───────────────────────────────────────

@@ -290,11 +290,12 @@ class InnovationController extends BaseApiController
         return $this->successResponse([
             'app_info' => [
                 'name'                   => 'IPH Alumni Association',
-                'current_version'        => '1.0.0',
+                'current_version'        => $settings['app_version_name'] ?? '1.0.0',
                 'min_supported_version'  => '1.0.0',
                 'force_update'           => false,
-                'play_store_url'         => 'https://play.google.com/store/apps/details?id=com.iphalumni.app',
-                'app_store_url'          => 'https://apps.apple.com/app/iph-alumni/id123456789',
+                'play_store_url'         => !empty($settings['app_google_play_url']) ? $settings['app_google_play_url'] : null,
+                'app_store_url'          => !empty($settings['app_apple_store_url']) ? $settings['app_apple_store_url'] : null,
+                'apk_url'                => !empty($settings['app_apk_url']) ? $settings['app_apk_url'] : null,
             ],
             'theme' => [
                 'primary_color'   => '#d4af37', // Gold

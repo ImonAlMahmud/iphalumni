@@ -152,9 +152,15 @@ class AlumniProfile extends Model
 
         $pending = DB::table('alumni_profiles')->whereNull('deleted_at')->whereIn('status', ['pending', 'under_review'])->count();
 
-        $batches = DB::table('alumni_profiles')->whereNull('deleted_at')->distinct('batch_year')->count('batch_year');
+        // Distinct batches from students_reference matching the batch dropdown in admin/students
+        $batches = DB::table('students_reference')
+            ->whereNotNull('batch')
+            ->where('batch', '!=', '')
+            ->distinct()
+            ->count('batch');
+
         if ($batches === 0) {
-            $batches = DB::table('students_reference')->distinct('batch')->count('batch');
+            $batches = count(DB::table('alumni_profiles')->whereNull('deleted_at')->whereNotNull('batch_year')->where('batch_year', '!=', '')->distinct()->pluck('batch_year'));
         }
 
         $countries = DB::table('alumni_profiles')->whereNull('deleted_at')->whereNotNull('current_location')->where('current_location', '!=', '')->distinct('current_location')->count('current_location');

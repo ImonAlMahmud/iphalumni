@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BaseController;
 use App\Models\ApiToken;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -338,12 +339,36 @@ class MobileApiController extends BaseController
             'active_tokens'   => $tokenCount,
         ];
 
+        $setting = new Setting();
+        $appLinks = [
+            'google_play_url' => (string)$setting->get('app_google_play_url', 'https://play.google.com/store/apps/details?id=com.iphalumni.app'),
+            'apple_store_url' => (string)$setting->get('app_apple_store_url', ''),
+            'apk_url'         => (string)$setting->get('app_apk_url', ''),
+            'cta_enabled'     => (string)$setting->get('app_cta_enabled', '1') !== '0',
+            'version_name'    => (string)$setting->get('app_version_name', '1.0.0'),
+        ];
+
         return $this->legacyView(
             'admin/api/index',
-            compact('endpoints', 'stats', 'recentTokens', 'tokenString'),
+            compact('endpoints', 'stats', 'recentTokens', 'tokenString', 'appLinks'),
             'admin',
             'Mobile App & REST API Hub'
         );
+    }
+
+    /**
+     * Update Mobile App Store Links & Public CTA Visibility
+     */
+    public function updateLinks(Request $request)
+    {
+        $setting = new Setting();
+        $setting->set('app_google_play_url', trim((string)$request->input('app_google_play_url', '')));
+        $setting->set('app_apple_store_url', trim((string)$request->input('app_apple_store_url', '')));
+        $setting->set('app_apk_url', trim((string)$request->input('app_apk_url', '')));
+        $setting->set('app_cta_enabled', $request->has('app_cta_enabled') ? '1' : '0');
+        $setting->set('app_version_name', trim((string)$request->input('app_version_name', '1.0.0')));
+
+        return redirect('/admin/mobile-api')->with('success', '✅ মোবাইল অ্যাপ স্টোর লিংক এবং সেটিংস সফলভাবে আপডেট করা হয়েছে!');
     }
 
     /**

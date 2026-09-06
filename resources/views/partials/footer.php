@@ -45,6 +45,35 @@
             <i class="fa-solid fa-envelope text-[13px]"></i>
           </a>
         </div>
+
+        <?php
+        $footerPlayUrl = (new \App\Models\Setting())->get('app_google_play_url', '');
+        $footerAppStoreUrl = (new \App\Models\Setting())->get('app_apple_store_url', '');
+        $footerCtaEnabled = (new \App\Models\Setting())->get('app_cta_enabled', '1') !== '0';
+        ?>
+        <?php if ($footerCtaEnabled && (!empty($footerPlayUrl) || !empty($footerAppStoreUrl))): ?>
+        <div class="mt-5 pt-4 border-t border-white/10">
+          <div class="text-[11px] font-mono text-amber-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <i class="fa-solid fa-mobile-screen"></i> <?= __('মোবাইল অ্যাপ ডাউনলোড', 'Mobile App Download') ?>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <?php if (!empty($footerPlayUrl)): ?>
+            <a href="<?= e($footerPlayUrl) ?>" target="_blank" rel="noopener noreferrer" 
+               class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/60 hover:bg-black border border-white/15 hover:border-emerald-400 text-white text-[11.5px] transition-all hover:scale-105 shadow-md">
+              <i class="fa-brands fa-google-play text-emerald-400 text-[14px]"></i>
+              <span class="font-sans font-semibold">Google Play</span>
+            </a>
+            <?php endif; ?>
+            <?php if (!empty($footerAppStoreUrl)): ?>
+            <a href="<?= e($footerAppStoreUrl) ?>" target="_blank" rel="noopener noreferrer" 
+               class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/60 hover:bg-black border border-white/15 hover:border-sky-400 text-white text-[11.5px] transition-all hover:scale-105 shadow-md">
+              <i class="fa-brands fa-apple text-slate-200 text-[15px]"></i>
+              <span class="font-sans font-semibold">App Store</span>
+            </a>
+            <?php endif; ?>
+          </div>
+        </div>
+        <?php endif; ?>
       </div>
 
       <!-- Platform Links -->

@@ -259,16 +259,40 @@
               <label class="form-label"><?= __('ব্যাচ', 'Batch') ?> <span class="text-red-500">*</span></label>
               <select x-model="formData.batch_year" class="form-input">
                 <option value=""><?= __('ব্যাচ নির্বাচন করুন', 'Select Batch') ?></option>
-                <optgroup label="L-Batches (L-1 to L-9)">
-                  <?php for ($i = 1; $i <= 9; $i++): ?>
-                  <option value="L-<?= $i ?>">L-<?= $i ?></option>
-                  <?php endfor; ?>
+                <?php 
+                  $lBatches = [];
+                  $fBatches = [];
+                  $otherBatches = [];
+                  $allBatches = !empty($batches) ? $batches : ['L-1','L-2','L-3','L-4','L-5','L-6','L-7','L-8','L-9','F-1','F-2','F-3','F-4','F-5'];
+                  foreach ($allBatches as $b) {
+                      if (str_starts_with($b, 'L-')) $lBatches[] = $b;
+                      elseif (str_starts_with($b, 'F-')) $fBatches[] = $b;
+                      else $otherBatches[] = $b;
+                  }
+                ?>
+                <?php if (!empty($lBatches)): ?>
+                <optgroup label="L-Batches (Laboratory)">
+                  <?php foreach ($lBatches as $b): ?>
+                  <option value="<?= e($b) ?>"><?= e($b) ?></option>
+                  <?php endforeach; ?>
                 </optgroup>
-                <optgroup label="F-Batches (F-1 to F-5)">
-                  <?php for ($i = 1; $i <= 5; $i++): ?>
-                  <option value="F-<?= $i ?>">F-<?= $i ?></option>
-                  <?php endfor; ?>
+                <?php endif; ?>
+
+                <?php if (!empty($fBatches)): ?>
+                <optgroup label="F-Batches (Food Safety)">
+                  <?php foreach ($fBatches as $b): ?>
+                  <option value="<?= e($b) ?>"><?= e($b) ?></option>
+                  <?php endforeach; ?>
                 </optgroup>
+                <?php endif; ?>
+
+                <?php if (!empty($otherBatches)): ?>
+                <optgroup label="Other Batches">
+                  <?php foreach ($otherBatches as $b): ?>
+                  <option value="<?= e($b) ?>"><?= e($b) ?></option>
+                  <?php endforeach; ?>
+                </optgroup>
+                <?php endif; ?>
               </select>
             </div>
             <div>

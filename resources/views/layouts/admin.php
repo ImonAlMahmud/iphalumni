@@ -64,6 +64,7 @@ $navGroups = [
     ],
     'SYSTEM' => [
         ['/admin/mobile-api', 'Mobile App & APIs', 'fa-solid fa-mobile-screen-button'],
+        ['/admin/mobile-app-links', 'Mobile App Links', 'fa-solid fa-link'],
         ['/admin/broadcast', 'Email Broadcast', 'fa-solid fa-bullhorn'],
         ['/admin/email-templates', 'Email Templates', 'fa-solid fa-envelope-circle-check'],
         ['/admin/reports', 'Reports', 'fa-solid fa-chart-pie'],

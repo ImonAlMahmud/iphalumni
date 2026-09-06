@@ -207,6 +207,17 @@ body.home-intro-revealed .hero-delay-5 { animation-delay: 0.7s; }
         <i class="fa-solid fa-address-book text-[13px] sm:text-[14px] text-amber-300"></i>
         <span><?= __('ডিরেক্টরি দেখুন', 'Browse Directory') ?></span>
       </a>
+      <?php 
+        $heroPlayUrl = (new \App\Models\Setting())->get('app_google_play_url', '');
+        $heroCtaEnabled = (new \App\Models\Setting())->get('app_cta_enabled', '1') !== '0';
+      ?>
+      <?php if ($heroCtaEnabled && !empty($heroPlayUrl)): ?>
+      <a href="<?= e($heroPlayUrl) ?>" target="_blank" rel="noopener noreferrer"
+         class="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3.5 sm:py-4 rounded-2xl text-[14px] sm:text-[15px] font-semibold text-white bg-emerald-700/70 hover:bg-emerald-600 border border-emerald-400/40 backdrop-blur-md transition-all hover:-translate-y-1 hover:shadow-lg active:scale-95 shrink-0 shadow-emerald-950/40">
+        <i class="fa-brands fa-google-play text-[16px] text-emerald-300"></i>
+        <span><?= __('মোবাইল অ্যাপ', 'Get Mobile App') ?></span>
+      </a>
+      <?php endif; ?>
     </div>
 
     <?php 
@@ -1008,6 +1019,9 @@ body.home-intro-revealed .hero-delay-5 { animation-delay: 0.7s; }
   </div>
 </section>
 <?php endif; ?>
+
+<!-- ════════════════════════ MOBILE APP DOWNLOAD CTA ═════════════════════ -->
+<?php require view_path('partials/app_download_cta.php'); ?>
 
 <!-- ════════════════════════ CTA BANNER ══════════════════════════════════ -->
 <section class="max-w-7xl mx-auto px-6 py-10 pb-20">

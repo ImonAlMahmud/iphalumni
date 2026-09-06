@@ -63,7 +63,20 @@ class AuthController extends BaseController
     public function registerForm(Request $request)
     {
         if (Auth::check()) return redirect('/portal');
-        return $this->legacyView('auth/register', [], 'main', 'Register as Alumni');
+
+        $batches = DB::table('students_reference')
+            ->whereNotNull('batch')
+            ->where('batch', '!=', '')
+            ->distinct()
+            ->orderByRaw("
+                CASE WHEN batch LIKE 'L-%' THEN 1 WHEN batch LIKE 'F-%' THEN 2 ELSE 3 END ASC,
+                CAST(SUBSTRING(batch, 3) AS UNSIGNED) ASC,
+                batch ASC
+            ")
+            ->pluck('batch')
+            ->toArray();
+
+        return $this->legacyView('auth/register', compact('batches'), 'main', 'Register as Alumni');
     }
 
     public function register(Request $request)
