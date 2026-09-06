@@ -323,7 +323,7 @@ $isLoggedIn = auth() !== null;
       </div>
 
       <!-- Publications & Achievements Card -->
-      <?php if (!empty($alumni['publications']) || !empty($alumni['awards_recognition']) || !empty($alumni['association_roles'])): ?>
+      <?php if (!empty($alumni['publications']) || !empty($alumni['awards_recognition']) || !empty($committeeMember)): ?>
       <div class="p-8 rounded-3xl bg-white border border-slate-200/80 shadow-sm space-y-6">
         <h3 class="font-serif text-[20px] font-bold text-gray-800 flex items-center gap-2">
           <span>🏆</span> <?= __('গবেষণা, অর্জন ও অ্যাসোসিয়েশন ভূমিকা', 'Publications & Honors') ?>
@@ -343,10 +343,16 @@ $isLoggedIn = auth() !== null;
         </div>
         <?php endif; ?>
 
-        <?php if (!empty($alumni['association_roles'])): ?>
-        <div class="p-5 rounded-2xl bg-purple-50/60 border border-purple-100 space-y-1">
-          <span class="text-[11px] font-mono text-purple-800 font-bold uppercase block mb-1">🏛️ IPH ASSOCIATION ROLES (অ্যাসোসিয়েশনে দায়িত্ব)</span>
-          <p class="text-[14px] text-purple-950 font-semibold"><?= e($alumni['association_roles']) ?></p>
+        <?php if (!empty($committeeMember)): ?>
+        <div class="p-5 rounded-2xl bg-amber-50/70 border border-amber-200/80 space-y-1">
+          <span class="text-[11px] font-mono text-amber-800 font-bold uppercase block mb-1">🏛️ IPH ASSOCIATION COMMITTEE (অ্যাসোসিয়েশনে দায়িত্ব)</span>
+          <p class="text-[15px] text-amber-950 font-bold flex items-center gap-2">
+            <i class="fa-solid fa-crown text-amber-600 text-[13px]"></i>
+            <span><?= e($committeeMember->designation) ?></span>
+            <span class="text-[12px] font-mono text-amber-800/80 font-normal">
+              (<?= e($committeeMember->committee_name ?? (ucfirst($committeeMember->committee_type ?? 'Executive') . ' Committee')) ?>)
+            </span>
+          </p>
         </div>
         <?php endif; ?>
       </div>

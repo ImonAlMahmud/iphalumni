@@ -133,7 +133,6 @@ class ProfileController extends BaseController
                 'emergency_contact_phone' => trim((string)$request->input('emergency_contact_phone', '')),
                 'publications'        => trim((string)$request->input('publications', '')),
                 'awards_recognition'  => trim((string)$request->input('awards_recognition', '')),
-                'association_roles'   => trim((string)$request->input('association_roles', '')),
                 'updated_at'          => now(),
             ]);
 

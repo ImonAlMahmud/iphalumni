@@ -97,7 +97,16 @@ class DirectoryController extends BaseController
         $education  = $model->getEducation($id);
         $employment = $model->getEmployment($id);
 
-        return $this->legacyView('directory/profile', compact('alumni', 'education', 'employment'), 'main', (string)$alumni['name']);
+        $committeeMember = DB::table('committee_members as cm')
+            ->leftJoin('committees as c', 'c.id', '=', 'cm.committee_id')
+            ->where('cm.user_id', $alumni['user_id'])
+            ->where('cm.is_active', 1)
+            ->whereNull('cm.deleted_at')
+            ->select('cm.designation', 'cm.committee_type', 'c.name as committee_name')
+            ->orderBy('cm.sort_order', 'asc')
+            ->first();
+
+        return $this->legacyView('directory/profile', compact('alumni', 'education', 'employment', 'committeeMember'), 'main', (string)$alumni['name']);
     }
 
     public function sendContactRequest(Request $request, $id)

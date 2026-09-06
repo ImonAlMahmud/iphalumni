@@ -422,10 +422,6 @@ $actType = $profile['activity_type'] ?? 'work';
             <label class="form-label" for="awards_recognition">Awards & Achievements (অ্যাওয়ার্ড ও স্বীকৃতি)</label>
             <textarea id="awards_recognition" name="awards_recognition" rows="2" placeholder="List any notable awards, honors or achievements..." class="form-input"><?= e($profile['awards_recognition'] ?? '') ?></textarea>
           </div>
-          <div>
-            <label class="form-label" for="association_roles">IPH Association Roles (গঠনতন্ত্র বা কমিটিতে দায়িত্ব)</label>
-            <input id="association_roles" type="text" name="association_roles" value="<?= e($profile['association_roles'] ?? '') ?>" placeholder="e.g. Executive Member (2020-2022)" class="form-input">
-          </div>
         </div>
 
         <button type="submit" class="btn btn-gold text-white w-full md:w-auto px-8">Save Profile Info</button>
