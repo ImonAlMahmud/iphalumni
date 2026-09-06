@@ -138,26 +138,19 @@
     break-inside: avoid;
   }
 
-  /* Combined Seal & Signatories Area */
-  .authorization-area {
+  /* 1. Official Seal (আগে সিল আসবে) */
+  .seal-section {
     display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 20px;
-    margin-bottom: 12px;
+    justify-content: flex-end;
+    padding-right: 25px;
+    margin-bottom: 6px;
     page-break-inside: avoid;
     break-inside: avoid;
   }
 
-  .seal-col {
-    flex-shrink: 0;
-    display: flex;
-    align-items: flex-end;
-  }
-
   .official-seal-badge {
-    width: 105px;
-    height: 105px;
+    width: 90px;
+    height: 90px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -171,19 +164,25 @@
     object-fit: contain;
   }
 
-  .signatories-col {
+  /* 2. Signatures (তারপর সিগনেচার - পাশাপাশি একই লাইনে) */
+  .signatories-row {
     display: flex;
-    align-items: flex-end;
+    flex-direction: row;
+    flex-wrap: nowrap;
     justify-content: flex-end;
-    flex-wrap: wrap;
-    gap: 20px;
-    flex-grow: 1;
+    align-items: flex-end;
+    gap: 35px;
+    width: 100%;
+    margin-bottom: 12px;
+    page-break-inside: avoid;
+    break-inside: avoid;
   }
 
   .signatory-item {
-    min-width: 150px;
+    min-width: 140px;
     max-width: 190px;
     text-align: center;
+    flex-shrink: 0;
     page-break-inside: avoid;
     break-inside: avoid;
   }
@@ -266,7 +265,11 @@
       page-break-inside: avoid !important;
       break-inside: avoid !important;
     }
-    .authorization-area {
+    .seal-section {
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+    }
+    .signatories-row {
       page-break-inside: avoid !important;
       break-inside: avoid !important;
     }
@@ -320,34 +323,34 @@
 
   <!-- Bottom Fixed Zone: Always fixed at the footer of the page -->
   <div class="letterhead-bottom-zone">
-    <!-- Combined Authorization Area: Official Seal (Stamp) on left + Signatories on right -->
-    <div class="authorization-area">
-      <div class="seal-col">
-        <div class="official-seal-badge">
-          <img src="<?= asset('images/Stamp.png') ?>" alt="Official Seal">
-        </div>
+    <!-- 1. Official Seal (আগে সিল আসবে) -->
+    <div class="seal-section">
+      <div class="official-seal-badge">
+        <img src="<?= asset('images/Stamp.png') ?>" alt="Official Seal">
       </div>
-
-      <?php if (!empty($signatories)): ?>
-      <div class="signatories-col">
-        <?php foreach ($signatories as $sig): ?>
-        <div class="signatory-item">
-          <div class="sig-img-wrap">
-            <?php if (!empty($sig['signature_image'])): ?>
-            <img src="<?= asset('storage/signatures/' . e($sig['signature_image'])) ?>" alt="Signature">
-            <?php endif; ?>
-          </div>
-          <div class="sig-line">
-            <div class="sig-name"><?= e($sig['name']) ?></div>
-            <div class="sig-title"><?= e($sig['designation_title'] ?: $sig['default_designation'] ?: 'Committee Member') ?></div>
-            <div class="sig-org">IPH Alumni Association</div>
-          </div>
-        </div>
-        <?php endforeach; ?>
-      </div>
-      <?php endif; ?>
     </div>
 
+    <!-- 2. Signatures (তারপর সিগনেচার - পাশাপাশি একই লাইনে) -->
+    <?php if (!empty($signatories)): ?>
+    <div class="signatories-row">
+      <?php foreach ($signatories as $sig): ?>
+      <div class="signatory-item">
+        <div class="sig-img-wrap">
+          <?php if (!empty($sig['signature_image'])): ?>
+          <img src="<?= asset('storage/signatures/' . e($sig['signature_image'])) ?>" alt="Signature">
+          <?php endif; ?>
+        </div>
+        <div class="sig-line">
+          <div class="sig-name"><?= e($sig['name']) ?></div>
+          <div class="sig-title"><?= e($sig['designation_title'] ?: $sig['default_designation'] ?: 'Committee Member') ?></div>
+          <div class="sig-org">IPH Alumni Association</div>
+        </div>
+      </div>
+      <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
+
+    <!-- 3. Pad Footer Bar -->
     <div class="pad-footer">
       <span>📞 Phone: <?= e(!empty($siteSettings['site_phone']) ? $siteSettings['site_phone'] : ($siteSettings['contact_phone'] ?? '+880 1811-332204')) ?></span> | 
       <span>✉️ Email: <?= e(!empty($siteSettings['site_email']) ? $siteSettings['site_email'] : ($siteSettings['contact_email'] ?? 'info@iphalumni.org')) ?></span> | 
