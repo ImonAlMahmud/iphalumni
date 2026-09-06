@@ -17,10 +17,12 @@ if (!empty($lastEdu->degree)) {
 }
 $degree     = !empty($latestDegree) ? $latestDegree : (!empty($profile['degree']) ? $profile['degree'] : ($refData['department'] ?? 'Public Health Graduate'));
 $batch      = !empty($refData['batch']) ? $refData['batch'] : (!empty($refData['session']) ? $refData['session'] : (!empty($profile['batch_year']) ? $profile['batch_year'] : 'N/A'));
+// Variables definition
 $phone      = !empty($profile['phone']) ? $profile['phone'] : ($refData['mobile'] ?? 'N/A');
 $nidNumber  = !empty($profile['nid_number']) ? $profile['nid_number'] : 'N/A';
 $bloodGroup = !empty($profile['blood_group']) ? $profile['blood_group'] : 'N/A';
 $issueDate  = !empty($profile['created_at']) ? date('d M Y', strtotime($profile['created_at'])) : date('d M Y');
+$email      = !empty($profile['email']) ? $profile['email'] : ($refData['email'] ?? 'N/A');
 
 $verificationUrl = url('/directory/' . $profile['id']);
 $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=0&data=' . urlencode($verificationUrl);
@@ -161,7 +163,7 @@ $fullPresentLocation = !empty($presentParts) ? implode(', ', $presentParts) : 'M
 
         <div class="mt-1.5 pt-1 border-t border-white/5 flex items-center justify-between">
           <div class="font-mono text-[9px] font-bold text-amber-300 tracking-wider uppercase">
-            IPH Alumni Association Member Card
+            IPH Alumni Association Membership Card
           </div>
         </div>
       </div>
@@ -189,10 +191,9 @@ $fullPresentLocation = !empty($presentParts) ? implode(', ', $presentParts) : 'M
             <?= e($degree) ?>
           </div>
           
-          <div class="grid grid-cols-2 gap-x-2 gap-y-0.5 font-mono text-[9.5px] text-slate-300 pt-0.5">
+          <div class="grid grid-cols-2 gap-x-2 gap-y-1 font-mono text-[9.5px] text-slate-300 pt-1">
             <div><span class="text-slate-400">ID NO:</span> <span class="text-white font-bold"><?= e($memberNo) ?></span></div>
             <div><span class="text-slate-400">BATCH:</span> <span class="text-amber-300 font-bold"><?= e($batch) ?></span></div>
-            <div class="col-span-2 truncate"><span class="text-slate-400">EMAIL:</span> <?= e($profile['email']) ?></div>
             <div><span class="text-slate-400">BLOOD:</span> <span class="text-rose-400 font-bold"><?= e($bloodGroup) ?></span></div>
             <div><span class="text-slate-400">ISSUE:</span> <?= e($issueDate) ?></div>
           </div>
@@ -229,23 +230,29 @@ $fullPresentLocation = !empty($presentParts) ? implode(', ', $presentParts) : 'M
 
       <!-- Back Info Content -->
       <div class="space-y-2 my-auto text-[11px] text-slate-200">
-        <div class="grid grid-cols-2 gap-2 font-mono text-[10.5px]">
-          <div class="p-2 rounded-xl bg-white/5 border border-white/10">
-            <span class="text-slate-400 block text-[9px]">NID NUMBER</span>
-            <span class="font-bold text-white"><?= e($nidNumber) ?></span>
+        <div class="grid grid-cols-2 gap-2 font-mono text-[10px]">
+          <div class="p-1.5 px-2.5 rounded-xl bg-white/5 border border-white/10">
+            <span class="text-slate-400 block text-[8.5px]">NID NUMBER</span>
+            <span class="font-bold text-white truncate block"><?= e($nidNumber) ?></span>
           </div>
-          <div class="p-2 rounded-xl bg-white/5 border border-white/10">
-            <span class="text-slate-400 block text-[9px]">PHONE NUMBER</span>
-            <span class="font-bold text-white"><?= e($phone) ?></span>
+          <div class="p-1.5 px-2.5 rounded-xl bg-white/5 border border-white/10">
+            <span class="text-slate-400 block text-[8.5px]">PHONE NUMBER</span>
+            <span class="font-bold text-white truncate block"><?= e($phone) ?></span>
           </div>
         </div>
 
-        <div class="p-2.5 rounded-xl bg-white/5 border border-white/10 space-y-1">
-          <span class="text-slate-400 block font-mono text-[9px]">PRESENT ADDRESS</span>
-          <div class="text-[11px] text-white leading-tight font-medium"><?= e($fullPresentLocation) ?></div>
+        <div class="p-2 px-2.5 rounded-xl bg-white/5 border border-white/10 space-y-1">
+          <div class="flex items-center justify-between gap-2 pb-1 border-b border-white/5">
+            <span class="text-slate-400 shrink-0 font-mono text-[8.5px]">EMAIL ADDRESS</span>
+            <span class="font-mono text-[10px] font-semibold text-white truncate text-right"><?= e($email) ?></span>
+          </div>
+          <div class="pt-0.5">
+            <span class="text-slate-400 block font-mono text-[8.5px]">PRESENT ADDRESS</span>
+            <div class="text-[10px] text-white leading-tight font-medium line-clamp-2"><?= e($fullPresentLocation) ?></div>
+          </div>
         </div>
 
-        <div class="text-[9.5px] text-slate-400 italic pt-1 leading-snug">
+        <div class="text-[9px] text-slate-400 italic pt-0.5 leading-snug">
           * This card is official property of IPH Alumni Association. If found, please return to IPH Campus, Mohakhali, Dhaka-1212.
         </div>
       </div>

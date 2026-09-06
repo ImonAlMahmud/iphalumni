@@ -106,7 +106,19 @@ class DirectoryController extends BaseController
             ->orderBy('cm.sort_order', 'asc')
             ->first();
 
-        return $this->legacyView('directory/profile', compact('alumni', 'education', 'employment', 'committeeMember'), 'main', (string)$alumni['name']);
+        $membership = DB::table('memberships as m')
+            ->leftJoin('membership_types as mt', 'mt.id', '=', 'm.membership_type_id')
+            ->select('m.*', 'mt.name as type_name')
+            ->where('m.alumni_profile_id', $id)
+            ->whereNull('m.deleted_at')
+            ->orderByRaw("CASE WHEN m.status = 'active' THEN 1 WHEN m.status = 'approved' THEN 2 ELSE 3 END")
+            ->orderByDesc('m.created_at')
+            ->first();
+
+        $hasMembership = !empty($membership) && in_array(strtolower($membership->status ?? ''), ['active', 'approved', 'paid']);
+        $membership = $membership ? (array)$membership : null;
+
+        return $this->legacyView('directory/profile', compact('alumni', 'education', 'employment', 'committeeMember', 'membership', 'hasMembership'), 'main', (string)$alumni['name']);
     }
 
     public function sendContactRequest(Request $request, $id)
