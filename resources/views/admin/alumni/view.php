@@ -10,25 +10,25 @@
   </a>
 
   <div class="flex items-center gap-2 flex-wrap">
-    <a href="<?= url('/admin/alumni/' . $alumni['id'] . '/edit') ?>" class="px-3.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[12.5px] border border-amber-500/40 font-bold flex items-center gap-1.5 transition-colors shadow-sm" title="Edit this member's profile information">
+    <a href="<?= url('/admin/alumni/' . $alumni['id'] . '/edit') ?>" class="px-3.5 py-1.5 rounded-xl bg-[#800020] hover:bg-[#990026] text-white text-[12.5px] border border-[#A22638] font-bold flex items-center gap-1.5 transition-colors shadow-sm" title="Edit this member's profile information">
       <i class="fa-solid fa-user-pen text-[11px]"></i> Edit Profile
     </a>
-    <a href="<?= url('/admin/alumni/' . $alumni['id'] . '/id-card') ?>" target="_blank" class="px-3 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 text-[12px] border border-sky-500/30 font-semibold flex items-center gap-1.5 transition-colors" title="View Member Alumni ID Card (Front & Back)">
-      <i class="fa-solid fa-id-card text-[11px]"></i> Member ID Card
+    <a href="<?= url('/admin/alumni/' . $alumni['id'] . '/id-card') ?>" target="_blank" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-[12px] border border-white/10 font-medium flex items-center gap-1.5 transition-colors" title="View Member Alumni ID Card (Front & Back)">
+      <i class="fa-solid fa-id-card text-[11px] text-[#E58E97]"></i> Member ID Card
     </a>
-    <a href="<?= url('/admin/alumni/' . $alumni['id'] . '/membership-card') ?>" target="_blank" class="px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-[12px] border border-emerald-500/30 font-semibold flex items-center gap-1.5 transition-colors" title="View Digital Membership Card & QR Smart Pass">
-      <i class="fa-solid fa-qrcode text-[11px]"></i> Membership Card
+    <a href="<?= url('/admin/alumni/' . $alumni['id'] . '/membership-card') ?>" target="_blank" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-[12px] border border-white/10 font-medium flex items-center gap-1.5 transition-colors" title="View Digital Membership Card & QR Smart Pass">
+      <i class="fa-solid fa-qrcode text-[11px] text-[#E58E97]"></i> Membership Card
     </a>
-    <a href="<?= url('/admin/alumni/' . $alumni['id'] . '/card-svg/zip') ?>" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white text-[12px] border border-white/10 font-medium flex items-center gap-1.5 transition-colors" title="Download Print Card in SVG format (Both Sides)">
-      <i class="fa-solid fa-download text-[11px]"></i> Card SVG
+    <a href="<?= url('/admin/alumni/' . $alumni['id'] . '/card-svg/zip') ?>" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-[12px] border border-white/10 font-medium flex items-center gap-1.5 transition-colors" title="Download Print Card in SVG format (Both Sides)">
+      <i class="fa-solid fa-download text-[11px] text-[#E58E97]"></i> Card SVG
     </a>
     <?php if (!empty($alumni['phone'])): ?>
-    <a href="tel:<?= e($alumni['phone']) ?>" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-white text-[12px] border border-white/10 font-semibold flex items-center gap-1.5 transition-colors">
-      <i class="fa-solid fa-phone text-[11px] mr-1"></i> Call
+    <a href="tel:<?= e($alumni['phone']) ?>" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-[12px] border border-white/10 font-medium flex items-center gap-1.5 transition-colors">
+      <i class="fa-solid fa-phone text-[11px] mr-1 text-[#E58E97]"></i> Call
     </a>
     <?php endif; ?>
-    <a href="mailto:<?= e($alumni['email']) ?>" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-white text-[12px] border border-white/10 font-semibold flex items-center gap-1.5 transition-colors">
-      <i class="fa-solid fa-envelope text-[11px] mr-1"></i> Email
+    <a href="mailto:<?= e($alumni['email']) ?>" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-[12px] border border-white/10 font-medium flex items-center gap-1.5 transition-colors">
+      <i class="fa-solid fa-envelope text-[11px] mr-1 text-[#E58E97]"></i> Email
     </a>
   </div>
 </div>
@@ -133,18 +133,18 @@
       <?php if (!empty($alumni['website']) || !empty($alumni['linkedin_url']) || !empty($alumni['facebook_url'])): ?>
       <div class="pt-3 border-t border-white/5 flex flex-wrap gap-3">
         <?php if (!empty($alumni['website'])): ?>
-        <a href="<?= e($alumni['website']) ?>" target="_blank" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-blue-300 text-[12px] flex items-center gap-1.5">
-          <i class="fa-solid fa-globe mr-1"></i> Website
+        <a href="<?= e($alumni['website']) ?>" target="_blank" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/90 border border-white/10 text-[12px] flex items-center gap-1.5 transition-colors">
+          <i class="fa-solid fa-globe text-[#E58E97]"></i> Website
         </a>
         <?php endif; ?>
         <?php if (!empty($alumni['linkedin_url'])): ?>
-        <a href="<?= e($alumni['linkedin_url']) ?>" target="_blank" class="px-3 py-1.5 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 text-[12px] flex items-center gap-1.5 border border-blue-500/20">
-          <i class="fa-brands fa-linkedin mr-1"></i> LinkedIn Profile
+        <a href="<?= e($alumni['linkedin_url']) ?>" target="_blank" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/90 border border-white/10 text-[12px] flex items-center gap-1.5 transition-colors">
+          <i class="fa-brands fa-linkedin text-[#E58E97]"></i> LinkedIn Profile
         </a>
         <?php endif; ?>
         <?php if (!empty($alumni['facebook_url'])): ?>
-        <a href="<?= e($alumni['facebook_url']) ?>" target="_blank" class="px-3 py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 text-[12px] flex items-center gap-1.5 border border-indigo-500/20">
-          <i class="fa-brands fa-facebook mr-1"></i> Facebook Profile
+        <a href="<?= e($alumni['facebook_url']) ?>" target="_blank" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/90 border border-white/10 text-[12px] flex items-center gap-1.5 transition-colors">
+          <i class="fa-brands fa-facebook text-[#E58E97]"></i> Facebook Profile
         </a>
         <?php endif; ?>
       </div>

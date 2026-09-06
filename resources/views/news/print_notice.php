@@ -350,7 +350,7 @@
     </div>
 
     <div class="meta-bar">
-      <div><strong>স্মারক নং / Ref:</strong> IPH-AA/NOT/<?= date('Y') ?>/<?= sprintf('%04d', $n['id']) ?></div>
+      <div><strong>স্মারক নং / Ref:</strong> <?= e($refNo ?? ('IPH-AA/NOT/' . date('Y', strtotime($n['published_at'] ?? $n['created_at'])) . '/' . sprintf('%04d', $n['id']))) ?></div>
       <div><strong>তারিখ / Date:</strong> <?= date('d F Y', strtotime($n['published_at'] ?? $n['created_at'])) ?></div>
     </div>
 

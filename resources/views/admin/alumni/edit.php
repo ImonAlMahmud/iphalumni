@@ -28,11 +28,11 @@
     </div>
 
     <div class="flex items-center gap-2">
-      <a href="<?= url('/admin/alumni/' . $alumni['id'] . '/id-card') ?>" target="_blank" class="px-3.5 py-2 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/30 text-[12.5px] font-semibold transition-all flex items-center gap-1.5">
-        <i class="fa-solid fa-id-card text-[11px]"></i> ID Card
+      <a href="<?= url('/admin/alumni/' . $alumni['id'] . '/id-card') ?>" target="_blank" class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/10 text-[12.5px] font-medium transition-all flex items-center gap-1.5">
+        <i class="fa-solid fa-id-card text-[11px] text-[#E58E97]"></i> ID Card
       </a>
-      <a href="<?= url('/admin/alumni/' . $alumni['id'] . '/membership-card') ?>" target="_blank" class="px-3.5 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-[12.5px] font-semibold transition-all flex items-center gap-1.5">
-        <i class="fa-solid fa-qrcode text-[11px]"></i> Membership Pass
+      <a href="<?= url('/admin/alumni/' . $alumni['id'] . '/membership-card') ?>" target="_blank" class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/10 text-[12.5px] font-medium transition-all flex items-center gap-1.5">
+        <i class="fa-solid fa-qrcode text-[11px] text-[#E58E97]"></i> Membership Pass
       </a>
       <a href="<?= url('/admin/alumni/' . $alumni['id']) ?>" class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-[12.5px] font-medium transition-all flex items-center gap-1.5">
         View Profile
@@ -150,23 +150,23 @@
     <!-- Section 2: Personal & Identity Details -->
     <div class="p-6 rounded-3xl bg-white/5 border border-white/10 shadow-xl space-y-4">
       <h3 class="text-[16px] font-bold text-white flex items-center gap-2 pb-3 border-b border-white/10">
-        <i class="fa-solid fa-address-card text-emerald-400"></i> ২. ব্যক্তিগত ও নাগরিক তথ্য (Personal & Identity)
+        <i class="fa-solid fa-address-card text-[#E58E97]"></i> ২. ব্যক্তিগত ও নাগরিক তথ্য (Personal & Identity)
       </h3>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-[13px]">
         <div>
           <label class="block text-[11px] font-mono text-white/60 mb-1">NID নম্বর (National ID)</label>
-          <input type="text" name="nid_number" value="<?= e($alumni['nid_number'] ?? '') ?>" placeholder="জাতীয় পরিচয়পত্র নম্বর" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-emerald-400">
+          <input type="text" name="nid_number" value="<?= e($alumni['nid_number'] ?? '') ?>" placeholder="জাতীয় পরিচয়পত্র নম্বর" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-[#E58E97]">
         </div>
 
         <div>
           <label class="block text-[11px] font-mono text-white/60 mb-1">জন্ম তারিখ (Date of Birth)</label>
-          <input type="date" name="dob" value="<?= !empty($alumni['dob']) ? date('Y-m-d', strtotime($alumni['dob'])) : '' ?>" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-emerald-400">
+          <input type="date" name="dob" value="<?= !empty($alumni['dob']) ? date('Y-m-d', strtotime($alumni['dob'])) : '' ?>" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-[#E58E97]">
         </div>
 
         <div>
           <label class="block text-[11px] font-mono text-white/60 mb-1">লিঙ্গ (Gender)</label>
-          <select name="gender" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-emerald-400">
+          <select name="gender" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-[#E58E97]">
             <option value="">-- নির্বাচন করুন --</option>
             <option value="male" <?= strtolower($alumni['gender'] ?? '') === 'male' ? 'selected' : '' ?>>Male (পুরুষ)</option>
             <option value="female" <?= strtolower($alumni['gender'] ?? '') === 'female' ? 'selected' : '' ?>>Female (মহিলা)</option>
@@ -176,7 +176,7 @@
 
         <div>
           <label class="block text-[11px] font-mono text-white/60 mb-1">রক্তের গ্রুপ (Blood Group)</label>
-          <select name="blood_group" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-emerald-400">
+          <select name="blood_group" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-[#E58E97]">
             <option value="">-- নির্বাচন করুন --</option>
             <?php foreach (['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'] as $bg): ?>
             <option value="<?= $bg ?>" <?= ($alumni['blood_group'] ?? '') === $bg ? 'selected' : '' ?>><?= $bg ?></option>
@@ -189,43 +189,43 @@
     <!-- Section 3: Academic Records -->
     <div class="p-6 rounded-3xl bg-white/5 border border-white/10 shadow-xl space-y-4">
       <h3 class="text-[16px] font-bold text-white flex items-center gap-2 pb-3 border-b border-white/10">
-        <i class="fa-solid fa-graduation-cap text-sky-400"></i> ৩. শিক্ষাগত ও ইনস্টিটিউট তথ্য (Academic Info)
+        <i class="fa-solid fa-graduation-cap text-[#E58E97]"></i> ৩. শিক্ষাগত ও ইনস্টিটিউট তথ্য (Academic Info)
       </h3>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-[13px]">
         <div>
           <label class="block text-[11px] font-mono text-white/60 mb-1">ব্যাচ বছর (Batch Year)</label>
-          <input type="text" name="batch_year" value="<?= e($alumni['batch_year'] ?? '') ?>" placeholder="যেমন: 2018 বা Batch-01" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-sky-400">
+          <input type="text" name="batch_year" value="<?= e($alumni['batch_year'] ?? '') ?>" placeholder="যেমন: 2018 বা Batch-01" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-[#E58E97]">
         </div>
 
         <div>
           <label class="block text-[11px] font-mono text-white/60 mb-1">স্টুডেন্ট / রেজিঃ নম্বর (Student / DU Reg ID)</label>
-          <input type="text" name="student_id" value="<?= e($alumni['student_id'] ?? '') ?>" placeholder="যেমন: 2018-001" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-sky-400">
+          <input type="text" name="student_id" value="<?= e($alumni['student_id'] ?? '') ?>" placeholder="যেমন: 2018-001" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-[#E58E97]">
         </div>
 
         <div>
           <label class="block text-[11px] font-mono text-white/60 mb-1">সেশন (Session Years)</label>
-          <input type="text" name="session_years" value="<?= e($alumni['session_years'] ?? '') ?>" placeholder="যেমন: 2017-2018" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-sky-400">
+          <input type="text" name="session_years" value="<?= e($alumni['session_years'] ?? '') ?>" placeholder="যেমন: 2017-2018" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-[#E58E97]">
         </div>
 
         <div>
           <label class="block text-[11px] font-mono text-white/60 mb-1">ডিগ্রী / কোর্স (Degree / Course)</label>
-          <input type="text" name="degree" value="<?= e($primaryEdu['degree'] ?? '') ?>" placeholder="যেমন: Master of Public Health (MPH)" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-sky-400">
+          <input type="text" name="degree" value="<?= e($primaryEdu['degree'] ?? '') ?>" placeholder="যেমন: Master of Public Health (MPH)" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-[#E58E97]">
         </div>
 
         <div>
           <label class="block text-[11px] font-mono text-white/60 mb-1">বিষয় / বিভাগ (Field of Study)</label>
-          <input type="text" name="field_of_study" value="<?= e($primaryEdu['field_of_study'] ?? '') ?>" placeholder="যেমন: Epidemiology / Community Medicine" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-sky-400">
+          <input type="text" name="field_of_study" value="<?= e($primaryEdu['field_of_study'] ?? '') ?>" placeholder="যেমন: Epidemiology / Community Medicine" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-[#E58E97]">
         </div>
 
         <div>
           <label class="block text-[11px] font-mono text-white/60 mb-1">পাস করার বছর (Graduation Year)</label>
-          <input type="text" name="graduation_year" value="<?= e($primaryEdu['graduation_year'] ?? '') ?>" placeholder="যেমন: 2020" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-sky-400">
+          <input type="text" name="graduation_year" value="<?= e($primaryEdu['graduation_year'] ?? '') ?>" placeholder="যেমন: 2020" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-[#E58E97]">
         </div>
 
         <div class="sm:col-span-2 lg:col-span-3">
           <label class="block text-[11px] font-mono text-white/60 mb-1">প্রতিষ্ঠান / বিশ্ববিদ্যালয় (Institution / University)</label>
-          <input type="text" name="institution" value="<?= e($primaryEdu['institution'] ?? 'Institute of Public Health (IPH)') ?>" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-sky-400">
+          <input type="text" name="institution" value="<?= e($primaryEdu['institution'] ?? 'Institute of Public Health (IPH)') ?>" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-[#E58E97]">
         </div>
       </div>
     </div>
@@ -233,28 +233,28 @@
     <!-- Section 4: Professional & Employment Details -->
     <div class="p-6 rounded-3xl bg-white/5 border border-white/10 shadow-xl space-y-4">
       <h3 class="text-[16px] font-bold text-white flex items-center gap-2 pb-3 border-b border-white/10">
-        <i class="fa-solid fa-briefcase text-purple-400"></i> ৪. পেশাগত ও কর্মসংস্থান তথ্য (Professional & Career)
+        <i class="fa-solid fa-briefcase text-[#E58E97]"></i> ৪. পেশাগত ও কর্মসংস্থান তথ্য (Professional & Career)
       </h3>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-[13px]">
         <div>
           <label class="block text-[11px] font-mono text-white/60 mb-1">বর্তমান প্রতিষ্ঠান (Organization / Hospital / Workplace)</label>
-          <input type="text" name="organization" value="<?= e($currentEmp['organization'] ?? '') ?>" placeholder="কর্মস্থলের নাম" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-purple-400">
+          <input type="text" name="organization" value="<?= e($currentEmp['organization'] ?? '') ?>" placeholder="কর্মস্থলের নাম" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-[#E58E97]">
         </div>
 
         <div>
           <label class="block text-[11px] font-mono text-white/60 mb-1">পদবী (Job Title / Designation)</label>
-          <input type="text" name="designation" value="<?= e($currentEmp['job_title'] ?? ($currentEmp['designation'] ?? '')) ?>" placeholder="যেমন: Medical Officer / Consultant" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-purple-400">
+          <input type="text" name="designation" value="<?= e($currentEmp['job_title'] ?? ($currentEmp['designation'] ?? '')) ?>" placeholder="যেমন: Medical Officer / Consultant" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-[#E58E97]">
         </div>
 
         <div>
           <label class="block text-[11px] font-mono text-white/60 mb-1">বিভাগ / ইউনিট (Department / Unit)</label>
-          <input type="text" name="department" value="<?= e($currentEmp['department'] ?? '') ?>" placeholder="যেমন: Dept of Health Services" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-purple-400">
+          <input type="text" name="department" value="<?= e($currentEmp['department'] ?? '') ?>" placeholder="যেমন: Dept of Health Services" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-[#E58E97]">
         </div>
 
         <div>
           <label class="block text-[11px] font-mono text-white/60 mb-1">বর্তমান কার্যধারা (Activity Type)</label>
-          <select name="activity_type" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-purple-400">
+          <select name="activity_type" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-[#E58E97]">
             <option value="work" <?= ($alumni['activity_type'] ?? '') === 'work' ? 'selected' : '' ?>>Job / Employment (চাকরি)</option>
             <option value="study" <?= ($alumni['activity_type'] ?? '') === 'study' ? 'selected' : '' ?>>Higher Studies (উচ্চশিক্ষা)</option>
             <option value="research" <?= ($alumni['activity_type'] ?? '') === 'research' ? 'selected' : '' ?>>Research (গবেষণা)</option>
@@ -265,12 +265,12 @@
 
         <div>
           <label class="block text-[11px] font-mono text-white/60 mb-1">অভিজ্ঞতা (Years of Experience)</label>
-          <input type="text" name="experience_years" value="<?= e($alumni['experience_years'] ?? '') ?>" placeholder="যেমন: 5 Years" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-purple-400">
+          <input type="text" name="experience_years" value="<?= e($alumni['experience_years'] ?? '') ?>" placeholder="যেমন: 5 Years" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-[#E58E97]">
         </div>
 
         <div>
           <label class="block text-[11px] font-mono text-white/60 mb-1">স্পেশালাইজেশন (Specialization)</label>
-          <input type="text" name="specialization" value="<?= e($alumni['specialization'] ?? '') ?>" placeholder="যেমন: Public Health, Cardiology..." class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-purple-400">
+          <input type="text" name="specialization" value="<?= e($alumni['specialization'] ?? '') ?>" placeholder="যেমন: Public Health, Cardiology..." class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-[#E58E97]">
         </div>
       </div>
     </div>
@@ -278,13 +278,13 @@
     <!-- Section 5: Location & Address -->
     <div class="p-6 rounded-3xl bg-white/5 border border-white/10 shadow-xl space-y-4">
       <h3 class="text-[16px] font-bold text-white flex items-center gap-2 pb-3 border-b border-white/10">
-        <i class="fa-solid fa-location-dot text-rose-400"></i> ৫. বর্তমান ও স্থায়ী ঠিকানা (Location & Address)
+        <i class="fa-solid fa-location-dot text-[#E58E97]"></i> ৫. বর্তমান ও স্থায়ী ঠিকানা (Location & Address)
       </h3>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-[13px]">
         <div>
           <label class="block text-[11px] font-mono text-white/60 mb-1">অবস্থানের ধরন (Location Type)</label>
-          <select name="location_type" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-rose-400">
+          <select name="location_type" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-[#E58E97]">
             <option value="bangladesh" <?= ($alumni['location_type'] ?? 'bangladesh') === 'bangladesh' ? 'selected' : '' ?>>Bangladesh (বাংলাদেশ)</option>
             <option value="abroad" <?= ($alumni['location_type'] ?? '') === 'abroad' ? 'selected' : '' ?>>Abroad (প্রবাসী / প্রবাসী সদস্য)</option>
           </select>
@@ -292,27 +292,27 @@
 
         <div>
           <label class="block text-[11px] font-mono text-white/60 mb-1">বর্তমান শহর / জেলা (Current Location)</label>
-          <input type="text" name="current_location" value="<?= e($alumni['current_location'] ?? '') ?>" placeholder="যেমন: Dhaka" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-rose-400">
+          <input type="text" name="current_location" value="<?= e($alumni['current_location'] ?? '') ?>" placeholder="যেমন: Dhaka" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-[#E58E97]">
         </div>
 
         <div>
           <label class="block text-[11px] font-mono text-white/60 mb-1">থানা / উপজেলা (Thana / Upazila)</label>
-          <input type="text" name="thana_upazila" value="<?= e($alumni['thana_upazila'] ?? '') ?>" placeholder="যেমন: Dhanmondi" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-rose-400">
+          <input type="text" name="thana_upazila" value="<?= e($alumni['thana_upazila'] ?? '') ?>" placeholder="যেমন: Dhanmondi" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-[#E58E97]">
         </div>
 
         <div>
           <label class="block text-[11px] font-mono text-white/60 mb-1">দেশ (Country)</label>
-          <input type="text" name="country" value="<?= e($alumni['country'] ?? 'Bangladesh') ?>" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-rose-400">
+          <input type="text" name="country" value="<?= e($alumni['country'] ?? 'Bangladesh') ?>" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-[#E58E97]">
         </div>
 
         <div>
           <label class="block text-[11px] font-mono text-white/60 mb-1">স্থায়ী জেলা (Permanent District)</label>
-          <input type="text" name="permanent_district" value="<?= e($alumni['permanent_district'] ?? '') ?>" placeholder="স্থায়ী জেলা" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-rose-400">
+          <input type="text" name="permanent_district" value="<?= e($alumni['permanent_district'] ?? '') ?>" placeholder="স্থায়ী জেলা" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-[#E58E97]">
         </div>
 
         <div>
           <label class="block text-[11px] font-mono text-white/60 mb-1">স্থায়ী ঠিকানা (Permanent Address)</label>
-          <input type="text" name="permanent_location" value="<?= e($alumni['permanent_location'] ?? '') ?>" placeholder="গ্রাম/রোড/এলাকা" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-rose-400">
+          <input type="text" name="permanent_location" value="<?= e($alumni['permanent_location'] ?? '') ?>" placeholder="গ্রাম/রোড/এলাকা" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-[#E58E97]">
         </div>
       </div>
     </div>
@@ -320,7 +320,7 @@
     <!-- Section 6: Bio & Social Profile Links -->
     <div class="p-6 rounded-3xl bg-white/5 border border-white/10 shadow-xl space-y-4">
       <h3 class="text-[16px] font-bold text-white flex items-center gap-2 pb-3 border-b border-white/10">
-        <i class="fa-solid fa-share-nodes text-indigo-400"></i> ৬. বায়ো ও সোশ্যাল লিংক (Bio & Web Links)
+        <i class="fa-solid fa-share-nodes text-[#E58E97]"></i> ৬. বায়ো ও সোশ্যাল লিংক (Bio & Web Links)
       </h3>
 
       <div class="space-y-4 text-[13px]">
@@ -331,18 +331,18 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <div>
-            <label class="block text-[11px] font-mono text-white/60 mb-1"><i class="fa-brands fa-linkedin text-sky-400 mr-1"></i> LinkedIn Profile URL</label>
-            <input type="url" name="linkedin_url" value="<?= e($alumni['linkedin_url'] ?? '') ?>" placeholder="https://linkedin.com/in/..." class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-indigo-400">
+            <label class="block text-[11px] font-mono text-white/60 mb-1"><i class="fa-brands fa-linkedin text-[#E58E97] mr-1"></i> LinkedIn Profile URL</label>
+            <input type="url" name="linkedin_url" value="<?= e($alumni['linkedin_url'] ?? '') ?>" placeholder="https://linkedin.com/in/..." class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-[#E58E97]">
           </div>
 
           <div>
-            <label class="block text-[11px] font-mono text-white/60 mb-1"><i class="fa-brands fa-facebook text-blue-400 mr-1"></i> Facebook Profile URL</label>
-            <input type="url" name="facebook_url" value="<?= e($alumni['facebook_url'] ?? '') ?>" placeholder="https://facebook.com/..." class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-indigo-400">
+            <label class="block text-[11px] font-mono text-white/60 mb-1"><i class="fa-brands fa-facebook text-[#E58E97] mr-1"></i> Facebook Profile URL</label>
+            <input type="url" name="facebook_url" value="<?= e($alumni['facebook_url'] ?? '') ?>" placeholder="https://facebook.com/..." class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-[#E58E97]">
           </div>
 
           <div>
-            <label class="block text-[11px] font-mono text-white/60 mb-1"><i class="fa-solid fa-globe text-emerald-400 mr-1"></i> Personal Website</label>
-            <input type="url" name="website" value="<?= e($alumni['website'] ?? '') ?>" placeholder="https://..." class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-indigo-400">
+            <label class="block text-[11px] font-mono text-white/60 mb-1"><i class="fa-solid fa-globe text-[#E58E97] mr-1"></i> Personal Website</label>
+            <input type="url" name="website" value="<?= e($alumni['website'] ?? '') ?>" placeholder="https://..." class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-[#E58E97]">
           </div>
         </div>
       </div>

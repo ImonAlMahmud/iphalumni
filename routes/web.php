@@ -56,10 +56,15 @@ Route::post('/directory/{id}/request-contact', [DirectoryController::class, 'sen
 Route::get('/stories', [StoriesController::class, 'index'])->name('stories');
 Route::get('/stories/{slug}', [StoriesController::class, 'show'])->name('stories.show');
 
-// News
+// News & Official Notices
 Route::get('/news', [NewsController::class, 'index'])->name('news');
 Route::get('/news/{id}/pdf', [NewsController::class, 'printPdf'])->name('news.pdf');
 Route::get('/news/{slug}', [NewsController::class, 'show'])->name('news.show');
+
+// Official Notice Verification & REF No Resolvers
+Route::get('/notice/{ref}', [NewsController::class, 'showByRef'])->where('ref', '.*')->name('notice.ref');
+Route::get('/notice', [NewsController::class, 'showByRef'])->name('notice.index');
+Route::get('/verify/notice', [NewsController::class, 'showByRef'])->name('notice.verify');
 
 // Events
 Route::get('/events', [EventController::class, 'index'])->name('events');

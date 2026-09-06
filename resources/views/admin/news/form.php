@@ -28,10 +28,10 @@ $action = $news ? url('/admin/news/' . $news['id']) : url('/admin/news');
         <label class="block text-[13px] font-medium text-white/70 mb-1.5" for="category">Category (প্রকার) <span class="text-red-400">*</span></label>
         <select id="category" name="category" required class="w-full px-4 py-2.5 rounded-xl text-[14px] text-white focus:outline-none bg-[#101820]"
                 style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);">
-          <option value="news" <?= ($news['category'] ?? 'news') === 'news' ? 'selected' : '' ?>>📰 General News & Articles (সাধারণ খবর)</option>
-          <option value="press_release" <?= ($news['category'] ?? '') === 'press_release' ? 'selected' : '' ?>>📣 Press Release (প্রেস বিজ্ঞপ্তি)</option>
-          <option value="notice" <?= ($news['category'] ?? '') === 'notice' ? 'selected' : '' ?>>📌 Official Notice (অফিসিয়াল নোটিশ)</option>
-          <option value="resolution" <?= ($news['category'] ?? '') === 'resolution' ? 'selected' : '' ?>>📜 Meeting Resolution (মিটিং রেজুলেশন)</option>
+          <option value="news" <?= ($news['category'] ?? 'news') === 'news' ? 'selected' : '' ?>>General News & Articles (সাধারণ খবর)</option>
+          <option value="press_release" <?= ($news['category'] ?? '') === 'press_release' ? 'selected' : '' ?>>Press Release (প্রেস বিজ্ঞপ্তি)</option>
+          <option value="notice" <?= ($news['category'] ?? '') === 'notice' ? 'selected' : '' ?>>Official Notice (অফিসিয়াল নোটিশ)</option>
+          <option value="resolution" <?= ($news['category'] ?? '') === 'resolution' ? 'selected' : '' ?>>Meeting Resolution (মিটিং রেজুলেশন)</option>
         </select>
       </div>
     </div>
@@ -83,8 +83,8 @@ $action = $news ? url('/admin/news/' . $news['id']) : url('/admin/news');
     ?>
     <div class="p-6 rounded-2xl border border-white/10 space-y-4" style="background:rgba(255,255,255,0.02);">
       <div>
-        <h4 class="text-[14px] font-bold text-emerald-400 flex items-center gap-2">
-          ✍️ Notice Signatories / অনুমোদনকারী কমিটি মেম্বারবৃন্দ (সর্বোচ্চ ৪ জন)
+        <h4 class="text-[14px] font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-file-signature text-[#E58E97]"></i> Notice Signatories / অনুমোদনকারী কমিটি মেম্বারবৃন্দ (সর্বোচ্চ ৪ জন)
         </h4>
         <p class="text-[12px] text-white/50 mt-0.5">
           অফিসিয়াল নোটিশ বা রেজুলেশনের নিচে যে কমিটি মেম্বারদের স্বাক্ষর, নাম ও পদবী যুক্ত থাকবে তা নির্বাচন করুন।
@@ -97,7 +97,7 @@ $action = $news ? url('/admin/news/' . $news['id']) : url('/admin/news');
           $selectedTitle = $existingSignatories[$i]['designation_title'] ?? '';
         ?>
         <div class="p-4 rounded-xl border border-white/10 space-y-2.5" style="background:rgba(0,0,0,0.3);">
-          <div class="text-[12px] font-mono text-amber-300 font-bold">Signatory #<?= $i + 1 ?></div>
+          <div class="text-[12px] font-mono text-[#E58E97] font-bold">Signatory #<?= $i + 1 ?></div>
           
           <div>
             <label class="block text-[11.5px] text-white/60 mb-1">Select Member</label>
@@ -105,7 +105,7 @@ $action = $news ? url('/admin/news/' . $news['id']) : url('/admin/news');
               <option value="">-- None (কোনো স্বাক্ষরকারী নেই) --</option>
               <?php foreach ($committeeMembers as $cm): ?>
               <option value="<?= $cm['user_id'] ?>" <?= (int)$selectedUid === (int)$cm['user_id'] ? 'selected' : '' ?>>
-                <?= e($cm['name']) ?> (<?= e($cm['designation']) ?>) <?= empty($cm['signature_image']) ? '⚠️ No Sign Uploaded' : '✓ Sign Ready' ?>
+                <?= e($cm['name']) ?> (<?= e($cm['designation']) ?>) <?= empty($cm['signature_image']) ? '[No Sign Uploaded]' : '[Sign Ready]' ?>
               </option>
               <?php endforeach; ?>
             </select>

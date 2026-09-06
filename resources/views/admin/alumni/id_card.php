@@ -268,7 +268,7 @@ $fullPresentLocation = !empty($presentParts) ? implode(', ', $presentParts) : 'M
   <!-- Bottom Action Bar -->
   <div class="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/10 no-print">
     <a href="<?= url('/admin/alumni/' . $profile['id']) ?>" class="text-[13px] text-white/60 hover:text-white flex items-center gap-1.5 transition-colors">
-      ← Return to Alumni Profile
+      <i class="fa-solid fa-arrow-left text-[11px]"></i> Return to Alumni Profile
     </a>
     <a href="<?= url('/admin/alumni/' . $profile['id'] . '/edit') ?>" class="text-[13px] text-amber-300 hover:underline flex items-center gap-1.5 font-medium">
       <i class="fa-solid fa-user-pen"></i> Edit Member Info

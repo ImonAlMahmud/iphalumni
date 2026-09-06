@@ -31,11 +31,11 @@
       <a href="<?= url('/admin/membership') ?>" class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-[12.5px] font-medium transition-all flex items-center gap-1.5">
         <i class="fa-solid fa-sliders text-[11px]"></i> Plans & Pricing
       </a>
-      <a href="<?= url('/admin/membership/logs/export/csv?' . http_build_query($_GET)) ?>" class="px-3.5 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-[12.5px] font-semibold transition-all shadow-sm flex items-center gap-1.5" title="Export filtered records to CSV / Excel">
-        <i class="fa-solid fa-file-csv text-[13px]"></i> Export CSV
+      <a href="<?= url('/admin/membership/logs/export/csv?' . http_build_query($_GET)) ?>" class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/10 text-[12.5px] font-medium transition-all shadow-sm flex items-center gap-1.5" title="Export filtered records to CSV / Excel">
+        <i class="fa-solid fa-file-csv text-[13px] text-[#E58E97]"></i> Export CSV
       </a>
-      <a href="<?= url('/admin/membership/logs/export/pdf?' . http_build_query($_GET)) ?>" target="_blank" class="px-3.5 py-2 rounded-xl bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-[12.5px] font-semibold transition-all shadow-sm flex items-center gap-1.5" title="Printable report / Save as PDF">
-        <i class="fa-solid fa-file-pdf text-[13px]"></i> Export PDF
+      <a href="<?= url('/admin/membership/logs/export/pdf?' . http_build_query($_GET)) ?>" target="_blank" class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/10 text-[12.5px] font-medium transition-all shadow-sm flex items-center gap-1.5" title="Printable report / Save as PDF">
+        <i class="fa-solid fa-file-pdf text-[13px] text-[#E58E97]"></i> Export PDF
       </a>
       <button type="button" onclick="window.print()" class="px-3.5 py-2 rounded-xl bg-[#800020] hover:bg-[#990026] text-white text-[12.5px] font-semibold transition-all shadow-md flex items-center gap-1.5">
         <i class="fa-solid fa-print text-[11px]"></i> Print
@@ -410,16 +410,16 @@
                 <?php endif; ?>
 
                 <div class="pt-2 mt-1 border-t border-white/5 flex flex-col items-end gap-1.5 font-mono text-[11px]">
-                  <a href="<?= url('/admin/alumni/' . $m['alumni_profile_id'] . '/edit') ?>" class="text-amber-400 hover:text-amber-300 inline-flex items-center gap-1 font-semibold">
-                    <i class="fa-solid fa-user-pen text-[10px]"></i> Edit Profile
+                  <a href="<?= url('/admin/alumni/' . $m['alumni_profile_id'] . '/edit') ?>" class="text-white/70 hover:text-white inline-flex items-center gap-1 font-medium transition-colors">
+                    <i class="fa-solid fa-user-pen text-[10px] text-[#E58E97]"></i> Edit Profile
                   </a>
-                  <a href="<?= url('/admin/alumni/' . $m['alumni_profile_id'] . '/id-card') ?>" target="_blank" class="text-sky-400 hover:text-sky-300 inline-flex items-center gap-1">
-                    <i class="fa-solid fa-id-card text-[10px]"></i> Member Card
+                  <a href="<?= url('/admin/alumni/' . $m['alumni_profile_id'] . '/id-card') ?>" target="_blank" class="text-white/70 hover:text-white inline-flex items-center gap-1 transition-colors">
+                    <i class="fa-solid fa-id-card text-[10px] text-[#E58E97]"></i> Member Card
                   </a>
-                  <a href="<?= url('/admin/alumni/' . $m['alumni_profile_id'] . '/membership-card') ?>" target="_blank" class="text-emerald-400 hover:text-emerald-300 inline-flex items-center gap-1">
-                    <i class="fa-solid fa-qrcode text-[10px]"></i> Membership Card
+                  <a href="<?= url('/admin/alumni/' . $m['alumni_profile_id'] . '/membership-card') ?>" target="_blank" class="text-white/70 hover:text-white inline-flex items-center gap-1 transition-colors">
+                    <i class="fa-solid fa-qrcode text-[10px] text-[#E58E97]"></i> Membership Card
                   </a>
-                  <a href="<?= url('/admin/alumni/' . $m['alumni_profile_id']) ?>" class="text-white/40 hover:text-white inline-flex items-center gap-1">
+                  <a href="<?= url('/admin/alumni/' . $m['alumni_profile_id']) ?>" class="text-white/40 hover:text-white inline-flex items-center gap-1 transition-colors">
                     Full Profile <i class="fa-solid fa-arrow-up-right-from-square text-[8.5px]"></i>
                   </a>
                 </div>
@@ -442,8 +442,8 @@
       <div class="flex items-center gap-1.5">
         <?php if ($page > 1): ?>
         <a href="<?= url('/admin/membership/logs?' . http_build_query(array_merge($_GET, ['page' => $page - 1]))) ?>" 
-           class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-[12px] transition-all">
-          ← Prev
+           class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-[12px] transition-all flex items-center gap-1">
+          <i class="fa-solid fa-arrow-left text-[10px]"></i> Prev
         </a>
         <?php endif; ?>
 
@@ -456,8 +456,8 @@
 
         <?php if ($page < $totalPages): ?>
         <a href="<?= url('/admin/membership/logs?' . http_build_query(array_merge($_GET, ['page' => $page + 1]))) ?>" 
-           class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-[12px] transition-all">
-          Next →
+           class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-[12px] transition-all flex items-center gap-1">
+          Next <i class="fa-solid fa-arrow-right text-[10px]"></i>
         </a>
         <?php endif; ?>
       </div>

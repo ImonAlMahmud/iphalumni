@@ -53,8 +53,9 @@ $missingInfo = $_GET['missing_info'] ?? '';
 
     <!-- Missing Info Filter Button -->
     <a href="<?= url('/admin/students?' . http_build_query(array_merge($_GET, ['missing_info' => $missingInfo === '1' ? '' : '1', 'page' => 1]))) ?>" 
-       class="px-4 py-2 rounded-xl text-[13px] font-semibold transition-all flex items-center gap-1.5 <?= $missingInfo === '1' ? 'bg-amber-500 text-slate-950 font-bold shadow-lg shadow-amber-500/20 ring-2 ring-amber-400' : 'bg-amber-500/10 text-amber-300 border border-amber-500/30 hover:bg-amber-500/20' ?>">
-      ⚠️ <?= $missingInfo === '1' ? 'Showing Missing Info' : 'Filter Missing Info' ?>
+       class="px-4 py-2 rounded-xl text-[13px] font-semibold transition-all flex items-center gap-1.5 <?= $missingInfo === '1' ? 'bg-[#800020] text-white font-bold shadow-lg ring-2 ring-[#E58E97]' : 'bg-white/5 text-white/70 border border-white/10 hover:bg-white/10 hover:text-white' ?>">
+      <i class="fa-solid fa-triangle-exclamation text-[11px] <?= $missingInfo === '1' ? 'text-white' : 'text-[#E58E97]' ?>"></i>
+      <?= $missingInfo === '1' ? 'Showing Missing Info' : 'Filter Missing Info' ?>
     </a>
 
     <button type="submit" class="px-5 py-2 rounded-xl text-[13px] font-semibold text-white"
@@ -63,11 +64,11 @@ $missingInfo = $_GET['missing_info'] ?? '';
   </form>
 
   <div class="ml-auto flex items-center gap-2">
-    <a href="<?= url('/admin/students/export/csv?' . http_build_query($_GET)) ?>" class="px-3.5 py-2 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-300 border border-emerald-600/30 rounded-xl text-[12.5px] font-semibold transition-colors flex items-center gap-1.5">
-      📥 Export Excel
+    <a href="<?= url('/admin/students/export/csv?' . http_build_query($_GET)) ?>" class="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white border border-white/10 rounded-xl text-[12.5px] font-medium transition-colors flex items-center gap-1.5">
+      <i class="fa-solid fa-file-excel text-[#E58E97] text-[12px]"></i> Export Excel
     </a>
-    <a href="<?= url('/admin/students/export/print?' . http_build_query($_GET)) ?>" target="_blank" class="px-3.5 py-2 bg-blue-600/20 hover:bg-blue-600/40 text-blue-300 border border-blue-600/30 rounded-xl text-[12.5px] font-semibold transition-colors flex items-center gap-1.5">
-      📄 Export PDF
+    <a href="<?= url('/admin/students/export/print?' . http_build_query($_GET)) ?>" target="_blank" class="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white border border-white/10 rounded-xl text-[12.5px] font-medium transition-colors flex items-center gap-1.5">
+      <i class="fa-solid fa-file-pdf text-[#E58E97] text-[12px]"></i> Export PDF
     </a>
     <div class="text-[12.5px] text-white/40 ml-2">
       <?= number_format($pagination['total']) ?> total records
@@ -153,9 +154,9 @@ $missingInfo = $_GET['missing_info'] ?? '';
           <div class="flex items-center justify-end gap-2">
             <!-- Edit Button -->
             <button onclick="openEditModal(<?= htmlspecialchars(json_encode($s), ENT_QUOTES, 'UTF-8') ?>)"
-                    class="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 border border-amber-500/30 rounded-lg text-[12px] font-semibold transition-colors flex items-center gap-1"
+                    class="px-2.5 py-1 bg-white/10 hover:bg-white/20 text-white border border-white/10 rounded-lg text-[12px] font-medium transition-colors flex items-center gap-1"
                     title="Edit Record">
-              ✏️ Edit
+              <i class="fa-solid fa-pen text-[10px] text-[#E58E97]"></i> Edit
             </button>
             
             <!-- Delete Form -->
@@ -163,9 +164,9 @@ $missingInfo = $_GET['missing_info'] ?? '';
                   onsubmit="return confirm('Are you sure you want to delete <?= e(addslashes($s['name_english'])) ?> from the student reference database? This action cannot be undone.');">
               <?= csrf_field() ?>
               <button type="submit" 
-                      class="px-2.5 py-1 bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 border border-rose-500/30 rounded-lg text-[12px] font-semibold transition-colors flex items-center gap-1"
+                      class="px-2.5 py-1 bg-rose-950/40 hover:bg-rose-900 text-rose-300 border border-rose-800/40 rounded-lg text-[12px] font-medium transition-colors flex items-center gap-1"
                       title="Delete Record">
-                🗑️ Delete
+                <i class="fa-solid fa-trash-can text-[10px]"></i> Delete
               </button>
             </form>
           </div>
@@ -195,7 +196,7 @@ $missingInfo = $_GET['missing_info'] ?? '';
   <div class="bg-[#18191c] border border-white/10 rounded-2xl w-full max-w-xl p-6 shadow-2xl space-y-5">
     <div class="flex items-center justify-between border-b border-white/10 pb-4">
       <h3 class="text-[17px] font-bold text-white flex items-center gap-2">
-        ✏️ Edit Student Record (তথ্য ম্যানুয়ালি সংশোধন)
+        <i class="fa-solid fa-user-pen text-[#E58E97]"></i> Edit Student Record (তথ্য ম্যানুয়ালি সংশোধন)
       </h3>
       <button onclick="closeEditModal()" class="text-white/50 hover:text-white text-xl font-bold">&times;</button>
     </div>
