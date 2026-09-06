@@ -5,11 +5,11 @@
 $user = auth();
 $pdo = \App\Services\Database::connection();
 
-$stmt = $pdo->prepare("SELECT ap.*, u.avatar as user_avatar, m.status as member_status 
+$stmt = $pdo->prepare("SELECT ap.*, u.avatar as user_avatar, m.status as member_status, m.membership_number 
                        FROM alumni_profiles ap 
                        JOIN users u ON u.id = ap.user_id 
-                       LEFT JOIN memberships m ON m.alumni_profile_id = ap.id 
-                       WHERE ap.user_id = ? LIMIT 1");
+                       LEFT JOIN memberships m ON m.alumni_profile_id = ap.id AND m.deleted_at IS NULL
+                       WHERE ap.user_id = ? ORDER BY m.created_at DESC LIMIT 1");
 $stmt->execute([$user['id']]);
 $profile = $stmt->fetch();
 
@@ -35,7 +35,7 @@ if (!empty($lastEdu['degree'])) {
 }
 
 $rawId = !empty($profile['id']) ? $profile['id'] : $user['id'];
-$memberNo    = 'IPHAA-' . str_pad((string)$rawId, 5, '0', STR_PAD_LEFT);
+$memberNo = !empty($profile['membership_number']) ? $profile['membership_number'] : (!empty($membership['membership_number']) ? $membership['membership_number'] : ('IPHAA-' . str_pad((string)$rawId, 5, '0', STR_PAD_LEFT)));
 $degree      = !empty($latestDegree) ? $latestDegree : (!empty($profile['degree']) ? $profile['degree'] : ($refData['department'] ?? 'Public Health Graduate'));
 $batch       = !empty($refData['batch']) ? $refData['batch'] : (!empty($refData['session']) ? $refData['session'] : (!empty($profile['batch_year']) ? $profile['batch_year'] : 'N/A'));
 $phone       = !empty($profile['phone']) ? $profile['phone'] : ($refData['mobile'] ?? 'N/A');

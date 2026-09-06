@@ -5,7 +5,7 @@
  */
 
 $rawId = !empty($profile['id']) ? $profile['id'] : ($profile['user_id'] ?? 1);
-$memberNo = 'IPHAA-' . str_pad((string)$rawId, 5, '0', STR_PAD_LEFT);
+$memberNo = !empty($membership['membership_number']) ? $membership['membership_number'] : ('IPHAA-' . str_pad((string)$rawId, 5, '0', STR_PAD_LEFT));
 
 $latestDegree = '';
 if (!empty($lastEdu->degree)) {
