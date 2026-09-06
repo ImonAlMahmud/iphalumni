@@ -42,12 +42,16 @@ try {
     $zip = [System.IO.Compression.ZipFile]::Open($tempZip, [System.IO.Compression.ZipArchiveMode]::Create)
 
     $includeFolders = @(
-        "app", "bootstrap", "config", "database", "public", "resources", "routes",
-        "public\videos", "storage\app\public",
-        "storage\avatars", "storage\app\public\avatars",
-        "storage\gallery", "storage\app\public\gallery",
-        "storage\stories", "storage\app\public\stories"
+        "app", "bootstrap", "config", "database", "public", "resources", "routes"
     )
+    if ($IncludeStorage) {
+        $includeFolders += @(
+            "storage\app\public",
+            "storage\avatars", "storage\app\public\avatars",
+            "storage\gallery", "storage\app\public\gallery",
+            "storage\stories", "storage\app\public\stories"
+        )
+    }
     if ($IncludeVendor) {
         $includeFolders += "vendor"
     }
@@ -57,14 +61,14 @@ try {
         if (Test-Path $folderPath) {
             Get-ChildItem -Path $folderPath -Recurse -File | ForEach-Object {
                 $relPath = $_.FullName.Substring($projectRoot.Length + 1).Replace('\', '/')
-                if (-not ($relPath.StartsWith("storage/logs") -or $relPath.StartsWith("storage/framework"))) {
+                if (-not ($relPath.StartsWith("storage/logs") -or $relPath.StartsWith("storage/framework") -or $relPath.StartsWith("public/videos"))) {
                     [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $_.FullName, $relPath, [System.IO.Compression.CompressionLevel]::Optimal) | Out-Null
                 }
             }
         }
     }
 
-    $includeFiles = @("composer.json", "composer.lock", "package.json", "artisan", "iph_alumni_database_fixed.sql")
+    $includeFiles = @("composer.json", "composer.lock", "package.json", "artisan")
     foreach ($file in $includeFiles) {
         $filePath = Join-Path $projectRoot $file
         if (Test-Path $filePath) {
@@ -85,7 +89,25 @@ try {
 
     $requestUrl = "$Url`?secret=$Secret"
     
-    $webClient = New-Object System.Net.WebClient
+    # Custom WebClient with 10-minute timeout
+    try {
+        Add-Type -TypeDefinition @"
+        using System.Net;
+        public class TimeoutWebClient : WebClient {
+            public int CustomTimeout { get; set; }
+            public TimeoutWebClient() { this.CustomTimeout = 600000; }
+            protected override WebRequest GetWebRequest(System.Uri address) {
+                WebRequest w = base.GetWebRequest(address);
+                if (w != null) { w.Timeout = this.CustomTimeout; }
+                return w;
+            }
+        }
+"@ -ErrorAction SilentlyContinue
+        $webClient = New-Object TimeoutWebClient
+    } catch {
+        $webClient = New-Object System.Net.WebClient
+    }
+
     $webClient.Headers.Add("X-Deploy-Token", $Secret)
     $webClient.Headers.Add("Content-Type", "application/octet-stream")
 
