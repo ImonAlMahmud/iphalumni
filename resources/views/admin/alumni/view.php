@@ -6,7 +6,7 @@
 ?>
 <div class="mb-6 flex items-center justify-between">
   <a href="<?= url('/admin/alumni') ?>" class="text-[13px] text-white/60 hover:text-white inline-flex items-center gap-1.5 transition-colors">
-    ← Back to Alumni List
+    <i class="fa-solid fa-arrow-left mr-1"></i> Back to Alumni List
   </a>
 
   <div class="flex items-center gap-2 flex-wrap">
@@ -24,11 +24,11 @@
     </a>
     <?php if (!empty($alumni['phone'])): ?>
     <a href="tel:<?= e($alumni['phone']) ?>" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-white text-[12px] border border-white/10 font-semibold flex items-center gap-1.5 transition-colors">
-      📞 Call
+      <i class="fa-solid fa-phone text-[11px] mr-1"></i> Call
     </a>
     <?php endif; ?>
     <a href="mailto:<?= e($alumni['email']) ?>" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-white text-[12px] border border-white/10 font-semibold flex items-center gap-1.5 transition-colors">
-      ✉ Email
+      <i class="fa-solid fa-envelope text-[11px] mr-1"></i> Email
     </a>
   </div>
 </div>
@@ -59,13 +59,13 @@
           </div>
 
           <div class="text-[13.5px] text-white/60 mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
-            <span>✉ <?= e($alumni['email']) ?></span>
+            <span><i class="fa-solid fa-envelope mr-1 text-white/50"></i> <?= e($alumni['email']) ?></span>
             <?php if (!empty($alumni['secondary_email'])): ?>
             <span class="text-white/40 font-mono text-[12px]">|</span>
-            <span title="Secondary Email">✉ <?= e($alumni['secondary_email']) ?> <span class="text-[11px] text-amber-300/80 font-mono">(Secondary)</span></span>
+            <span title="Secondary Email"><i class="fa-solid fa-envelope-open mr-1 text-white/50"></i> <?= e($alumni['secondary_email']) ?> <span class="text-[11px] text-amber-300/80 font-mono">(Secondary)</span></span>
             <?php endif; ?>
             <?php if (!empty($alumni['phone'])): ?>
-            <span>📞 <?= e($alumni['phone']) ?></span>
+            <span><i class="fa-solid fa-phone mr-1 text-white/50"></i> <?= e($alumni['phone']) ?></span>
             <?php endif; ?>
           </div>
 
@@ -91,7 +91,7 @@
     <!-- Card 2: Detailed Personal & Contact Information -->
     <div class="p-6 rounded-3xl space-y-4" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
       <h3 class="text-[15px] font-semibold text-[#E58E97] font-serif flex items-center gap-2 pb-3 border-b border-white/5">
-        👤 Personal & Contact Details (ব্যক্তিগত ও যোগাযোগের তথ্য)
+        <i class="fa-solid fa-user text-[#E58E97]"></i> Personal & Contact Details (ব্যক্তিগত ও যোগাযোগের তথ্য)
       </h3>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-[13px]">
@@ -134,17 +134,17 @@
       <div class="pt-3 border-t border-white/5 flex flex-wrap gap-3">
         <?php if (!empty($alumni['website'])): ?>
         <a href="<?= e($alumni['website']) ?>" target="_blank" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-blue-300 text-[12px] flex items-center gap-1.5">
-          🌐 Website
+          <i class="fa-solid fa-globe mr-1"></i> Website
         </a>
         <?php endif; ?>
         <?php if (!empty($alumni['linkedin_url'])): ?>
         <a href="<?= e($alumni['linkedin_url']) ?>" target="_blank" class="px-3 py-1.5 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 text-[12px] flex items-center gap-1.5 border border-blue-500/20">
-          🔗 LinkedIn Profile
+          <i class="fa-brands fa-linkedin mr-1"></i> LinkedIn Profile
         </a>
         <?php endif; ?>
         <?php if (!empty($alumni['facebook_url'])): ?>
         <a href="<?= e($alumni['facebook_url']) ?>" target="_blank" class="px-3 py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 text-[12px] flex items-center gap-1.5 border border-indigo-500/20">
-          📘 Facebook Profile
+          <i class="fa-brands fa-facebook mr-1"></i> Facebook Profile
         </a>
         <?php endif; ?>
       </div>
@@ -155,7 +155,7 @@
     <?php if (!empty($alumni['spouse_name']) || !empty($alumni['children_info'])): ?>
     <div class="p-6 rounded-3xl space-y-4" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
       <h3 class="text-[15px] font-semibold text-[#E58E97] font-serif flex items-center gap-2 pb-3 border-b border-white/5">
-        👨‍👩‍👧‍👦 Family Details (পারিবারিক তথ্য)
+        <i class="fa-solid fa-people-roof text-[#E58E97]"></i> Family Details (পারিবারিক তথ্য)
       </h3>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-[13px]">
         <?php if (!empty($alumni['spouse_name'])): ?>
@@ -177,7 +177,7 @@
     <!-- Card 4: Academic Background (Education) -->
     <div class="p-6 rounded-3xl space-y-4" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
       <h3 class="text-[15px] font-semibold text-[#E58E97] font-serif flex items-center gap-2 pb-3 border-b border-white/5">
-        🎓 Academic Background (শিক্ষাগত যোগ্যতা)
+        <i class="fa-solid fa-graduation-cap text-[#E58E97]"></i> Academic Background (শিক্ষাগত যোগ্যতা)
       </h3>
       <?php if (empty($education)): ?>
         <p class="text-[13px] text-white/40 italic">No academic history records added yet.</p>
@@ -199,7 +199,7 @@
     <!-- Card 5: Employment & Professional Experience -->
     <div class="p-6 rounded-3xl space-y-4" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
       <h3 class="text-[15px] font-semibold text-[#E58E97] font-serif flex items-center gap-2 pb-3 border-b border-white/5">
-        💼 Professional Experience (কর্মসংস্থান তথ্য)
+        <i class="fa-solid fa-briefcase text-[#E58E97]"></i> Professional Experience (কর্মসংস্থান তথ্য)
       </h3>
       <?php if (empty($employment)): ?>
         <p class="text-[13px] text-white/40 italic">No professional experience records added yet.</p>
@@ -229,12 +229,12 @@
     <?php if (!empty($alumni['proof_document'])): ?>
     <div class="p-6 rounded-3xl space-y-3" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
       <h3 class="text-[15px] font-semibold text-[#E58E97] font-serif flex items-center gap-2 pb-2 border-b border-white/5">
-        📄 Verification Document (ভেরিফিকেশন নথি)
+        <i class="fa-solid fa-file-shield text-[#E58E97]"></i> Verification Document (ভেরিফিকেশন নথি)
       </h3>
       <p class="text-[12.5px] text-white/60">Uploaded certificate or proof of studentship document submitted during registration.</p>
       <a href="<?= asset('storage/documents/' . e($alumni['proof_document'])) ?>" target="_blank"
          class="px-5 py-2.5 bg-blue-600/20 hover:bg-blue-600/40 text-blue-300 border border-blue-600/30 rounded-xl text-[13px] font-semibold inline-flex items-center gap-2 transition-colors">
-        📄 Download / Open Uploaded Document
+        <i class="fa-solid fa-file-arrow-down mr-1.5"></i> Download / Open Uploaded Document
       </a>
     </div>
     <?php endif; ?>
@@ -253,7 +253,7 @@
           <?= csrf_field() ?>
           <button type="submit" onclick="return confirm('Are you sure you want to approve this alumni profile?');"
                   class="w-full py-3 rounded-xl text-[13.5px] font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2">
-            ✓ Approve Profile & Activate Account
+            <i class="fa-solid fa-circle-check mr-1.5"></i> Approve Profile & Activate Account
           </button>
         </form>
 
@@ -264,7 +264,7 @@
                     style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);"></textarea>
           <button type="submit" onclick="return confirm('Are you sure you want to reject this alumni profile?');"
                   class="w-full py-3 rounded-xl text-[13.5px] font-semibold bg-rose-600 hover:bg-rose-700 text-white transition-colors shadow-lg shadow-rose-600/20 flex items-center justify-center gap-2">
-            ✕ Reject Profile
+            <i class="fa-solid fa-circle-xmark mr-1.5"></i> Reject Profile
           </button>
         </form>
       </div>
@@ -279,12 +279,16 @@
     <div class="p-6 rounded-3xl space-y-4" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
       <div class="flex items-center justify-between pb-3 border-b border-white/5">
         <h3 class="text-[15px] font-semibold text-white font-serif flex items-center gap-2">
-          ✍️ Digital Signature (স্বাক্ষর)
+          <i class="fa-solid fa-file-signature text-[#E58E97]"></i> Digital Signature (স্বাক্ষর)
         </h3>
         <?php if (!empty($alumni['signature_image'])): ?>
-          <span class="px-2 py-0.5 rounded text-[10.5px] font-mono font-semibold bg-emerald-500/20 text-emerald-300">✓ Uploaded</span>
+          <span class="px-2 py-0.5 rounded text-[10.5px] font-mono font-semibold bg-emerald-500/20 text-emerald-300">
+            <i class="fa-solid fa-circle-check text-[10px] mr-1"></i> Uploaded
+          </span>
         <?php else: ?>
-          <span class="px-2 py-0.5 rounded text-[10.5px] font-mono font-semibold bg-amber-500/20 text-amber-300">⚠️ Missing</span>
+          <span class="px-2 py-0.5 rounded text-[10.5px] font-mono font-semibold bg-amber-500/20 text-amber-300">
+            <i class="fa-solid fa-triangle-exclamation text-[10px] mr-1"></i> Missing
+          </span>
         <?php endif; ?>
       </div>
 
@@ -299,7 +303,9 @@
           </span>
           <form method="POST" action="<?= url('/admin/alumni/' . $alumni['id'] . '/delete-signature') ?>" onsubmit="return confirm('আপনি কি নিশ্চিত যে এই স্বাক্ষর মুছে ফেলতে চান?');" class="inline">
             <?= csrf_field() ?>
-            <button type="submit" class="text-rose-400 hover:text-rose-300 underline font-medium">মুছে ফেলুন</button>
+            <button type="submit" class="text-rose-400 hover:text-rose-300 underline font-medium inline-flex items-center gap-1">
+              <i class="fa-solid fa-trash-can text-[10px]"></i> মুছে ফেলুন
+            </button>
           </form>
         </div>
 
@@ -309,12 +315,12 @@
           <input type="file" name="signature" accept="image/png,image/jpeg,image/webp" required
                  class="block w-full text-[12px] text-white/70 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[11.5px] file:font-semibold file:bg-emerald-600/30 file:text-emerald-200 hover:file:bg-emerald-600/50 cursor-pointer">
           <button type="submit" class="w-full py-2 bg-emerald-600/90 hover:bg-emerald-600 text-white rounded-xl text-[12.5px] font-semibold transition-colors flex items-center justify-center gap-1.5 shadow-md">
-            📤 স্বাক্ষর প্রতিস্থাপন করুন
+            <i class="fa-solid fa-arrow-up-from-bracket mr-1"></i> স্বাক্ষর প্রতিস্থাপন করুন
           </button>
         </form>
       <?php else: ?>
         <div class="p-4 rounded-2xl bg-white/[0.02] border border-dashed border-white/15 text-center py-5">
-          <div class="text-2xl mb-1 text-white/30">✍️</div>
+          <i class="fa-solid fa-signature text-3xl text-white/20 block mb-1"></i>
           <p class="text-[12.5px] text-white/40">কোনো ডিজিটাল স্বাক্ষর আপলোড করা নেই।</p>
         </div>
 
@@ -325,7 +331,7 @@
                  class="block w-full text-[12px] text-white/70 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[11.5px] file:font-semibold file:bg-emerald-600/30 file:text-emerald-200 hover:file:bg-emerald-600/50 cursor-pointer">
           <p class="text-[11px] text-white/40">স্বচ্ছ ব্যাকগ্রাউন্ড (PNG) সুপারিশকৃত, সর্বোচ্চ ২MB।</p>
           <button type="submit" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[12.5px] font-semibold transition-colors flex items-center justify-center gap-1.5 shadow-md">
-            📤 স্বাক্ষর আপলোড করুন
+            <i class="fa-solid fa-arrow-up-from-bracket mr-1"></i> স্বাক্ষর আপলোড করুন
           </button>
         </form>
       <?php endif; ?>
@@ -334,7 +340,9 @@
     <!-- Audit & History Trail -->
     <?php if (!empty($approvalHistory)): ?>
     <div class="p-6 rounded-3xl space-y-3" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
-      <h3 class="text-[14px] font-semibold text-white font-serif border-b border-white/5 pb-2">Approval Log History</h3>
+      <h3 class="text-[14px] font-semibold text-white font-serif border-b border-white/5 pb-2 flex items-center gap-1.5">
+        <i class="fa-solid fa-clock-rotate-left text-white/60"></i> Approval Log History
+      </h3>
       <div class="space-y-2.5 text-[12px]">
         <?php foreach ($approvalHistory as $log): ?>
         <div class="p-3 rounded-xl bg-white/[0.02] border border-white/5">

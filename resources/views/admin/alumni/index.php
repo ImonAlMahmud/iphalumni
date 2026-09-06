@@ -87,8 +87,9 @@
         <td class="px-5 py-3.5">
           <form method="POST" action="<?= url('/admin/alumni/' . $a['id'] . '/toggle-featured') ?>" class="inline">
             <?= csrf_field() ?>
-            <button type="submit" class="px-2.5 py-1 rounded text-[11px] font-semibold uppercase transition-all shadow-sm <?= !empty($a['is_featured']) ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30' : 'bg-white/5 text-white/40 border border-white/10 hover:bg-white/10 hover:text-white' ?>" title="হোমপেজে Featured হিসেবে দেখাতে ক্লিক করুন">
-              <?= !empty($a['is_featured']) ? '★ Featured' : '☆ Feature' ?>
+            <button type="submit" class="px-2.5 py-1 rounded text-[11px] font-semibold uppercase transition-all shadow-sm flex items-center gap-1 <?= !empty($a['is_featured']) ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30' : 'bg-white/5 text-white/40 border border-white/10 hover:bg-white/10 hover:text-white' ?>" title="হোমপেজে Featured হিসেবে দেখাতে ক্লিক করুন">
+              <i class="<?= !empty($a['is_featured']) ? 'fa-solid fa-star text-amber-300' : 'fa-regular fa-star' ?> text-[10px]"></i>
+              <?= !empty($a['is_featured']) ? 'Featured' : 'Feature' ?>
             </button>
           </form>
         </td>
@@ -98,7 +99,7 @@
         <td class="px-5 py-3.5">
           <div class="flex items-center gap-1.5">
             <a href="<?= url('/admin/alumni/' . $a['id']) ?>" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[12px] font-medium transition-colors bg-white/5 hover:bg-white/10 text-white/80 border border-white/10" title="View Full Profile">
-              View
+              <i class="fa-solid fa-eye text-[10px]"></i> View
             </a>
             <a href="<?= url('/admin/alumni/' . $a['id'] . '/edit') ?>" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[12px] font-medium transition-colors bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30" title="Edit Member Profile">
               <i class="fa-solid fa-user-pen text-[10px]"></i> Edit

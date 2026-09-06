@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title><?= e($reportTitle) ?></title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
   body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; color: #111; margin: 0; padding: 20px; }
   .header { text-align: center; border-bottom: 2px solid #800020; padding-bottom: 12px; margin-bottom: 15px; }
@@ -36,9 +37,11 @@
 <body>
 
 <div class="no-print" style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
-  <a href="javascript:window.close()" onclick="window.history.back()" style="color: #666; text-decoration: none; font-size: 12px;">← Back to Admin Panel</a>
-  <button onclick="window.print()" style="background: #800020; color: white; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.15);">
-    🖨️ Print / Save as PDF
+  <a href="javascript:window.close()" onclick="window.history.back()" style="color: #666; text-decoration: none; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
+    <i class="fa-solid fa-arrow-left"></i> Back to Admin Panel
+  </a>
+  <button onclick="window.print()" style="background: #800020; color: white; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.15); display: inline-flex; align-items: center; gap: 6px;">
+    <i class="fa-solid fa-print"></i> Print / Save as PDF
   </button>
 </div>
 

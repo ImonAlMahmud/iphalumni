@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Official Notice - <?= e($n['title']) ?></title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
   @import url('https://fonts.maateen.me/kalpurush/font.css');
   @page {
@@ -138,7 +139,7 @@
     break-inside: avoid;
   }
 
-  /* 1. Official Seal (আগে সিল আসবে - আকারে বড়) */
+  /* 1. Official Seal (আগে সিল আসবে - বড় ও স্পষ্ট) */
   .seal-section {
     display: flex;
     margin-bottom: 8px;
@@ -324,8 +325,8 @@
 <body onload="if(window.location.search.includes('autoprint=1')) window.print();">
 
 <div class="no-print" style="margin: 15px auto; max-width: 840px; text-align: right;">
-  <button onclick="window.print()" style="background: #800020; color: white; border: none; padding: 10px 22px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px;">
-    🖨️ Print Official Notice / Save PDF
+  <button onclick="window.print()" style="background: #800020; color: white; border: none; padding: 10px 22px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; display: inline-flex; align-items: center; gap: 8px;">
+    <i class="fa-solid fa-print"></i> Print Official Notice / Save PDF
   </button>
 </div>
 
@@ -407,8 +408,8 @@
 
     <!-- 3. Pad Footer Bar -->
     <div class="pad-footer">
-      <span>📞 Phone: <?= e(!empty($siteSettings['site_phone']) ? $siteSettings['site_phone'] : ($siteSettings['contact_phone'] ?? '+880 1811-332204')) ?></span> | 
-      <span>✉️ Email: <?= e(!empty($siteSettings['site_email']) ? $siteSettings['site_email'] : ($siteSettings['contact_email'] ?? 'info@iphalumni.org')) ?></span> | 
+      <span><i class="fa-solid fa-phone text-[10.5px] mr-1"></i> Phone: <?= e(!empty($siteSettings['site_phone']) ? $siteSettings['site_phone'] : ($siteSettings['contact_phone'] ?? '+880 1811-332204')) ?></span> | 
+      <span><i class="fa-solid fa-envelope text-[10.5px] mr-1"></i> Email: <?= e(!empty($siteSettings['site_email']) ? $siteSettings['site_email'] : ($siteSettings['contact_email'] ?? 'info@iphalumni.org')) ?></span> | 
       <?php
         $appUrl = env('APP_URL', 'http://localhost/alumni/public');
         $parsedHost = parse_url($appUrl, PHP_URL_HOST);
@@ -418,8 +419,8 @@
             $displayWeb = (parse_url($appUrl, PHP_URL_SCHEME) ?? 'https') . '://' . $parsedHost;
         }
       ?>
-      <span>🌐 Website: <?= e($displayWeb) ?></span>
-      <div style="font-size: 10.5px; color: #888; margin-top: 3px;">This is an official computer-generated document verified via embedded QR Security Code.</div>
+      <span><i class="fa-solid fa-globe text-[10.5px] mr-1"></i> Website: <?= e($displayWeb) ?></span>
+      <div style="font-size: 10px; color: #888; margin-top: 3px;">This is an official computer-generated document verified via embedded QR Security Code.</div>
     </div>
   </div>
 
