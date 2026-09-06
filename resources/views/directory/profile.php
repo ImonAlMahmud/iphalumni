@@ -272,7 +272,11 @@ $isLoggedIn = auth() !== null;
           <?php if (!empty($alumni['experience_years'])): ?>
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
             <span class="text-[11px] font-mono text-gray-400 uppercase block mb-1">TOTAL EXPERIENCE</span>
-            <span class="font-bold text-[#800020] text-[15px] font-mono"><?= e($alumni['experience_years']) ?></span>
+            <?php 
+              $expVal = trim((string)$alumni['experience_years']);
+              $expDisplay = preg_match('/year/i', $expVal) ? $expVal : ($expVal . ' Years');
+            ?>
+            <span class="font-bold text-[#800020] text-[15px] font-mono"><?= e($expDisplay) ?></span>
           </div>
           <?php endif; ?>
 

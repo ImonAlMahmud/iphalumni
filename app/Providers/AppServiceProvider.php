@@ -63,6 +63,13 @@ class AppServiceProvider extends ServiceProvider
                           OR (e1.id > e2.id AND COALESCE(e1.graduation_year, '') = COALESCE(e2.graduation_year, ''))
                       )
                 ");
+
+                \Illuminate\Support\Facades\DB::table('alumni_education')
+                    ->where('degree', 'like', '%Biotechnology%')
+                    ->where(function ($q) {
+                        $q->whereNull('graduation_year')->orWhere('graduation_year', '');
+                    })
+                    ->update(['graduation_year' => '2021']);
             }
         } catch (\Throwable $e) {
             // Fail silently if DB connection is not established during initial setup
