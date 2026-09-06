@@ -202,6 +202,7 @@ Route::prefix('/admin')->middleware('auth.admin')->name('admin.')->group(functio
     Route::get('/alumni/export/cards-svg', [AdminAlumni::class, 'exportCardsSvg'])->name('alumni.export_cards_svg');
     Route::get('/alumni/{id}/card-svg/{side}', [AdminAlumni::class, 'downloadSingleCardSvg'])->name('alumni.card_svg');
     Route::get('/alumni/mapping', [AdminAlumni::class, 'mapping'])->name('alumni.mapping');
+    Route::get('/alumni/search-students', [AdminAlumni::class, 'searchStudents'])->name('alumni.search_students');
     Route::post('/alumni/map-student', [AdminAlumni::class, 'mapStudent'])->name('alumni.map_student');
     Route::get('/alumni/contact-requests', [AdminAlumni::class, 'contactRequests'])->name('alumni.contact_requests');
     Route::get('/alumni/{id}', [AdminAlumni::class, 'show'])->name('alumni.show');

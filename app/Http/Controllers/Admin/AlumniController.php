@@ -277,7 +277,25 @@ class AlumniController extends BaseController
             'ap.*', 'u.name', 'u.email', 'sr.roll as ref_roll', 'sr.name_english as ref_name_en', 'sr.name_bangla as ref_name_bn', 'sr.batch as ref_batch', 'sr.mobile as ref_mobile'
         )->orderBy('ap.student_reference_id', 'asc')->orderBy('ap.id', 'desc')->get()->map(fn($r) => (array)$r)->toArray();
 
-        $unmappedStudents = DB::table('students_reference')->select('id', 'roll', 'name_english', 'name_bangla', 'batch', 'session')->orderBy('name_english', 'asc')->limit(300)->get()->map(fn($r) => (array)$r)->toArray();
+        $mappedRefIds = DB::table('alumni_profiles')->whereNotNull('student_reference_id')->pluck('student_reference_id')->toArray();
+
+        $unmappedStudentsQuery = DB::table('students_reference')
+            ->select('id', 'roll', 'name_english', 'name_bangla', 'batch', 'session', 'mobile');
+
+        if (!empty($mappedRefIds)) {
+            $unmappedStudentsQuery->whereNotIn('id', $mappedRefIds);
+        }
+
+        $unmappedStudents = $unmappedStudentsQuery
+            ->orderByRaw("
+                CASE WHEN batch LIKE 'L-%' THEN 1 WHEN batch LIKE 'F-%' THEN 2 ELSE 3 END ASC,
+                CAST(SUBSTRING(batch, 3) AS UNSIGNED) ASC,
+                roll ASC
+            ")
+            ->limit(50)
+            ->get()
+            ->map(fn($r) => (array)$r)
+            ->toArray();
 
         return $this->legacyView(
             'admin/alumni/mapping',
@@ -285,6 +303,44 @@ class AlumniController extends BaseController
             'admin',
             'Alumni Student Reference Mapping'
         );
+    }
+
+    public function searchStudents(Request $request)
+    {
+        $q = trim((string)$request->input('q', ''));
+        $mappedRefIds = DB::table('alumni_profiles')
+            ->whereNotNull('student_reference_id')
+            ->pluck('student_reference_id')
+            ->toArray();
+
+        $query = DB::table('students_reference');
+
+        if (!empty($mappedRefIds)) {
+            $query->whereNotIn('id', $mappedRefIds);
+        }
+
+        if ($q !== '') {
+            $query->where(function ($sub) use ($q) {
+                $sub->where('roll', 'like', "{$q}%")
+                    ->orWhere('name_english', 'like', "%{$q}%")
+                    ->orWhere('name_bangla', 'like', "%{$q}%")
+                    ->orWhere('batch', 'like', "%{$q}%")
+                    ->orWhere('mobile', 'like', "%{$q}%")
+                    ->orWhere('session', 'like', "%{$q}%");
+            });
+        }
+
+        $results = $query->select('id', 'roll', 'name_english', 'name_bangla', 'batch', 'session', 'mobile')
+            ->orderByRaw("CASE WHEN roll = ? THEN 1 WHEN roll LIKE ? THEN 2 ELSE 3 END", [$q, "{$q}%"])
+            ->orderByRaw("
+                CASE WHEN batch LIKE 'L-%' THEN 1 WHEN batch LIKE 'F-%' THEN 2 ELSE 3 END ASC,
+                CAST(SUBSTRING(batch, 3) AS UNSIGNED) ASC,
+                roll ASC
+            ")
+            ->limit(40)
+            ->get();
+
+        return response()->json($results);
     }
 
     public function mapStudent(Request $request)
@@ -299,15 +355,19 @@ class AlumniController extends BaseController
 
         $studentRef = DB::table('students_reference')->where('id', $studentRefId)->first();
         if ($studentRef) {
-            DB::table('alumni_profiles')->where('id', $profileId)->update([
+            $updates = [
                 'student_reference_id' => $studentRef->id,
                 'student_id'           => DB::raw("COALESCE(NULLIF(student_id, ''), " . DB::getPdo()->quote((string)$studentRef->roll) . ")"),
-                'phone'                => DB::raw("COALESCE(NULLIF(phone, ''), " . DB::getPdo()->quote((string)$studentRef->mobile) . ")"),
-                'gender'               => DB::raw("COALESCE(NULLIF(gender, ''), " . DB::getPdo()->quote((string)$studentRef->gender) . ")"),
-                'current_location'     => DB::raw("COALESCE(NULLIF(current_location, ''), " . DB::getPdo()->quote((string)$studentRef->district) . ")"),
+                'phone'                => DB::raw("COALESCE(NULLIF(phone, ''), " . DB::getPdo()->quote((string)($studentRef->mobile ?? '')) . ")"),
                 'status'               => 'verified',
                 'updated_at'           => now(),
-            ]);
+            ];
+
+            if (!empty($studentRef->batch)) {
+                $updates['batch_year'] = DB::raw("COALESCE(NULLIF(batch_year, ''), " . DB::getPdo()->quote((string)$studentRef->batch) . ")");
+            }
+
+            DB::table('alumni_profiles')->where('id', $profileId)->update($updates);
 
             $uId = DB::table('alumni_profiles')->where('id', $profileId)->value('user_id');
             if ($uId) {
