@@ -182,11 +182,13 @@ $fullPresentLocation = !empty($presentParts) ? implode(', ', $presentParts) : 'M
         </div>
 
         <!-- Alumni Info Grid -->
-        <div class="min-w-0 flex-1 space-y-1">
-          <h3 class="font-bold text-[16px] text-white truncate leading-tight"><?= e($profile['name']) ?></h3>
-          <div class="text-[11px] font-semibold text-rose-200 truncate"><?= e($degree) ?></div>
+        <div class="min-w-0 flex-1 space-y-0.5">
+          <h3 class="font-bold text-[15.5px] text-white truncate leading-tight"><?= e($profile['name']) ?></h3>
+          <div class="text-[10px] sm:text-[10.5px] font-semibold text-rose-200 leading-[1.25] line-clamp-2" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;" title="<?= e($degree) ?>">
+            <?= e($degree) ?>
+          </div>
           
-          <div class="grid grid-cols-2 gap-x-2 gap-y-0.5 font-mono text-[10px] text-slate-300 pt-1">
+          <div class="grid grid-cols-2 gap-x-2 gap-y-0.5 font-mono text-[9.5px] text-slate-300 pt-0.5">
             <div><span class="text-slate-400">ID NO:</span> <span class="text-white font-bold"><?= e($memberNo) ?></span></div>
             <div><span class="text-slate-400">BATCH:</span> <span class="text-amber-300 font-bold"><?= e($batch) ?></span></div>
             <div class="col-span-2 truncate"><span class="text-slate-400">EMAIL:</span> <?= e($profile['email']) ?></div>

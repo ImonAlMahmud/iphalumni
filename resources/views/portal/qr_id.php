@@ -251,7 +251,7 @@ $validity  = !empty($membership['end_date']) ? date('d M Y', strtotime($membersh
 
         <div>
           <span class="text-[9.5px] uppercase tracking-wider text-white/40 block">DEGREE / DEPARTMENT</span>
-          <span class="text-white/80 text-[12px] truncate block font-sans font-medium" title="<?= e($degree) ?>">
+          <span class="text-white/90 text-[11.5px] block font-sans font-medium leading-[1.3] line-clamp-2" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;" title="<?= e($degree) ?>">
             <?= e($degree) ?>
           </span>
         </div>
