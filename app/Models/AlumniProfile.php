@@ -174,6 +174,7 @@ class AlumniProfile extends Model
     {
         $rows = DB::table('alumni_education')
             ->where('alumni_profile_id', $profileId)
+            ->orderByRaw("CASE WHEN graduation_year IS NOT NULL AND graduation_year != '' THEN 0 ELSE 1 END ASC")
             ->orderBy('is_primary', 'DESC')
             ->orderBy('graduation_year', 'DESC')
             ->orderBy('id', 'ASC')
